@@ -38,28 +38,70 @@ fn add_vectors(vec1: [Num<i32, 8>; 3], vec2: [Num<i32, 8>; 3]) -> [Num<i32, 8>; 
     return result;
 }
 
+fn draw_line(
+    bitmap: &mut agb::display::bitmap4::Bitmap4,
+    mut x1: i32,
+    mut y1: i32,
+    x2: i32,
+    y2: i32,
+    color: u8,
+) {
+    let dx: i32 = (x2 - x1).abs();
+    let dy: i32 = (y2 - y1).abs();
 
+    let mut sx: i32;
+    let mut sy: i32;
+
+    if (x1 < x2) {
+        sx = 1
+    } else {
+        sx = -1
+    }
+    if (y1 < y2) {
+        sy = 1
+    } else {
+        sy = -1;
+    }
+
+    let mut err: i32 = dx - dy;
+
+    while (true) {
+        bitmap.draw_point(x1, y1, color);
+        if (x1 == x2 && y1 == y2) {
+            break;
+        }
+
+        let e2: i32 = 2 * err;
+        if (e2 > -dy) {
+            err -= dy;
+            x1 += sx
+        }
+        if (e2 < dx) {
+            err += dx;
+            y1 += sy;
+        }
+    }
+}
 
 // The main function must take 1 arguments and never return. The agb::entry decorator
 // ensures that everything is in order. `agb` will call this after setting up the stack
 // and interrupt handlers correctly. It will also handle creating the `Gba` struct for you.
 #[agb::entry]
 fn main(mut gba: agb::Gba) -> ! {
-    let mut bitmap4 = gba.display.video.bitmap4();
+    let mut bitmap4: agb::display::bitmap4::Bitmap4 = gba.display.video.bitmap4();
 
     // Set a palette entry 1
     bitmap4.set_palette_entry(1, 0x001F);
 
-
     let points: [[Num<i32, 8>; 3]; 8] = [
-        [Num::new(-1), Num::new(-1), Num::new(1)], 
-        [Num::new(1), Num::new(-1), Num::new(1)],
         [Num::new(1), Num::new(1), Num::new(1)],
         [Num::new(-1), Num::new(1), Num::new(1)],
-        [Num::new(-1), Num::new(-1), Num::new(-1)],
+        [Num::new(-1), Num::new(-1), Num::new(1)],
+        [Num::new(1), Num::new(-1), Num::new(1)],
         [Num::new(1), Num::new(-1), Num::new(-1)],
         [Num::new(1), Num::new(1), Num::new(-1)],
         [Num::new(-1), Num::new(1), Num::new(-1)],
+        [Num::new(-1), Num::new(-1), Num::new(-1)],
     ];
 
     //constants
@@ -67,13 +109,11 @@ fn main(mut gba: agb::Gba) -> ! {
     let height = 160;
     let mut scale: Num<i32, 8> = Num::new(20); //100;
     let middle: [Num<i32, 8>; 2] = [Num::new(width / 2), Num::new(height / 2)]; // x, y
-    let mut angle:  Num<i32, 8> = Num::new(0);
+    let mut angle: Num<i32, 8> = Num::new(0);
     let increment: Num<i32, 8> = Num::new(1) / 256;
 
     let translation_z: Num<i32, 8> = Num::new(3);
     let translation_x: Num<i32, 8> = Num::new(0);
-
-
 
     loop {
         bitmap4.clear(0);
@@ -86,22 +126,20 @@ fn main(mut gba: agb::Gba) -> ! {
 
         let rotX: [[Num<i32, 8>; 3]; 3] = [
             [Num::new(1), Num::new(0), Num::new(0)],
-            /*[ Num::new(0), Num::from_f32(-0.41614684), Num::from_f32(-0.90929743)],
-            [ Num::new(0), Num::from_f32(0.90929743), Num::from_f32(-0.41614684)],
-            */
             [Num::new(0), angle.cos(), -angle.sin()],
-            [Num::new(0), angle.sin(),angle.cos()],
-            
+            [Num::new(0), angle.sin(), angle.cos()],
         ];
+
+        let mut screenPoints: [[i32; 2]; 8] = [[0, 0]; 8];
+        let mut i = 0;
 
         // loop here to not exit
         for point in &points {
-            let rotated_point: [Num<i32, 8>;3] = matmul(rotX, *point);
+            let rotated_point: [Num<i32, 8>; 3] = matmul(rotX, *point);
 
             let mut translated_point: [Num<i32, 8>; 3] = rotated_point;
             translated_point[0] += translation_x;
             translated_point[2] += translation_z;
-
 
             //perspective
             let z: Num<i32, 8> = translated_point[2];
@@ -118,14 +156,62 @@ fn main(mut gba: agb::Gba) -> ! {
                 y = middle[1];
             }
 
-            bitmap4.draw_point(x.trunc(), y.trunc(), 1);
+            screenPoints[i] = [x.trunc(), y.trunc()];
+            //bitmap4.draw_point(x.trunc(), y.trunc(), 1);
+            i += 1;
         }
+
+        for i in 0..screenPoints.len() - 1 {
+            let p1: [i32; 2] = screenPoints[i];
+            let p2: [i32; 2] = screenPoints[(i + 1)];
+            draw_line(&mut bitmap4, p1[0], p1[1], p2[0], p2[1], 1);
+        }
+        
+        draw_line(
+            &mut bitmap4,
+            screenPoints[0][0],
+            screenPoints[0][1],
+            screenPoints[3][0],
+            screenPoints[3][1],
+            1,
+        );
+        
+        draw_line(
+            &mut bitmap4,
+            screenPoints[4][0],
+            screenPoints[4][1],
+            screenPoints[7][0],
+            screenPoints[7][1],
+            1,
+        );
+        
+        draw_line(
+            &mut bitmap4,
+            screenPoints[0][0],
+            screenPoints[0][1],
+            screenPoints[5][0],
+            screenPoints[5][1],
+            1,
+        );
+        draw_line(
+            &mut bitmap4,
+            screenPoints[1][0],
+            screenPoints[1][1],
+            screenPoints[6][0],
+            screenPoints[6][1],
+            1,
+        );
+        draw_line(
+            &mut bitmap4,
+            screenPoints[2][0],
+            screenPoints[2][1],
+            screenPoints[7][0],
+            screenPoints[7][1],
+            1,
+        );
+
+
         bitmap4.flip_page();
-        /*
-        scale -= Num::new(10);
-        if (scale < Num::new(10)) {
-            scale = Num::new(10);
-        }*/
     }
 }
 
