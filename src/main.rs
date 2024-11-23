@@ -28,11 +28,42 @@ fn matmul(matrix: [[Num<i32, 8>; 3]; 3], vector: [Num<i32, 8>; 3]) -> [Num<i32, 
     return result;
 }
 
-fn add_vectors(vec1: [Num<i32, 8>; 3], vec2: [Num<i32, 8>; 3]) -> [Num<i32, 8>; 3] {
+fn vectorCross(vec1: [Num<i32, 8>; 3], vec2: [Num<i32, 8>; 3]) -> [Num<i32, 8>; 3] {
+    let mut result: [Num<i32, 8>; 3] = [Num::new(0); 3];
+
+    // Cross product formula
+    result[0] = vec1[1] * vec2[2] - vec1[2] * vec2[1]; // x component
+    result[1] = vec1[2] * vec2[0] - vec1[0] * vec2[2]; // y component
+    result[2] = vec1[0] * vec2[1] - vec1[1] * vec2[0]; // z component
+
+    return result;
+}
+
+fn vectorDot(vec1: [Num<i32, 8>; 3], vec2: [Num<i32, 8>; 3]) -> Num<i32, 8> {
+    let mut result: Num<i32, 8> = Num::new(0);
+
+    for i in 0..3 {
+        result = result + vec1[i] * vec2[i];
+    }
+
+    return result;
+}
+
+fn vectorAdd(vec1: [Num<i32, 8>; 3], vec2: [Num<i32, 8>; 3]) -> [Num<i32, 8>; 3] {
     let mut result: [Num<i32, 8>; 3] = [Num::new(0); 3];
 
     for i in 0..3 {
         result[i] = vec1[i] + vec2[i];
+    }
+
+    return result;
+}
+
+fn vectorSub(vec1: [Num<i32, 8>; 3], vec2: [Num<i32, 8>; 3]) -> [Num<i32, 8>; 3] {
+    let mut result: [Num<i32, 8>; 3] = [Num::new(0); 3];
+
+    for i in 0..3 {
+        result[i] = vec1[i] - vec2[i];
     }
 
     return result;
@@ -83,6 +114,71 @@ fn draw_line(
     }
 }
 
+fn draw_face(
+    bitmap4: &mut agb::display::bitmap4::Bitmap4,
+    screenPoints: [[i32; 2]; 8],
+    p1: usize,
+    p2: usize,
+    p3: usize,
+    p4: usize,
+) {
+    draw_line(
+        bitmap4,
+        screenPoints[p1][0],
+        screenPoints[p1][1],
+        screenPoints[p2][0],
+        screenPoints[p2][1],
+        1,
+    );
+    draw_line(
+        bitmap4,
+        screenPoints[p2][0],
+        screenPoints[p2][1],
+        screenPoints[p3][0],
+        screenPoints[p3][1],
+        1,
+    );
+    draw_line(
+        bitmap4,
+        screenPoints[p3][0],
+        screenPoints[p3][1],
+        screenPoints[p4][0],
+        screenPoints[p4][1],
+        1,
+    );
+    draw_line(
+        bitmap4,
+        screenPoints[p4][0],
+        screenPoints[p4][1],
+        screenPoints[p1][0],
+        screenPoints[p1][1],
+        1,
+    );
+}
+
+//return true if visible, presume points to be defined in counter clockwise direction
+fn backFaceCulling(
+    points: [[Num<i32, 8>; 3]; 8],
+    p1: usize,
+    p2: usize,
+    p3: usize,
+    p4: usize,
+) -> bool {
+    let v12: [Num<i32, 8>; 3] = vectorSub(points[p2], points[p1]);
+    let v23: [Num<i32, 8>; 3] = vectorSub(points[p3], points[p2]);
+
+    let normal: [Num<i32, 8>; 3] = vectorCross(v12, v23);
+
+    let viewDir: [Num<i32, 8>; 3] = [Num::new(0), Num::new(0), Num::new(1)];
+
+    let dotProd: Num<i32, 8> = vectorDot(normal, viewDir);
+    if (dotProd < Num::new(0)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 // The main function must take 1 arguments and never return. The agb::entry decorator
 // ensures that everything is in order. `agb` will call this after setting up the stack
 // and interrupt handlers correctly. It will also handle creating the `Gba` struct for you.
@@ -98,16 +194,16 @@ fn main(mut gba: agb::Gba) -> ! {
         [Num::new(-1), Num::new(1), Num::new(1)],
         [Num::new(-1), Num::new(-1), Num::new(1)],
         [Num::new(1), Num::new(-1), Num::new(1)],
-        [Num::new(1), Num::new(-1), Num::new(-1)],
         [Num::new(1), Num::new(1), Num::new(-1)],
         [Num::new(-1), Num::new(1), Num::new(-1)],
         [Num::new(-1), Num::new(-1), Num::new(-1)],
+        [Num::new(1), Num::new(-1), Num::new(-1)],
     ];
 
     //constants
-    let width = 240;
-    let height = 160;
-    let mut scale: Num<i32, 8> = Num::new(20); //100;
+    let width: i32 = 240;
+    let height: i32 = 160;
+    let mut scale: Num<i32, 8> = Num::new(30); //100;
     let middle: [Num<i32, 8>; 2] = [Num::new(width / 2), Num::new(height / 2)]; // x, y
     let mut angle: Num<i32, 8> = Num::new(0);
     let increment: Num<i32, 8> = Num::new(1) / 256;
@@ -130,12 +226,22 @@ fn main(mut gba: agb::Gba) -> ! {
             [Num::new(0), angle.sin(), angle.cos()],
         ];
 
+        let rotY: [[Num<i32, 8>; 3]; 3] = [
+            [angle.cos(), Num::new(0), angle.sin()],
+            [Num::new(0), Num::new(1), Num::new(0)],
+            [-angle.sin(), Num::new(0), angle.cos()],
+        ];
+
         let mut screenPoints: [[i32; 2]; 8] = [[0, 0]; 8];
+        let mut translatedPoints: [[Num<i32, 8>; 3]; 8] =
+            [[Num::new(0), Num::new(0), Num::new(0)]; 8];
+
         let mut i = 0;
 
         // loop here to not exit
         for point in &points {
             let rotated_point: [Num<i32, 8>; 3] = matmul(rotX, *point);
+            let rotated_point: [Num<i32, 8>; 3] = matmul(rotY, rotated_point);
 
             let mut translated_point: [Num<i32, 8>; 3] = rotated_point;
             translated_point[0] += translation_x;
@@ -157,16 +263,55 @@ fn main(mut gba: agb::Gba) -> ! {
             }
 
             screenPoints[i] = [x.trunc(), y.trunc()];
+            translatedPoints[i] = translated_point;
             //bitmap4.draw_point(x.trunc(), y.trunc(), 1);
             i += 1;
         }
+
+        let visible: bool = backFaceCulling(translatedPoints, 0, 1, 2, 3);
+        if (visible) {
+            draw_face(&mut bitmap4, screenPoints, 0, 1, 2, 3);
+        }
+
+        let visible: bool = backFaceCulling(translatedPoints, 7, 6, 5, 4);
+        if (visible) {
+            draw_face(&mut bitmap4, screenPoints, 7, 6, 5, 4);
+        }
+
+        let visible: bool = backFaceCulling(translatedPoints, 0, 3, 7, 4);
+        if (visible) {
+            draw_face(&mut bitmap4, screenPoints, 0, 3, 7, 4);
+        }
+
+        let visible: bool = backFaceCulling(translatedPoints, 1, 5, 6, 2);
+        if (visible) {
+            draw_face(&mut bitmap4, screenPoints, 1, 5, 6, 2);
+        }
+
+        let visible: bool = backFaceCulling(translatedPoints, 7, 3, 2, 6);
+        if (visible) {
+            draw_face(&mut bitmap4, screenPoints, 7, 3, 2, 6);
+        }
+
+        let visible: bool = backFaceCulling(translatedPoints, 0, 4, 5, 1);
+        if (visible) {
+            draw_face(&mut bitmap4, screenPoints, 0, 4, 5, 1);
+        }
+
+        bitmap4.flip_page();
+    }
+}
+
+//[[417.0, 268.0], [435.0, 306.0], [410.0, 306.0], [397.0, 279.0], [380.0, 288.0], [405.0, 333.0], [387.0, 325.0], [368.0, 294.0]]
+
+/*
 
         for i in 0..screenPoints.len() - 1 {
             let p1: [i32; 2] = screenPoints[i];
             let p2: [i32; 2] = screenPoints[(i + 1)];
             draw_line(&mut bitmap4, p1[0], p1[1], p2[0], p2[1], 1);
         }
-        
+
         draw_line(
             &mut bitmap4,
             screenPoints[0][0],
@@ -175,7 +320,7 @@ fn main(mut gba: agb::Gba) -> ! {
             screenPoints[3][1],
             1,
         );
-        
+
         draw_line(
             &mut bitmap4,
             screenPoints[4][0],
@@ -184,7 +329,7 @@ fn main(mut gba: agb::Gba) -> ! {
             screenPoints[7][1],
             1,
         );
-        
+
         draw_line(
             &mut bitmap4,
             screenPoints[0][0],
@@ -209,10 +354,4 @@ fn main(mut gba: agb::Gba) -> ! {
             screenPoints[7][1],
             1,
         );
-
-
-        bitmap4.flip_page();
-    }
-}
-
-//[[417.0, 268.0], [435.0, 306.0], [410.0, 306.0], [397.0, 279.0], [380.0, 288.0], [405.0, 333.0], [387.0, 325.0], [368.0, 294.0]]
+*/
