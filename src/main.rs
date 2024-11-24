@@ -114,7 +114,7 @@ fn draw_line(
     }
 }
 
-fn draw_face(
+fn draw_face_outline(
     bitmap4: &mut agb::display::bitmap4::Bitmap4,
     screenPoints: [[i32; 2]; 8],
     p1: usize,
@@ -172,10 +172,71 @@ fn backFaceCulling(
     let viewDir: [Num<i32, 8>; 3] = [Num::new(0), Num::new(0), Num::new(1)];
 
     let dotProd: Num<i32, 8> = vectorDot(normal, viewDir);
-    if (dotProd < Num::new(0)) {
+    if (dotProd < Num::new(-1)) {
+        //using threshold other than 0, to account for inaccuracies
         return true;
     } else {
         return false;
+    }
+}
+
+fn draw_h_line(
+    bitmap4: &mut agb::display::bitmap4::Bitmap4,
+    x1: i32,
+    x2: i32,
+    y: i32,
+) {
+    // Ensure x1 is less than or equal to x2 for proper iteration
+    let (start, end) = if x1 <= x2 {
+        (x1, x2)
+    } else {
+        (x2, x1)
+    };
+
+    for x in start..=end {
+        // Draw each point on the horizontal line
+        bitmap4.draw_point(x, y, 1);
+    }
+}
+
+
+fn draw_flat_bottom_triangle(
+    bitmap4: &mut agb::display::bitmap4::Bitmap4,
+    p1: [i32; 2],
+    p2: [i32; 2],
+    p3: [i32; 2],
+) {
+    let invslope1: Num<i32, 8> = Num::new(p2[0] - p1[0]) / Num::new(p2[1] - p1[1]);
+    let invslope2: Num<i32, 8> = Num::new(p3[0] - p1[0]) / Num::new(p3[1] - p1[1]);
+    let mut curx1: Num<i32, 8> = Num::new(p1[0]);
+    let mut curx2: Num<i32, 8> = Num::new(p1[0]);
+
+    for scanline_y in p1[1]..=p2[1] {
+        draw_h_line(bitmap4, curx1.trunc(), curx2.trunc(), scanline_y);
+        curx1 += invslope1;
+        curx2 += invslope2;
+    }
+}
+
+fn draw_flat_top_triangle(
+    bitmap4: &mut agb::display::bitmap4::Bitmap4,
+    p1: [i32; 2],
+    p2: [i32; 2],
+    p3: [i32; 2],
+) {
+    // Calculate the slopes (invslope1 and invslope2)
+    let invslope1: Num<i32, 8> = Num::new(p3[0] - p1[0]) / Num::new(p3[1] - p1[1]);
+    let invslope2: Num<i32, 8> = Num::new(p3[0] - p2[0]) / Num::new(p3[1] - p2[1]);
+
+    // Initialize the starting x-coordinates at the top vertices
+    let mut curx1: Num<i32, 8> = Num::new(p1[0]);
+    let mut curx2: Num<i32, 8> = Num::new(p2[0]);
+
+    // Iterate over the scanlines from the top (p1 and p2) down to p3
+    for scanline_y in p1[1]..=p3[1] {
+        draw_h_line(bitmap4, curx1.trunc(), curx2.trunc(), scanline_y);
+        curx1 += invslope1;
+        curx2 += invslope2;
     }
 }
 
@@ -270,88 +331,38 @@ fn main(mut gba: agb::Gba) -> ! {
 
         let visible: bool = backFaceCulling(translatedPoints, 0, 1, 2, 3);
         if (visible) {
-            draw_face(&mut bitmap4, screenPoints, 0, 1, 2, 3);
+            draw_face_outline(&mut bitmap4, screenPoints, 0, 1, 2, 3);
         }
 
         let visible: bool = backFaceCulling(translatedPoints, 7, 6, 5, 4);
         if (visible) {
-            draw_face(&mut bitmap4, screenPoints, 7, 6, 5, 4);
+            draw_face_outline(&mut bitmap4, screenPoints, 7, 6, 5, 4);
         }
 
         let visible: bool = backFaceCulling(translatedPoints, 0, 3, 7, 4);
         if (visible) {
-            draw_face(&mut bitmap4, screenPoints, 0, 3, 7, 4);
+            draw_face_outline(&mut bitmap4, screenPoints, 0, 3, 7, 4);
         }
 
         let visible: bool = backFaceCulling(translatedPoints, 1, 5, 6, 2);
         if (visible) {
-            draw_face(&mut bitmap4, screenPoints, 1, 5, 6, 2);
+            draw_face_outline(&mut bitmap4, screenPoints, 1, 5, 6, 2);
         }
 
         let visible: bool = backFaceCulling(translatedPoints, 7, 3, 2, 6);
         if (visible) {
-            draw_face(&mut bitmap4, screenPoints, 7, 3, 2, 6);
+            draw_face_outline(&mut bitmap4, screenPoints, 7, 3, 2, 6);
         }
 
         let visible: bool = backFaceCulling(translatedPoints, 0, 4, 5, 1);
         if (visible) {
-            draw_face(&mut bitmap4, screenPoints, 0, 4, 5, 1);
+            draw_face_outline(&mut bitmap4, screenPoints, 0, 4, 5, 1);
         }
+
+        draw_flat_bottom_triangle(&mut bitmap4, [0, 0], [0, 100], [100, 100]);
+        draw_flat_top_triangle(&mut bitmap4, [0, 0], [100,0], [100, 100]);
+
 
         bitmap4.flip_page();
     }
 }
-
-//[[417.0, 268.0], [435.0, 306.0], [410.0, 306.0], [397.0, 279.0], [380.0, 288.0], [405.0, 333.0], [387.0, 325.0], [368.0, 294.0]]
-
-/*
-
-        for i in 0..screenPoints.len() - 1 {
-            let p1: [i32; 2] = screenPoints[i];
-            let p2: [i32; 2] = screenPoints[(i + 1)];
-            draw_line(&mut bitmap4, p1[0], p1[1], p2[0], p2[1], 1);
-        }
-
-        draw_line(
-            &mut bitmap4,
-            screenPoints[0][0],
-            screenPoints[0][1],
-            screenPoints[3][0],
-            screenPoints[3][1],
-            1,
-        );
-
-        draw_line(
-            &mut bitmap4,
-            screenPoints[4][0],
-            screenPoints[4][1],
-            screenPoints[7][0],
-            screenPoints[7][1],
-            1,
-        );
-
-        draw_line(
-            &mut bitmap4,
-            screenPoints[0][0],
-            screenPoints[0][1],
-            screenPoints[5][0],
-            screenPoints[5][1],
-            1,
-        );
-        draw_line(
-            &mut bitmap4,
-            screenPoints[1][0],
-            screenPoints[1][1],
-            screenPoints[6][0],
-            screenPoints[6][1],
-            1,
-        );
-        draw_line(
-            &mut bitmap4,
-            screenPoints[2][0],
-            screenPoints[2][1],
-            screenPoints[7][0],
-            screenPoints[7][1],
-            1,
-        );
-*/
