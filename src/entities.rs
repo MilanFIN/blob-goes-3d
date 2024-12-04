@@ -1,6 +1,22 @@
 use agb::fixnum::Num;
 
-trait Entity {
+#[derive(Copy, Clone)]
+pub enum EntityEnum {
+    Cube(Cube),
+    Empty(Empty),
+}
+
+impl EntityEnum {
+    fn render(&self) {
+        match self {
+            EntityEnum::Cube(c) => c.render(),
+            EntityEnum::Empty(e) => e.render(),
+        }
+    }
+}
+
+pub trait Entity {
+    
     fn render(&self);
 
     fn set_x_offset(&mut self, x_offset: Num<i32, 8>);
@@ -15,7 +31,8 @@ trait Entity {
     fn set_vertex(&mut self, point: [Num<i32, 8>; 3], index: i32);
 }
 
-struct Cube {
+#[derive(Copy, Clone)]
+pub struct Cube {
     x_offset: Num<i32, 8>,
     y_offset: Num<i32, 8>,
     z_offset: Num<i32, 8>,
@@ -25,6 +42,20 @@ struct Cube {
     z_rotation: Num<i32, 8>,
 
     points: [[Num<i32, 8>; 3]; 8],
+}
+
+impl Cube {
+    pub fn default() -> Self {
+        Self {
+            x_offset: Num::new(0),
+            y_offset: Num::new(0),
+            z_offset: Num::new(0),
+            x_rotation: Num::new(0),
+            y_rotation: Num::new(0),
+            z_rotation: Num::new(0),
+            points: [[Num::new(0); 3]; 8],
+        }
+    }
 }
 
 impl Entity for Cube {
@@ -69,9 +100,28 @@ impl Entity for Cube {
     fn set_z_rotation(&mut self, z_rotation: Num<i32, 8>) {
         self.z_rotation = z_rotation;
     }
-    
+
     fn set_vertex(&mut self, point: [Num<i32, 8>; 3], index: i32) {
         //not implemented
+    }
+}
+
+#[derive(Copy, Clone)]
+pub struct Empty {}
+impl Entity for Empty {
+    fn render(&self) {}
+    fn set_x_offset(&mut self, x_offset: Num<i32, 8>) {}
+    fn set_y_offset(&mut self, y_offset: Num<i32, 8>) {}
+    fn set_z_offset(&mut self, z_offset: Num<i32, 8>) {}
+    fn set_size(&mut self, size: i32) {}
+    fn set_x_rotation(&mut self, x_rotation: Num<i32, 8>) {}
+    fn set_y_rotation(&mut self, y_rotation: Num<i32, 8>) {}
+    fn set_z_rotation(&mut self, z_rotation: Num<i32, 8>) {}
+    fn set_vertex(&mut self, point: [Num<i32, 8>; 3], index: i32) {}
+}
+impl Empty {
+    pub fn default() -> Self {
+        Self {}
     }
 }
 

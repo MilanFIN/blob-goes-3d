@@ -62,6 +62,13 @@ fn main(mut gba: agb::Gba) -> ! {
 
     let backfaceCullingThreshold: Num<i32, 8> = Num::from_f32(1.2);
 
+
+    //todo: use these
+    let mut arr: [EntityEnum; 2] = [EntityEnum::Empty(Empty::default()); 2];
+    for i in 0..1 {
+        arr[i] = EntityEnum::Cube(Cube::default());
+    }
+
     loop {
         bitmap4.clear(0);
 
