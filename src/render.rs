@@ -1,4 +1,3 @@
-
 use agb::fixnum::Num;
 
 use math::*;
@@ -98,27 +97,34 @@ pub fn backFaceCulling(
     p1: usize,
     p2: usize,
     p3: usize,
-    p4: usize,
-) -> Num<i32, 8> {
+) -> bool{
+
     let v12: [Num<i32, 8>; 3] = vectorSub(points[p2], points[p1]);
     let v23: [Num<i32, 8>; 3] = vectorSub(points[p3], points[p2]);
 
     let normal: [Num<i32, 8>; 3] = vectorCross(v12, v23);
 
     let viewDir: [Num<i32, 8>; 3] = [Num::new(0), Num::new(0), Num::new(1)];
+    //get center of the three polygons
+    let centroid: [Num<i32, 8>; 3] = [
+        (points[p1][0] + points[p2][0] + points[p3][0]) / Num::new(3),
+        (points[p1][1] + points[p2][1] + points[p3][1]) / Num::new(3),
+        (points[p1][2] + points[p2][2] + points[p3][2]) / Num::new(3),
+    ];
+    //calculate view direction towards the center of the polygon
+    let viewDir: [Num<i32, 8>; 3] = normalize(centroid);
 
-    let dotProd: Num<i32, 8> = vectorDot(normal, viewDir);
-    return dotProd;
-    /*
-    if (dotProd < Num::from_f32(-1.2)) {
-        //using threshold other than 0, to account for inaccuracies
-        return true;
-    } else {
-        return false;
-    }*/
+    let dotProd: Num<i32, 8> = vectorDot(normal, viewDir).change_base();
+    return dotProd < Num::new(0);
 }
 
-pub fn draw_h_line(bitmap4: &mut agb::display::bitmap4::Bitmap4, x1: i32, x2: i32, y: i32, color: u8) {
+pub fn draw_h_line(
+    bitmap4: &mut agb::display::bitmap4::Bitmap4,
+    x1: i32,
+    x2: i32,
+    y: i32,
+    color: u8,
+) {
     // Ensure x1 is less than or equal to x2 for proper iteration
     let (start, end) = if x1 <= x2 { (x1, x2) } else { (x2, x1) };
 
@@ -140,7 +146,7 @@ pub fn draw_flat_bottom_triangle(
 ) {
     let mut div1 = p2[1] - p1[1];
     let mut div2 = p3[1] - p1[1];
-    
+
     if (div1 < Num::new(3)) {
         div1 = Num::new(3);
     }
@@ -154,7 +160,7 @@ pub fn draw_flat_bottom_triangle(
     let mut curx2: Num<i32, 8> = (p1[0]);
 
     for scanline_y in p1[1].trunc()..=p2[1].trunc() {
-        draw_h_line(bitmap4, curx1.trunc(), curx2.trunc(), scanline_y,color);
+        draw_h_line(bitmap4, curx1.trunc(), curx2.trunc(), scanline_y, color);
         curx1 += invslope1;
         curx2 += invslope2;
     }
@@ -205,11 +211,11 @@ pub fn sort_points(
         }
     }
     if (p3[1] < p1[1]) || (p3[1] == p1[1] && p3[0] < p1[0]) {
-            for i in 0..2 {
-                let temp: Num<i32, 8> = p1[i];
-                p1[i] = p3[i];
-                p3[i] = temp;
-            }
+        for i in 0..2 {
+            let temp: Num<i32, 8> = p1[i];
+            p1[i] = p3[i];
+            p3[i] = temp;
+        }
     }
     // Ensure p2 is the middle and p3 is the largest
     if (p3[1] < p2[1]) || (p3[1] == p2[1] && p3[0] < p2[0]) {
@@ -219,7 +225,6 @@ pub fn sort_points(
             p3[i] = temp;
         }
     }
-
 }
 
 pub fn draw_triangle(
@@ -238,11 +243,8 @@ pub fn draw_triangle(
     else if (p2[1] == p3[1]) {
         draw_flat_bottom_triangle(bitmap4, p1, p2, p3, color);
     } else {
-        let p4x: Num<i32, 8> = p1[0]
-            + (p2[1] - p1[1]) / (p3[1] - p1[1])
-                * (p3[0] - p1[0]);
+        let p4x: Num<i32, 8> = p1[0] + (p2[1] - p1[1]) / (p3[1] - p1[1]) * (p3[0] - p1[0]);
         draw_flat_bottom_triangle(bitmap4, p1, p2, [p4x, p2[1]], color);
         draw_flat_top_triangle(bitmap4, p2, [p4x, p2[1]], p3, color);
-
     }
 }

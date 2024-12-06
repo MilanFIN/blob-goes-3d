@@ -42,6 +42,7 @@ pub fn vectorAdd(vec1: [Num<i32, 8>; 3], vec2: [Num<i32, 8>; 3]) -> [Num<i32, 8>
     return result;
 }
 
+
 pub fn vectorSub(vec1: [Num<i32, 8>; 3], vec2: [Num<i32, 8>; 3]) -> [Num<i32, 8>; 3] {
     let mut result: [Num<i32, 8>; 3] = [Num::new(0); 3];
 
@@ -50,4 +51,10 @@ pub fn vectorSub(vec1: [Num<i32, 8>; 3], vec2: [Num<i32, 8>; 3]) -> [Num<i32, 8>
     }
 
     return result;
+}
+
+
+pub fn normalize(v: [Num<i32, 8>; 3]) -> [Num<i32, 8>; 3] {
+    let length = (v[0] * v[0] + v[1] * v[1] + v[2] * v[2]).sqrt();
+    [v[0] / length, v[1] / length, v[2] / length]
 }

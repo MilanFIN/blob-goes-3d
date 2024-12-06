@@ -37,213 +37,34 @@ fn main(mut gba: agb::Gba) -> ! {
     bitmap4.set_palette_entry(2, 0x3E0);
     bitmap4.set_palette_entry(3, 0x7C00);
 
-    let points: [[Num<i32, 8>; 3]; 8] = [
-        [Num::new(1), Num::new(1), Num::new(1)],
-        [Num::new(-1), Num::new(1), Num::new(1)],
-        [Num::new(-1), Num::new(-1), Num::new(1)],
-        [Num::new(1), Num::new(-1), Num::new(1)],
-        [Num::new(1), Num::new(1), Num::new(-1)],
-        [Num::new(-1), Num::new(1), Num::new(-1)],
-        [Num::new(-1), Num::new(-1), Num::new(-1)],
-        [Num::new(1), Num::new(-1), Num::new(-1)],
-    ];
 
-    //constants
-    let width: i32 = 240;
-    let height: i32 = 160;
-    let scale: Num<i32, 8> = Num::new(30); //100;
-    let middle: [Num<i32, 8>; 2] = [Num::new(width / 2), Num::new(height / 2)]; // x, y
     let mut angle: Num<i32, 8> = Num::from_f32(0.5);
     let increment: Num<i32, 8> = Num::new(1) / 256;
 
-    let translation_z: Num<i32, 8> = Num::new(3);
-    let translation_x: Num<i32, 8> = Num::new(0);
-    let translation_y: Num<i32, 8> = Num::new(0);
-
-    let backfaceCullingThreshold: Num<i32, 8> = Num::from_f32(1.2);
-
-
     //todo: use these
-    let mut arr: [EntityEnum; 2] = [EntityEnum::Empty(Empty::default()); 2];
-    for i in 0..1 {
-        arr[i] = EntityEnum::Cube(Cube::default());
+    let mut entityArray: [EntityEnum; 2] = [EntityEnum::Empty(Empty::default()); 2];
+    for i in 0..2 {
+        entityArray[i] = EntityEnum::Cube(Cube::default());
+        entityArray[i].set_z_offset(Num::new(3));
+        entityArray[i].set_size(2);
     }
+
+    entityArray[0].set_x_offset(Num::new(3));
+    entityArray[1].set_x_offset(Num::new(-3));
 
     loop {
         bitmap4.clear(0);
-
         angle += increment;
-
         if (angle > Num::new(1)) {
             angle = Num::new(0);
         }
+        for i in 0..2 {
+            entityArray[i].set_x_rotation(angle);
+            entityArray[i].set_y_rotation(angle);
 
-        let rotX: [[Num<i32, 8>; 3]; 3] = [
-            [Num::new(1), Num::new(0), Num::new(0)],
-            [Num::new(0), angle.cos(), -angle.sin()],
-            [Num::new(0), angle.sin(), angle.cos()],
-        ];
-
-        let rotY: [[Num<i32, 8>; 3]; 3] = [
-            [angle.cos(), Num::new(0), angle.sin()],
-            [Num::new(0), Num::new(1), Num::new(0)],
-            [-angle.sin(), Num::new(0), angle.cos()],
-        ];
-
-        let rotZ: [[Num<i32, 8>; 3]; 3] = [
-            [angle.cos(), -angle.sin(), Num::new(0)],
-            [angle.sin(), angle.cos(), Num::new(0)],
-            [Num::new(0), Num::new(0), Num::new(1)],
-        ];
-
-        let mut screenPoints: [[Num<i32, 8>; 2]; 8] = [[Num::new(0), Num::new(0)]; 8];
-        let mut translatedPoints: [[Num<i32, 8>; 3]; 8] =
-            [[Num::new(0), Num::new(0), Num::new(0)]; 8];
-
-        let mut i = 0;
-
-        // loop here to not exit
-        for point in &points {
-            let mut rotated_point: [Num<i32, 8>; 3] = matmul(rotX, *point);
-            rotated_point = matmul(rotY, rotated_point);
-            rotated_point = matmul(rotZ, rotated_point);
-
-            let mut translated_point: [Num<i32, 8>; 3] = rotated_point;
-            translated_point[0] += translation_x;
-            translated_point[1] += translation_y;
-            translated_point[2] += translation_z;
-
-            //perspective
-            let z: Num<i32, 8> = translated_point[2];
-            let zero: Num<i32, 8> = Num::new(0);
-            let x: Num<i32, 8>;
-            let y: Num<i32, 8>;
-
-            if (z != zero) {
-                let perspective_scale: Num<i32, 8> = scale / z;
-                x = (translated_point[0] * perspective_scale) + middle[0];
-                y = (translated_point[1] * perspective_scale) + middle[1];
-            } else {
-                x = middle[0];
-                y = middle[1];
-            }
-
-            screenPoints[i] = [x, y];
-            translatedPoints[i] = translated_point;
-            i += 1;
+            entityArray[i].render(&mut bitmap4);
         }
-
-        for i in 0..1 {
-            let angle: Num<i32, 8> = backFaceCulling(&translatedPoints, 0, 1, 2, 3);
-            if (angle < -backfaceCullingThreshold) {
-                //draw_face_outline(&mut bitmap4, screenPoints, 0, 1, 2, 3);
-                draw_triangle(
-                    &mut bitmap4,
-                    screenPoints[0],
-                    screenPoints[1],
-                    screenPoints[2],
-                    1,
-                );
-                draw_triangle(
-                    &mut bitmap4,
-                    screenPoints[0],
-                    screenPoints[2],
-                    screenPoints[3],
-                    1,
-                );
-            } else if (angle > backfaceCullingThreshold) {
-                //draw_face_outline(&mut bitmap4, screenPoints, 7, 6, 5, 4);
-                draw_triangle(
-                    &mut bitmap4,
-                    screenPoints[7],
-                    screenPoints[6],
-                    screenPoints[5],
-                    1,
-                );
-                draw_triangle(
-                    &mut bitmap4,
-                    screenPoints[7],
-                    screenPoints[5],
-                    screenPoints[4],
-                    1,
-                );
-            }
-
-            let angle: Num<i32, 8> = backFaceCulling(&translatedPoints, 0, 3, 7, 4);
-            if (angle < -backfaceCullingThreshold) {
-                //draw_face_outline(&mut bitmap4, screenPoints, 0, 3, 7, 4);
-                draw_triangle(
-                    &mut bitmap4,
-                    screenPoints[0],
-                    screenPoints[3],
-                    screenPoints[7],
-                    2,
-                );
-                draw_triangle(
-                    &mut bitmap4,
-                    screenPoints[0],
-                    screenPoints[7],
-                    screenPoints[4],
-                    2,
-                );
-            }
-
-            else if (angle > backfaceCullingThreshold) {
-                //draw_face_outline(&mut bitmap4, screenPoints, 1, 5, 6, 2);
-                draw_triangle(
-                    &mut bitmap4,
-                    screenPoints[1],
-                    screenPoints[5],
-                    screenPoints[6],
-                    2,
-                );
-                draw_triangle(
-                    &mut bitmap4,
-                    screenPoints[1],
-                    screenPoints[6],
-                    screenPoints[2],
-                    2,
-                );
-            }
-
-            let angle: Num<i32, 8> = backFaceCulling(&translatedPoints, 7, 3, 2, 6);
-            if (angle < -backfaceCullingThreshold) {
-                //draw_face_outline(&mut bitmap4, screenPoints, 7, 3, 2, 6);
-                draw_triangle(
-                    &mut bitmap4,
-                    screenPoints[7],
-                    screenPoints[3],
-                    screenPoints[2],
-                    3,
-                );
-                draw_triangle(
-                    &mut bitmap4,
-                    screenPoints[7],
-                    screenPoints[2],
-                    screenPoints[6],
-                    3,
-                );
-            }
-
-            else if (angle > backfaceCullingThreshold) {
-                //draw_face_outline(&mut bitmap4, screenPoints, 0, 4, 5, 1);
-                draw_triangle(
-                    &mut bitmap4,
-                    screenPoints[0],
-                    screenPoints[4],
-                    screenPoints[5],
-                    3,
-                );
-                draw_triangle(
-                    &mut bitmap4,
-                    screenPoints[0],
-                    screenPoints[5],
-                    screenPoints[1],
-                    3,
-                );
-            }
-        }
-
+        
         bitmap4.flip_page();
     }
 }
