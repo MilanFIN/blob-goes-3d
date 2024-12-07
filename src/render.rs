@@ -2,7 +2,7 @@ use agb::fixnum::Num;
 
 use math::*;
 
-use crate::math;
+use crate::{math, Camera};
 
 pub fn draw_line(
     bitmap: &mut agb::display::bitmap4::Bitmap4,
@@ -92,7 +92,13 @@ pub fn draw_face_outline(
 }
 
 //return true if visible, presume points to be defined in counter clockwise direction
-pub fn backFaceCulling(&points: &[[Num<i32, 8>; 3]; 8], p1: usize, p2: usize, p3: usize) -> bool {
+pub fn backFaceCulling(
+    &points: &[[Num<i32, 8>; 3]; 8],
+    p1: usize,
+    p2: usize,
+    p3: usize,
+    camera: &Camera,
+) -> bool {
     let v12: [Num<i32, 8>; 3] = vectorSub(points[p2], points[p1]);
     let v23: [Num<i32, 8>; 3] = vectorSub(points[p3], points[p2]);
 
@@ -100,13 +106,20 @@ pub fn backFaceCulling(&points: &[[Num<i32, 8>; 3]; 8], p1: usize, p2: usize, p3
 
     let viewDir: [Num<i32, 8>; 3] = [Num::new(0), Num::new(0), Num::new(1)];
     //get center of the three polygons
-    let centroid: [Num<i32, 8>; 3] = [
+    let polygonCenter: [Num<i32, 8>; 3] = [
         (points[p1][0] + points[p2][0] + points[p3][0]) / Num::new(3),
         (points[p1][1] + points[p2][1] + points[p3][1]) / Num::new(3),
         (points[p1][2] + points[p2][2] + points[p3][2]) / Num::new(3),
     ];
+
+    let viewVector: [Num<i32, 8>; 3] = [
+        polygonCenter[0] - camera.x,
+        polygonCenter[1] - camera.y,
+        polygonCenter[2] - camera.z,
+    ];
+
     //calculate view direction towards the center of the polygon
-    let viewDir: [Num<i32, 8>; 3] = normalize(centroid);
+    let viewDir: [Num<i32, 8>; 3] = normalize(viewVector);
 
     let dotProd: Num<i32, 8> = vectorDot(normal, viewDir).change_base();
     return dotProd < Num::new(0);

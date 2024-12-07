@@ -158,7 +158,7 @@ impl Entity for Cube {
             translatedPoints[i] = translated_point;
             i += 1;
         }
-        if (backFaceCulling(&translatedPoints, 0, 1, 2)) {
+        if (backFaceCulling(&translatedPoints, 0, 1, 2, camera)) {
             //draw_face_outline(&mut bitmap4, screenPoints, 0, 1, 2, 3);
             draw_triangle(
                 bitmap4,
@@ -175,7 +175,7 @@ impl Entity for Cube {
                 1,
             );
         }
-        if (backFaceCulling(&translatedPoints, 7, 6, 5)) {
+        if (backFaceCulling(&translatedPoints, 7, 6, 5, camera)) {
             //draw_face_outline(&mut bitmap4, screenPoints, 7, 6, 5, 4);
             draw_triangle(
                 bitmap4,
@@ -193,7 +193,7 @@ impl Entity for Cube {
             );
         }
 
-        if (backFaceCulling(&translatedPoints, 0, 3, 7)) {
+        if (backFaceCulling(&translatedPoints, 0, 3, 7, camera)) {
             //draw_face_outline(&mut bitmap4, screenPoints, 0, 3, 7, 4);
             draw_triangle(
                 bitmap4,
@@ -210,7 +210,7 @@ impl Entity for Cube {
                 2,
             );
         }
-        if (backFaceCulling(&translatedPoints, 1, 5, 6)) {
+        if (backFaceCulling(&translatedPoints, 1, 5, 6, camera)) {
             //draw_face_outline(&mut bitmap4, screenPoints, 1, 5, 6, 2);
             draw_triangle(
                 bitmap4,
@@ -228,7 +228,7 @@ impl Entity for Cube {
             );
         }
 
-        if (backFaceCulling(&translatedPoints, 7, 3, 2)) {
+        if (backFaceCulling(&translatedPoints, 7, 3, 2, camera)) {
             //draw_face_outline(&mut bitmap4, screenPoints, 7, 3, 2, 6);
             draw_triangle(
                 bitmap4,
@@ -245,7 +245,7 @@ impl Entity for Cube {
                 3,
             );
         }
-        if (backFaceCulling(&translatedPoints, 0, 4, 5)) {
+        if (backFaceCulling(&translatedPoints, 0, 4, 5, camera)) {
             //draw_face_outline(&mut bitmap4, screenPoints, 0, 4, 5, 1);
             draw_triangle(
                 bitmap4,
