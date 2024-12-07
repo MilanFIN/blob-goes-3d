@@ -6,6 +6,9 @@ use math::*;
 use crate::render;
 use render::*;
 
+use crate::camera;
+use camera::*;
+
 #[derive(Copy, Clone)]
 pub enum EntityEnum {
     Cube(Cube),
@@ -55,16 +58,16 @@ impl EntityEnum {
             EntityEnum::Empty(e) => e.set_size(size),
         }
     }
-    pub fn render(&self, bitmap4: &mut agb::display::bitmap4::Bitmap4) {
+    pub fn render(&self, bitmap4: &mut agb::display::bitmap4::Bitmap4, camera: &Camera) {
         match self {
-            EntityEnum::Cube(c) => c.render(bitmap4),
-            EntityEnum::Empty(e) => e.render(bitmap4),
+            EntityEnum::Cube(c) => c.render(bitmap4, camera),
+            EntityEnum::Empty(e) => e.render(bitmap4, camera),
         }
     }
 }
 
 pub trait Entity {
-    fn render(&self, bitmap4: &mut agb::display::bitmap4::Bitmap4);
+    fn render(&self, bitmap4: &mut agb::display::bitmap4::Bitmap4, camera: &Camera);
 
     fn set_x_offset(&mut self, x_offset: Num<i32, 8>);
     fn set_y_offset(&mut self, y_offset: Num<i32, 8>);
@@ -148,7 +151,7 @@ impl Entity for Cube {
         //not implemented
     }
 
-    fn render(&self, bitmap4: &mut agb::display::bitmap4::Bitmap4) {
+    fn render(&self, bitmap4: &mut agb::display::bitmap4::Bitmap4, camera: &Camera) {
         let width: i32 = 240;
         let height: i32 = 160;
         let scale: Num<i32, 8> = Num::new(30); //100;
@@ -178,17 +181,21 @@ impl Entity for Cube {
 
         let mut i = 0;
 
-        // loop here to not exit
         for point in &self.points {
             let mut rotated_point: [Num<i32, 8>; 3] = matmul(rotX, *point);
             rotated_point = matmul(rotY, rotated_point);
             rotated_point = matmul(rotZ, rotated_point);
 
+            //todo: need to use both object x, y z and world x, y & z
+            //that way we could rotate the entire scene
             let mut translated_point: [Num<i32, 8>; 3] = rotated_point;
-            translated_point[0] += self.x_offset;
-            translated_point[1] += self.y_offset;
-            translated_point[2] += self.z_offset;
+            translated_point[0] += self.x_offset - camera.x;
+            translated_point[1] += self.y_offset - camera.y;
+            translated_point[2] += self.z_offset - camera.z;
 
+            // might want to perform world rotation and translation here later on
+            //in that case, there would be a common rotx, y and z for all objects to rotate the scene around
+            let mut rotated_point: [Num<i32, 8>; 3] = matmul(rotX, translated_point);
             //perspective
             let z: Num<i32, 8> = translated_point[2];
             let zero: Num<i32, 8> = Num::new(0);
@@ -318,7 +325,7 @@ impl Entity for Cube {
 #[derive(Copy, Clone)]
 pub struct Empty {}
 impl Entity for Empty {
-    fn render(&self, bitmap4: &mut agb::display::bitmap4::Bitmap4) {}
+    fn render(&self, bitmap4: &mut agb::display::bitmap4::Bitmap4, camera: &Camera) {}
     fn set_x_offset(&mut self, x_offset: Num<i32, 8>) {}
     fn set_y_offset(&mut self, y_offset: Num<i32, 8>) {}
     fn set_z_offset(&mut self, z_offset: Num<i32, 8>) {}

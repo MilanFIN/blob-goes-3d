@@ -126,10 +126,14 @@ pub fn draw_h_line(
     color: u8,
 ) {
     // Ensure x1 is less than or equal to x2 for proper iteration
-    let (start, end) = if x1 <= x2 { (x1, x2) } else { (x2, x1) };
+    let (mut start, mut end) = if x1 <= x2 { (x1, x2) } else { (x2, x1) };
+    
+    start = if start < 0 {0} else {start};
+    end = if (end > 239) {239} else {end};
 
     // Adjust start to be the first even number in the range
-    let start = if start % 2 == 0 { start } else { start + 1 };
+    start = if start % 2 == 0 { start } else { start + 1 };
+
     // Iterate over even numbers using step_by(2)
     for x in (start..=end).step_by(2) {
         // Draw each point on the horizontal line
@@ -234,6 +238,20 @@ pub fn draw_triangle(
     mut p3: [Num<i32, 8>; 2],
     color: u8,
 ) {
+
+    let zero: Num<i32, 8> = Num::new(0);
+    let xMax: Num<i32, 8> = Num::new(240);
+    let yMax: Num<i32, 8> = Num::new(160);
+
+
+    //first check out if the triangle is completely out of view
+    if (p1[0] < zero && p2[0] < zero && p3[0] < zero 
+        || p1[1] < zero && p2[1] < zero && p3[1] < zero 
+        || p1[0] > xMax && p2[0] > xMax && p3[0] > xMax
+    || p1[1] > yMax && p2[1] > yMax && p3[1] > yMax) {
+        return
+    }
+
     sort_points(&mut p1, &mut p2, &mut p3);
     //flat top triangle
     if (p1[1] == p2[1]) {

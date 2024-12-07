@@ -25,6 +25,9 @@ use render::*;
 mod entities;
 use entities::*;
 
+mod camera;
+use camera::*;
+
 // The main function must take 1 arguments and never return. The agb::entry decorator
 // ensures that everything is in order. `agb` will call this after setting up the stack
 // and interrupt handlers correctly. It will also handle creating the `Gba` struct for you.
@@ -49,8 +52,10 @@ fn main(mut gba: agb::Gba) -> ! {
         entityArray[i].set_size(2);
     }
 
-    entityArray[0].set_x_offset(Num::new(3));
-    entityArray[1].set_x_offset(Num::new(-3));
+    entityArray[0].set_x_offset(Num::new(0));
+    entityArray[1].set_x_offset(Num::new(-2));
+
+    let mut camera: Camera = Camera::default();
 
     loop {
         bitmap4.clear(0);
@@ -58,11 +63,12 @@ fn main(mut gba: agb::Gba) -> ! {
         if (angle > Num::new(1)) {
             angle = Num::new(0);
         }
-        for i in 0..2 {
-            entityArray[i].set_x_rotation(angle);
+        camera.x -= Num::from_f32(0.1);
+        for i in 0..1 {
+            //entityArray[i].set_x_rotation(angle);
             entityArray[i].set_y_rotation(angle);
 
-            entityArray[i].render(&mut bitmap4);
+            entityArray[i].render(&mut bitmap4, &camera);
         }
         
         bitmap4.flip_page();
