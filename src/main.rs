@@ -71,9 +71,9 @@ fn main(mut gba: agb::Gba) -> ! {
         if (angle > Num::new(1)) {
             angle = Num::new(0);
         }
-        camera.y -= Num::from_f32(0.1);
+        //camera.y -= Num::from_f32(0.1);
         for i in 0..1 {
-            //entityArray[i].set_x_rotation(angle);
+            entityArray[i].set_x_rotation(angle);
             entityArray[i].set_y_rotation(angle);
             entityArray[i].refresh_model_matrix();
 
