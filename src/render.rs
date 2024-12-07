@@ -92,13 +92,7 @@ pub fn draw_face_outline(
 }
 
 //return true if visible, presume points to be defined in counter clockwise direction
-pub fn backFaceCulling(
-    &points: &[[Num<i32, 8>; 3]; 8],
-    p1: usize,
-    p2: usize,
-    p3: usize,
-) -> bool{
-
+pub fn backFaceCulling(&points: &[[Num<i32, 8>; 3]; 8], p1: usize, p2: usize, p3: usize) -> bool {
     let v12: [Num<i32, 8>; 3] = vectorSub(points[p2], points[p1]);
     let v23: [Num<i32, 8>; 3] = vectorSub(points[p3], points[p2]);
 
@@ -127,9 +121,9 @@ pub fn draw_h_line(
 ) {
     // Ensure x1 is less than or equal to x2 for proper iteration
     let (mut start, mut end) = if x1 <= x2 { (x1, x2) } else { (x2, x1) };
-    
-    start = if start < 0 {0} else {start};
-    end = if (end > 239) {239} else {end};
+
+    start = if start < 0 { 0 } else { start };
+    end = if (end > 239) { 239 } else { end };
 
     // Adjust start to be the first even number in the range
     start = if start % 2 == 0 { start } else { start + 1 };
@@ -163,7 +157,20 @@ pub fn draw_flat_bottom_triangle(
     let mut curx1: Num<i32, 8> = (p1[0]);
     let mut curx2: Num<i32, 8> = (p1[0]);
 
-    for scanline_y in p1[1].trunc()..=p2[1].trunc() {
+    let mut yTop: i32 = p1[1].trunc();
+    let yBottom: i32 = p3[1].trunc();
+
+    let yTopDifference = if yTop < 0 { 0 - yTop } else { 0 };
+    yTop += yTopDifference;
+
+    curx1 += invslope1 * yTopDifference;
+    curx2 += invslope2 * yTopDifference;
+
+    // Iterate over the scanlines from the top (p1 and p2) down to p3
+    for scanline_y in yTop..=yBottom {
+        if (scanline_y > 159) {
+            break;
+        }
         draw_h_line(bitmap4, curx1.trunc(), curx2.trunc(), scanline_y, color);
         curx1 += invslope1;
         curx2 += invslope2;
@@ -193,8 +200,20 @@ pub fn draw_flat_top_triangle(
     let mut curx1: Num<i32, 8> = (p1[0]);
     let mut curx2: Num<i32, 8> = (p2[0]);
 
+    let mut yTop: i32 = p1[1].trunc();
+    let yBottom: i32 = p3[1].trunc();
+
+    let yTopDifference = if yTop < 0 { 0 - yTop } else { 0 };
+    yTop += yTopDifference;
+
+    curx1 += invslope1 * yTopDifference;
+    curx2 += invslope2 * yTopDifference;
+
     // Iterate over the scanlines from the top (p1 and p2) down to p3
-    for scanline_y in p1[1].trunc()..=p3[1].trunc() {
+    for scanline_y in yTop..=yBottom {
+        if (scanline_y > 159) {
+            break;
+        }
         draw_h_line(bitmap4, curx1.trunc(), curx2.trunc(), scanline_y, color);
         curx1 += invslope1;
         curx2 += invslope2;
@@ -238,18 +257,17 @@ pub fn draw_triangle(
     mut p3: [Num<i32, 8>; 2],
     color: u8,
 ) {
-
     let zero: Num<i32, 8> = Num::new(0);
     let xMax: Num<i32, 8> = Num::new(240);
     let yMax: Num<i32, 8> = Num::new(160);
 
-
     //first check out if the triangle is completely out of view
-    if (p1[0] < zero && p2[0] < zero && p3[0] < zero 
-        || p1[1] < zero && p2[1] < zero && p3[1] < zero 
+    if (p1[0] < zero && p2[0] < zero && p3[0] < zero
+        || p1[1] < zero && p2[1] < zero && p3[1] < zero
         || p1[0] > xMax && p2[0] > xMax && p3[0] > xMax
-    || p1[1] > yMax && p2[1] > yMax && p3[1] > yMax) {
-        return
+        || p1[1] > yMax && p2[1] > yMax && p3[1] > yMax)
+    {
+        return;
     }
 
     sort_points(&mut p1, &mut p2, &mut p3);

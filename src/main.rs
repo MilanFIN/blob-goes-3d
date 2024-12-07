@@ -16,23 +16,24 @@
 
 use agb::fixnum::Num;
 
-mod math;
-use math::*;
-
-mod render;
-use render::*;
-
 mod entities;
 use entities::*;
+use cube::Cube;
+use empty::Empty;
 
 mod camera;
 use camera::*;
+
+mod render;
+mod math;
 
 // The main function must take 1 arguments and never return. The agb::entry decorator
 // ensures that everything is in order. `agb` will call this after setting up the stack
 // and interrupt handlers correctly. It will also handle creating the `Gba` struct for you.
 #[agb::entry]
 fn main(mut gba: agb::Gba) -> ! {
+
+
     let mut bitmap4: agb::display::bitmap4::Bitmap4 = gba.display.video.bitmap4();
 
     // Set a palette entries
@@ -49,6 +50,13 @@ fn main(mut gba: agb::Gba) -> ! {
     for i in 0..2 {
         entityArray[i] = EntityEnum::Cube(Cube::default());
         entityArray[i].set_z_offset(Num::new(3));
+        entityArray[i].set_x_rotation(Num::new(0));
+        entityArray[i].set_y_rotation(Num::new(0));
+        entityArray[i].set_z_rotation(Num::new(0));
+        //always call after modifying rotation
+        entityArray[i].refresh_model_matrix();
+
+    
         entityArray[i].set_size(2);
     }
 
@@ -63,10 +71,11 @@ fn main(mut gba: agb::Gba) -> ! {
         if (angle > Num::new(1)) {
             angle = Num::new(0);
         }
-        camera.x -= Num::from_f32(0.1);
+        camera.y -= Num::from_f32(0.1);
         for i in 0..1 {
             //entityArray[i].set_x_rotation(angle);
             entityArray[i].set_y_rotation(angle);
+            entityArray[i].refresh_model_matrix();
 
             entityArray[i].render(&mut bitmap4, &camera);
         }

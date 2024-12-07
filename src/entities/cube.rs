@@ -1,85 +1,12 @@
 use agb::fixnum::Num;
 
-use crate::math;
+use super::Entity;
+use super::Camera;
+use super::math;
 use math::*;
-
-use crate::render;
+use super::render;
 use render::*;
 
-use crate::camera;
-use camera::*;
-
-#[derive(Copy, Clone)]
-pub enum EntityEnum {
-    Cube(Cube),
-    Empty(Empty),
-}
-
-impl EntityEnum {
-    pub fn set_x_offset(&mut self, offset: Num<i32, 8>) {
-        match self {
-            EntityEnum::Cube(c) => c.set_x_offset(offset),
-            EntityEnum::Empty(e) => e.set_y_offset(offset),
-        }
-    }
-    pub fn set_y_offset(&mut self, offset: Num<i32, 8>) {
-        match self {
-            EntityEnum::Cube(c) => c.set_x_offset(offset),
-            EntityEnum::Empty(e) => e.set_y_offset(offset),
-        }
-    }
-    pub fn set_z_offset(&mut self, offset: Num<i32, 8>) {
-        match self {
-            EntityEnum::Cube(c) => c.set_z_offset(offset),
-            EntityEnum::Empty(e) => e.set_z_offset(offset),
-        }
-    }
-    pub fn set_x_rotation(&mut self, rot: Num<i32, 8>) {
-        match self {
-            EntityEnum::Cube(c) => c.set_x_rotation(rot),
-            EntityEnum::Empty(e) => e.set_x_rotation(rot),
-        }
-    }
-    pub fn set_y_rotation(&mut self, rot: Num<i32, 8>) {
-        match self {
-            EntityEnum::Cube(c) => c.set_y_rotation(rot),
-            EntityEnum::Empty(e) => e.set_y_rotation(rot),
-        }
-    }
-    pub fn set_z_rotation(&mut self, rot: Num<i32, 8>) {
-        match self {
-            EntityEnum::Cube(c) => c.set_z_rotation(rot),
-            EntityEnum::Empty(e) => e.set_z_rotation(rot),
-        }
-    }
-    pub fn set_size(&mut self, size: i32) {
-        match self {
-            EntityEnum::Cube(c) => c.set_size(size),
-            EntityEnum::Empty(e) => e.set_size(size),
-        }
-    }
-    pub fn render(&self, bitmap4: &mut agb::display::bitmap4::Bitmap4, camera: &Camera) {
-        match self {
-            EntityEnum::Cube(c) => c.render(bitmap4, camera),
-            EntityEnum::Empty(e) => e.render(bitmap4, camera),
-        }
-    }
-}
-
-pub trait Entity {
-    fn render(&self, bitmap4: &mut agb::display::bitmap4::Bitmap4, camera: &Camera);
-
-    fn set_x_offset(&mut self, x_offset: Num<i32, 8>);
-    fn set_y_offset(&mut self, y_offset: Num<i32, 8>);
-    fn set_z_offset(&mut self, z_offset: Num<i32, 8>);
-
-    fn set_x_rotation(&mut self, x_rotation: Num<i32, 8>);
-    fn set_y_rotation(&mut self, y_rotation: Num<i32, 8>);
-    fn set_z_rotation(&mut self, z_rotation: Num<i32, 8>);
-
-    fn set_size(&mut self, size: i32);
-    fn set_vertex(&mut self, point: [Num<i32, 8>; 3], index: i32);
-}
 
 #[derive(Copy, Clone)]
 pub struct Cube {
@@ -92,6 +19,11 @@ pub struct Cube {
     z_rotation: Num<i32, 8>,
 
     points: [[Num<i32, 8>; 3]; 8],
+    model_rotated_points: [[Num<i32, 8>; 3]; 8],
+
+    x_rotation_matrix: [[Num<i32, 8>; 3]; 3],
+    y_rotation_matrix: [[Num<i32, 8>; 3]; 3],
+    z_rotation_matrix: [[Num<i32, 8>; 3]; 3],
 }
 
 impl Cube {
@@ -104,6 +36,10 @@ impl Cube {
             y_rotation: Num::new(0),
             z_rotation: Num::new(0),
             points: [[Num::new(0); 3]; 8],
+            model_rotated_points: [[Num::new(0); 3]; 8],
+            x_rotation_matrix: [[Num::new(0); 3]; 3],
+            y_rotation_matrix: [[Num::new(0); 3]; 3],
+            z_rotation_matrix: [[Num::new(0); 3]; 3],
         }
     }
 }
@@ -137,14 +73,41 @@ impl Entity for Cube {
 
     fn set_x_rotation(&mut self, x_rotation: Num<i32, 8>) {
         self.x_rotation = x_rotation;
+        self.x_rotation_matrix = [
+            [Num::new(1), Num::new(0), Num::new(0)],
+            [Num::new(0), self.x_rotation.cos(), -self.x_rotation.sin()],
+            [Num::new(0), self.x_rotation.sin(), self.x_rotation.cos()],
+        ];
     }
 
     fn set_y_rotation(&mut self, y_rotation: Num<i32, 8>) {
         self.y_rotation = y_rotation;
+        self.y_rotation_matrix = [
+            [self.y_rotation.cos(), Num::new(0), self.y_rotation.sin()],
+            [Num::new(0), Num::new(1), Num::new(0)],
+            [-self.y_rotation.sin(), Num::new(0), self.y_rotation.cos()],
+        ];
     }
 
     fn set_z_rotation(&mut self, z_rotation: Num<i32, 8>) {
         self.z_rotation = z_rotation;
+        self.z_rotation_matrix = [
+            [self.z_rotation.cos(), -self.z_rotation.sin(), Num::new(0)],
+            [self.z_rotation.sin(), self.z_rotation.cos(), Num::new(0)],
+            [Num::new(0), Num::new(0), Num::new(1)],
+        ];
+    }
+
+    fn refresh_model_matrix(&mut self) {
+        for i in 0..self.points.len() {
+            let point: &[Num<i32, 8>; 3] = &self.points[i];
+
+            let mut rotated_point: [Num<i32, 8>; 3] = matmul(self.x_rotation_matrix, *point);
+            rotated_point = matmul(self.y_rotation_matrix, rotated_point);
+            rotated_point = matmul(self.z_rotation_matrix, rotated_point);
+
+            self.model_rotated_points[i] = rotated_point;
+        }
     }
 
     fn set_vertex(&mut self, point: [Num<i32, 8>; 3], index: i32) {
@@ -157,24 +120,6 @@ impl Entity for Cube {
         let scale: Num<i32, 8> = Num::new(30); //100;
         let middle: [Num<i32, 8>; 2] = [Num::new(width / 2), Num::new(height / 2)]; // x, y
 
-        let rotX: [[Num<i32, 8>; 3]; 3] = [
-            [Num::new(1), Num::new(0), Num::new(0)],
-            [Num::new(0), self.x_rotation.cos(), -self.x_rotation.sin()],
-            [Num::new(0), self.x_rotation.sin(), self.x_rotation.cos()],
-        ];
-
-        let rotY: [[Num<i32, 8>; 3]; 3] = [
-            [self.y_rotation.cos(), Num::new(0), self.y_rotation.sin()],
-            [Num::new(0), Num::new(1), Num::new(0)],
-            [-self.y_rotation.sin(), Num::new(0), self.y_rotation.cos()],
-        ];
-
-        let rotZ: [[Num<i32, 8>; 3]; 3] = [
-            [self.z_rotation.cos(), -self.z_rotation.sin(), Num::new(0)],
-            [self.z_rotation.sin(), self.z_rotation.cos(), Num::new(0)],
-            [Num::new(0), Num::new(0), Num::new(1)],
-        ];
-
         let mut screenPoints: [[Num<i32, 8>; 2]; 8] = [[Num::new(0), Num::new(0)]; 8];
         let mut translatedPoints: [[Num<i32, 8>; 3]; 8] =
             [[Num::new(0), Num::new(0), Num::new(0)]; 8];
@@ -182,20 +127,18 @@ impl Entity for Cube {
         let mut i = 0;
 
         for point in &self.points {
-            let mut rotated_point: [Num<i32, 8>; 3] = matmul(rotX, *point);
-            rotated_point = matmul(rotY, rotated_point);
-            rotated_point = matmul(rotZ, rotated_point);
+            let mut rotated_point: [Num<i32, 8>; 3] = matmul(self.x_rotation_matrix, *point);
+            rotated_point = matmul(self.y_rotation_matrix, rotated_point);
+            rotated_point = matmul(self.z_rotation_matrix, rotated_point);
 
-            //todo: need to use both object x, y z and world x, y & z
-            //that way we could rotate the entire scene
-            let mut translated_point: [Num<i32, 8>; 3] = rotated_point;
+            let mut translated_point: [Num<i32, 8>; 3] = self.model_rotated_points[i];
             translated_point[0] += self.x_offset - camera.x;
             translated_point[1] += self.y_offset - camera.y;
             translated_point[2] += self.z_offset - camera.z;
 
-            // might want to perform world rotation and translation here later on
+            // might want to perform world rotation here later on
             //in that case, there would be a common rotx, y and z for all objects to rotate the scene around
-            let mut rotated_point: [Num<i32, 8>; 3] = matmul(rotX, translated_point);
+
             //perspective
             let z: Num<i32, 8> = translated_point[2];
             let zero: Num<i32, 8> = Num::new(0);
@@ -321,37 +264,3 @@ impl Entity for Cube {
         }
     }
 }
-
-#[derive(Copy, Clone)]
-pub struct Empty {}
-impl Entity for Empty {
-    fn render(&self, bitmap4: &mut agb::display::bitmap4::Bitmap4, camera: &Camera) {}
-    fn set_x_offset(&mut self, x_offset: Num<i32, 8>) {}
-    fn set_y_offset(&mut self, y_offset: Num<i32, 8>) {}
-    fn set_z_offset(&mut self, z_offset: Num<i32, 8>) {}
-    fn set_size(&mut self, size: i32) {}
-    fn set_x_rotation(&mut self, x_rotation: Num<i32, 8>) {}
-    fn set_y_rotation(&mut self, y_rotation: Num<i32, 8>) {}
-    fn set_z_rotation(&mut self, z_rotation: Num<i32, 8>) {}
-    fn set_vertex(&mut self, point: [Num<i32, 8>; 3], index: i32) {}
-}
-impl Empty {
-    pub fn default() -> Self {
-        Self {}
-    }
-}
-
-/*
-    let vertices = [10, 20, 30, 40, 50]; // Example i32 array
-    let count = vertices.len() as i32;
-
-    // Pass a pointer to the array
-    set_vertices(vertices.as_ptr(), count);
-
-    unsafe {
-    for i in 0..count {
-        // Dereference the pointer to access the array elements
-        println!("Vertex {}: {}", i, *vertices.offset(i as isize));
-    }
-}
-*/
