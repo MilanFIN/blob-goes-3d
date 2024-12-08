@@ -54,16 +54,21 @@ fn main(mut gba: agb::Gba) -> ! {
         entityArray[i].set_y_rotation(Num::new(0));
         entityArray[i].set_z_rotation(Num::new(0));
         //always call after modifying rotation
-        entityArray[i].refresh_model_matrix();
 
     
         entityArray[i].set_size(2);
+        entityArray[i].refresh_model_matrix();
+
     }
 
     entityArray[0].set_x_offset(Num::new(0));
     entityArray[1].set_x_offset(Num::new(-2));
 
     let mut camera: Camera = Camera::default();
+    camera.set_x_rotation(Num::new(0));
+    camera.set_y_rotation(Num::new(0));
+    camera.set_z_rotation(Num::from_f32(0.0));
+
 
     loop {
         bitmap4.clear(0);
@@ -72,10 +77,12 @@ fn main(mut gba: agb::Gba) -> ! {
             angle = Num::new(0);
         }
         //camera.z += Num::from_f32(0.1);
+        camera.set_z_rotation(angle);
+
         for i in 0..1 {
-            entityArray[i].set_x_rotation(angle);
-            entityArray[i].set_y_rotation(angle);
-            entityArray[i].refresh_model_matrix();
+            //entityArray[i].set_x_rotation(angle);
+            //entityArray[i].set_y_rotation(angle);
+            //entityArray[i].refresh_model_matrix();
 
             entityArray[i].render(&mut bitmap4, &camera);
         }

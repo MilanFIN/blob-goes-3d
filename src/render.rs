@@ -1,8 +1,8 @@
 use agb::fixnum::Num;
 
-use math::*;
 
-use crate::{math, Camera};
+use crate::{math};
+use math::*;
 
 pub fn draw_line(
     bitmap: &mut agb::display::bitmap4::Bitmap4,
@@ -97,14 +97,12 @@ pub fn backFaceCulling(
     p1: usize,
     p2: usize,
     p3: usize,
-    camera: &Camera,
 ) -> bool {
     let v12: [Num<i32, 8>; 3] = vectorSub(points[p2], points[p1]);
     let v23: [Num<i32, 8>; 3] = vectorSub(points[p3], points[p2]);
 
     let normal: [Num<i32, 8>; 3] = vectorCross(v12, v23);
 
-    let viewDir: [Num<i32, 8>; 3] = [Num::new(0), Num::new(0), Num::new(1)];
     //get center of the three polygons
     let polygonCenter: [Num<i32, 8>; 3] = [
         (points[p1][0] + points[p2][0] + points[p3][0]) / Num::new(3),
@@ -112,14 +110,13 @@ pub fn backFaceCulling(
         (points[p1][2] + points[p2][2] + points[p3][2]) / Num::new(3),
     ];
 
-    let viewVector: [Num<i32, 8>; 3] = [
-        polygonCenter[0] - camera.x,
-        polygonCenter[1] - camera.y,
-        polygonCenter[2] - camera.z,
-    ];
+    //behind camera, so not visible
+    if (polygonCenter[2] < Num::new(0)) {
+        return false;
+    }
 
     //calculate view direction towards the center of the polygon
-    let viewDir: [Num<i32, 8>; 3] = normalize(viewVector);
+    let viewDir: [Num<i32, 8>; 3] = normalize(polygonCenter);
 
     let dotProd: Num<i32, 8> = vectorDot(normal, viewDir).change_base();
     return dotProd < Num::new(0);

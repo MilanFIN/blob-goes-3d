@@ -127,18 +127,23 @@ impl Entity for Cube {
         let mut i = 0;
 
         for point in &self.points {
-            let mut rotated_point: [Num<i32, 8>; 3] = matmul(self.x_rotation_matrix, *point);
+            /*let mut rotated_point: [Num<i32, 8>; 3] = matmul(self.x_rotation_matrix, *point);
             rotated_point = matmul(self.y_rotation_matrix, rotated_point);
-            rotated_point = matmul(self.z_rotation_matrix, rotated_point);
+            rotated_point = matmul(self.z_rotation_matrix, rotated_point);*/
 
             let mut translated_point: [Num<i32, 8>; 3] = self.model_rotated_points[i];
             translated_point[0] += self.x_offset - camera.x;
             translated_point[1] += self.y_offset - camera.y;
             translated_point[2] += self.z_offset - camera.z;
 
+            translated_point = matmul(camera.x_rotation_matrix, translated_point);
+            translated_point = matmul(camera.y_rotation_matrix, translated_point);
+            translated_point = matmul(camera.z_rotation_matrix, translated_point);
+
             // might want to perform world rotation here later on
             //in that case, there would be a common rotx, y and z for all objects to rotate the scene around
 
+            
             //perspective
             let z: Num<i32, 8> = translated_point[2];
             let zero: Num<i32, 8> = Num::new(0);
@@ -158,7 +163,7 @@ impl Entity for Cube {
             translatedPoints[i] = translated_point;
             i += 1;
         }
-        if (backFaceCulling(&translatedPoints, 0, 1, 2, camera)) {
+        if (backFaceCulling(&translatedPoints, 0, 1, 2)) {
             //draw_face_outline(&mut bitmap4, screenPoints, 0, 1, 2, 3);
             draw_triangle(
                 bitmap4,
@@ -175,7 +180,7 @@ impl Entity for Cube {
                 1,
             );
         }
-        if (backFaceCulling(&translatedPoints, 7, 6, 5, camera)) {
+        if (backFaceCulling(&translatedPoints, 7, 6, 5)) {
             //draw_face_outline(&mut bitmap4, screenPoints, 7, 6, 5, 4);
             draw_triangle(
                 bitmap4,
@@ -193,7 +198,7 @@ impl Entity for Cube {
             );
         }
 
-        if (backFaceCulling(&translatedPoints, 0, 3, 7, camera)) {
+        if (backFaceCulling(&translatedPoints, 0, 3, 7)) {
             //draw_face_outline(&mut bitmap4, screenPoints, 0, 3, 7, 4);
             draw_triangle(
                 bitmap4,
@@ -210,7 +215,7 @@ impl Entity for Cube {
                 2,
             );
         }
-        if (backFaceCulling(&translatedPoints, 1, 5, 6, camera)) {
+        if (backFaceCulling(&translatedPoints, 1, 5, 6)) {
             //draw_face_outline(&mut bitmap4, screenPoints, 1, 5, 6, 2);
             draw_triangle(
                 bitmap4,
@@ -228,7 +233,7 @@ impl Entity for Cube {
             );
         }
 
-        if (backFaceCulling(&translatedPoints, 7, 3, 2, camera)) {
+        if (backFaceCulling(&translatedPoints, 7, 3, 2)) {
             //draw_face_outline(&mut bitmap4, screenPoints, 7, 3, 2, 6);
             draw_triangle(
                 bitmap4,
@@ -245,7 +250,7 @@ impl Entity for Cube {
                 3,
             );
         }
-        if (backFaceCulling(&translatedPoints, 0, 4, 5, camera)) {
+        if (backFaceCulling(&translatedPoints, 0, 4, 5)) {
             //draw_face_outline(&mut bitmap4, screenPoints, 0, 4, 5, 1);
             draw_triangle(
                 bitmap4,
