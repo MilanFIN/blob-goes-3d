@@ -111,7 +111,7 @@ pub fn backFaceCulling(
     ];
 
     //behind camera, so not visible
-    if (polygonCenter[2] < Num::new(0)) {
+    if (polygonCenter[2] < Num::new(1)/2) {
         return false;
     }
 
