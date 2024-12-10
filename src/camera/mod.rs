@@ -1,4 +1,6 @@
-use agb::fixnum::{num, Num};
+use agb::fixnum::{Num};
+
+pub mod lut;
 
 pub struct Camera {
     pub x: Num<i32, 8>,
@@ -53,16 +55,3 @@ impl Camera {
         ];
     }
 }
-
-pub const fn NewNum(m:i32) -> Num<i32, 8> {
-    return Num::from_raw(m << 8);
-}
-
-pub const CAMERALOCATIONS: [[Num<i32, 8>; 3]; 4] = [
-    //x_off, z_off, x_angle
-    [NewNum(1), Num::from_raw(-3), Num::from_raw(0)],
-    [Num::from_raw(0), Num::from_raw(0), Num::from_raw(0)],
-    [Num::from_raw(0), Num::from_raw(0), Num::from_raw(0)],
-    [Num::from_raw(0), Num::from_raw(0), Num::from_raw(0)],
-
-];

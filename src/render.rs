@@ -3,6 +3,8 @@ use agb::fixnum::Num;
 
 use crate::{math};
 use math::*;
+use crate::{utils};
+use utils::*;
 
 pub fn draw_line(
     bitmap: &mut agb::display::bitmap4::Bitmap4,
@@ -98,6 +100,11 @@ pub fn backFaceCulling(
     p2: usize,
     p3: usize,
 ) -> bool {
+
+    /*if (points[p1][2] < NewNum(0) || points[p2][2] < NewNum(0) || points[p3][2] < NewNum(0)) {
+        return false
+    }*/
+
     let v12: [Num<i32, 8>; 3] = vectorSub(points[p2], points[p1]);
     let v23: [Num<i32, 8>; 3] = vectorSub(points[p3], points[p2]);
 
@@ -105,13 +112,14 @@ pub fn backFaceCulling(
 
     //get center of the three polygons
     let polygonCenter: [Num<i32, 8>; 3] = [
-        (points[p1][0] + points[p2][0] + points[p3][0]) / Num::new(3),
-        (points[p1][1] + points[p2][1] + points[p3][1]) / Num::new(3),
-        (points[p1][2] + points[p2][2] + points[p3][2]) / Num::new(3),
+        (points[p1][0] + points[p2][0] + points[p3][0]) / NewNum(3),
+        (points[p1][1] + points[p2][1] + points[p3][1]) / NewNum(3),
+        (points[p1][2] + points[p2][2] + points[p3][2]) / NewNum(3),
     ];
 
+    //doing this for all points instead
     //behind camera, so not visible
-    if (polygonCenter[2] < Num::new(1)/2) {
+    if (polygonCenter[2] < NewNum(1)) {
         return false;
     }
 
@@ -119,7 +127,7 @@ pub fn backFaceCulling(
     let viewDir: [Num<i32, 8>; 3] = normalize(polygonCenter);
 
     let dotProd: Num<i32, 8> = vectorDot(normal, viewDir).change_base();
-    return dotProd < Num::new(0);
+    return dotProd < NewNum(0);
 }
 
 pub fn draw_h_line(
@@ -155,11 +163,11 @@ pub fn draw_flat_bottom_triangle(
     let mut div1 = p2[1] - p1[1];
     let mut div2 = p3[1] - p1[1];
 
-    if (div1 < Num::new(3)) {
-        div1 = Num::new(3);
+    if div1 < NewNum(3) {
+        div1 = NewNum(3);
     }
-    if (div2 < Num::new(3)) {
-        div2 = Num::new(3);
+    if div2 < NewNum(3) {
+        div2 = NewNum(3);
     }
 
     let invslope1: Num<i32, 8> = (p2[0] - p1[0]) / (div1);
@@ -196,11 +204,11 @@ pub fn draw_flat_top_triangle(
 ) {
     let mut div1 = p3[1] - p1[1];
     let mut div2 = p3[1] - p2[1];
-    if (div1 < Num::new(3)) {
-        div1 = Num::new(3);
+    if (div1 < NewNum(3)) {
+        div1 = NewNum(3);
     }
-    if (div2 < Num::new(3)) {
-        div2 = Num::new(3);
+    if (div2 < NewNum(3)) {
+        div2 = NewNum(3);
     }
     // Calculate the slopes (invslope1 and invslope2)
     let invslope1: Num<i32, 8> = (p3[0] - p1[0]) / (div1);
@@ -260,6 +268,7 @@ pub fn sort_points(
     }
 }
 
+
 pub fn draw_triangle(
     bitmap4: &mut agb::display::bitmap4::Bitmap4,
     mut p1: [Num<i32, 8>; 2],
@@ -267,9 +276,28 @@ pub fn draw_triangle(
     mut p3: [Num<i32, 8>; 2],
     color: u8,
 ) {
-    let zero: Num<i32, 8> = Num::new(0);
-    let xMax: Num<i32, 8> = Num::new(240);
-    let yMax: Num<i32, 8> = Num::new(160);
+    let zero: Num<i32, 8> = NewNum(0);
+    let xMax: Num<i32, 8> = NewNum(240);
+    let yMax: Num<i32, 8> = NewNum(160);
+    
+    //jank way to avoid giant polygons near zero plane
+    if (p1[0] > NewNum(1000) || p1[0] < NewNum(-100)) {
+        return
+    }
+    if (p2[0] > NewNum(1000) || p2[0] < NewNum(-100)) {
+        return
+    }   
+    if (p3[0] > NewNum(1000) || p3[0] < NewNum(-100)) {
+        return
+    }    
+    if (p1[1] > NewNum(1000) || p1[1] < NewNum(-100)) {
+        return
+    }
+    if (p2[1] > NewNum(1000) || p2[1] < NewNum(-100)) {
+        return
+    }   if (p3[1] > NewNum(1000) || p3[1] < NewNum(-100)) {
+        return
+    }
 
     //first check out if the triangle is completely out of view
     if (p1[0] < zero && p2[0] < zero && p3[0] < zero

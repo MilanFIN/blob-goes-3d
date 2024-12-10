@@ -82,18 +82,3 @@ impl EntityEnum {
         }
     }
 }
-
-/*
-    let vertices = [10, 20, 30, 40, 50]; // Example i32 array
-    let count = vertices.len() as i32;
-
-    // Pass a pointer to the array
-    set_vertices(vertices.as_ptr(), count);
-
-    unsafe {
-    for i in 0..count {
-        // Dereference the pointer to access the array elements
-        println!("Vertex {}: {}", i, *vertices.offset(i as isize));
-    }
-}
-*/

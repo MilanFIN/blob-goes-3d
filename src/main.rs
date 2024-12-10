@@ -23,9 +23,12 @@ use empty::Empty;
 
 mod camera;
 use camera::*;
+use lut::CAMERALOCATIONS;
 
 mod render;
 mod math;
+mod utils;
+use utils::*;
 
 // The main function must take 1 arguments and never return. The agb::entry decorator
 // ensures that everything is in order. `agb` will call this after setting up the stack
@@ -44,6 +47,7 @@ fn main(mut gba: agb::Gba) -> ! {
 
     let mut angle: Num<i32, 8> = NewNum(0);
     let increment: Num<i32, 8> = NewNum(1) / 256;
+    let mut a = 0;
 
     //todo: use these
     let mut entityArray: [EntityEnum; 2] = [EntityEnum::Empty(Empty::default()); 2];
@@ -55,19 +59,20 @@ fn main(mut gba: agb::Gba) -> ! {
         entityArray[i].set_z_rotation(NewNum(0));
         //always call after modifying rotation
 
-    
         entityArray[i].set_size(2);
         entityArray[i].refresh_model_matrix();
 
     }
 
     entityArray[0].set_x_offset(NewNum(0));
-    entityArray[1].set_x_offset(NewNum(-2));
+    entityArray[1].set_x_offset(NewNum(10));
 
     let mut camera: Camera = Camera::default();
     camera.set_x_rotation(NewNum(0));
     camera.set_y_rotation(NewNum(0));
     camera.set_z_rotation(NewNum(0));
+    camera.y = NewNum(-3);
+
 
 
     loop {
@@ -76,29 +81,24 @@ fn main(mut gba: agb::Gba) -> ! {
         if (angle > NewNum(1)) {
             angle = NewNum(0);
         }
+
+        camera.set_y_rotation(CAMERALOCATIONS[a][2]);
+        camera.x = CAMERALOCATIONS[a][0];
+        camera.z = CAMERALOCATIONS[a][1];
+
+        a += 1;
+        if a > 255 {
+            a = 0;
+        }
+
         //constant vertical offset
-        camera.y = NewNum(-3);
-
-
-        //todo: init into a vector in heap using the ewram external allocator
-        //then split into 8, 16 etc...
+        /*
         camera.set_y_rotation(NewNum(0));
         camera.x = NewNum(0);
         camera.z = NewNum(-3);
+        */
 
-        camera.set_y_rotation(NewNum(1)/2);
-        camera.x = NewNum(0);
-        camera.z = NewNum(3);
-
-        camera.set_y_rotation(NewNum(1)/4);
-        camera.x = NewNum(3);
-        camera.z = NewNum(0);
-
-        camera.set_y_rotation(NewNum(3)/4);
-        camera.x = NewNum(-3);
-        camera.z = NewNum(0);
-
-        for i in 0..1 {
+        for i in 0..2 {
             //entityArray[i].set_z_rotation(angle);
             //entityArray[i].set_y_rotation(angle);
             //entityArray[i].refresh_model_matrix();

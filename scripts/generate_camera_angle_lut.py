@@ -20,4 +20,13 @@ for i in range(num_points):
     x = radius * math.sin(angle_radians)  # sin controls x, starts from 0
     y = -radius * math.cos(angle_radians)  # cos controls y, starts from -3
 
-    print(f"Angle: {i/256:.6f} , X: {x:.6f}, Z: {y:.6f}")
+    #print(f"Angle: {i/256:.6f} , X: {x:.6f}, Z: {y:.6f}")
+
+
+    formatted_x = int(x * 256)
+    formatted_y = int(y * 256)
+    formatted_angle = int(i)
+
+
+    formatted_string = f"[Num::from_raw({formatted_x}), Num::from_raw({formatted_y}), Num::from_raw({formatted_angle})],"
+    print (formatted_string)
