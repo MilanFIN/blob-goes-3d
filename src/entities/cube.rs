@@ -1,5 +1,7 @@
 use agb::fixnum::Num;
 
+use crate::NewNum;
+
 use super::Entity;
 use super::Camera;
 use super::math;
@@ -57,17 +59,17 @@ impl Entity for Cube {
         self.z_offset = z_offset;
     }
 
-    fn set_size(&mut self, size: i32) {
-        let radius = size >> 1;
+    fn set_size(&mut self, size: Num<i32, 8>) {
+        let radius: Num<i32, 8> = size / 2;//size /NewNum(2);
         self.points = [
-            [Num::new(radius), Num::new(radius), Num::new(radius)],
-            [Num::new(-radius), Num::new(radius), Num::new(radius)],
-            [Num::new(-radius), Num::new(-radius), Num::new(radius)],
-            [Num::new(radius), Num::new(-radius), Num::new(radius)],
-            [Num::new(radius), Num::new(radius), Num::new(-radius)],
-            [Num::new(-radius), Num::new(radius), Num::new(-radius)],
-            [Num::new(-radius), Num::new(-radius), Num::new(-radius)],
-            [Num::new(radius), Num::new(-radius), Num::new(-radius)],
+            [(radius), (radius), (radius)],
+            [(-radius), (radius), (radius)],
+            [(-radius), (-radius), (radius)],
+            [(radius), (-radius), (radius)],
+            [(radius), (radius), (-radius)],
+            [(-radius), (radius), (-radius)],
+            [(-radius), (-radius), (-radius)],
+            [(radius), (-radius), (-radius)],
         ];
     }
 

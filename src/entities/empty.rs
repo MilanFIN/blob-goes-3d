@@ -12,7 +12,7 @@ impl Entity for Empty {
     fn set_x_offset(&mut self, x_offset: Num<i32, 8>) {}
     fn set_y_offset(&mut self, y_offset: Num<i32, 8>) {}
     fn set_z_offset(&mut self, z_offset: Num<i32, 8>) {}
-    fn set_size(&mut self, size: i32) {}
+    fn set_size(&mut self, size: Num<i32, 8>) {}
     fn set_x_rotation(&mut self, x_rotation: Num<i32, 8>) {}
     fn set_y_rotation(&mut self, y_rotation: Num<i32, 8>) {}
     fn set_z_rotation(&mut self, z_rotation: Num<i32, 8>) {}

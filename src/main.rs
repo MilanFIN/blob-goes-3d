@@ -15,6 +15,7 @@
 #![cfg_attr(test, test_runner(agb::test_runner::test_runner))]
 
 use agb::fixnum::Num;
+use agb::input::*;
 
 mod entities;
 use entities::*;
@@ -30,12 +31,18 @@ mod math;
 mod utils;
 use utils::*;
 
+mod player;
+use player::*;
+
+
 // The main function must take 1 arguments and never return. The agb::entry decorator
 // ensures that everything is in order. `agb` will call this after setting up the stack
 // and interrupt handlers correctly. It will also handle creating the `Gba` struct for you.
 #[agb::entry]
 fn main(mut gba: agb::Gba) -> ! {
 
+    let mut input = ButtonController::new();
+    
 
     let mut bitmap4: agb::display::bitmap4::Bitmap4 = gba.display.video.bitmap4();
 
@@ -50,8 +57,8 @@ fn main(mut gba: agb::Gba) -> ! {
     let mut a = 0;
 
     //todo: use these
-    let mut entityArray: [EntityEnum; 2] = [EntityEnum::Empty(Empty::default()); 2];
-    for i in 0..2 {
+    let mut entityArray: [EntityEnum; 4] = [EntityEnum::Empty(Empty::default()); 4];
+    for i in 0..4 {
         entityArray[i] = EntityEnum::Cube(Cube::default());
         entityArray[i].set_z_offset(NewNum(0));
         entityArray[i].set_x_rotation(NewNum(0));
@@ -59,51 +66,75 @@ fn main(mut gba: agb::Gba) -> ! {
         entityArray[i].set_z_rotation(NewNum(0));
         //always call after modifying rotation
 
-        entityArray[i].set_size(2);
+        entityArray[i].set_size(NewNum(2));
         entityArray[i].refresh_model_matrix();
-
     }
 
-    entityArray[0].set_x_offset(NewNum(0));
-    entityArray[1].set_x_offset(NewNum(10));
+    //player entities
+    entityArray[0].set_size(NewNum(1));
+    entityArray[0].set_y_offset(NewNum(0));
+    entityArray[0].refresh_model_matrix();
 
-    let mut camera: Camera = Camera::default();
-    camera.set_x_rotation(NewNum(0));
-    camera.set_y_rotation(NewNum(0));
-    camera.set_z_rotation(NewNum(0));
-    camera.y = NewNum(-3);
+    entityArray[1].set_size(Num::from_f32(0.5));
+    entityArray[1].set_y_offset(Num::from_raw(-192));
+    entityArray[1].refresh_model_matrix();
 
 
+
+    //rest of the blocks
+    entityArray[2].set_x_offset(NewNum(5));
+    entityArray[3].set_x_offset(NewNum(-5));
+    let mut player = Player::default();
+
+    player.camera.set_x_rotation(NewNum(0));
+    player.camera.set_y_rotation(NewNum(0));
+    player.camera.set_z_rotation(NewNum(0));
+    player.camera.local_y = NewNum(-3);
+
+    player.x = NewNum(5);
 
     loop {
+        input.update();
+
+        if (input.is_pressed(Button::UP)) {
+            player.forward();
+        }
+        else if (input.is_pressed(Button::DOWN)) {
+            player.back();
+        }
+        if (input.is_pressed(Button::LEFT)) {
+            player.left();
+        }
+        else if (input.is_pressed(Button::RIGHT)) {
+            player.right();
+        }
+        if (input.is_pressed(Button::L)) {
+            player.camera_left(1);
+        }
+        else if (input.is_pressed(Button::R)) {
+            player.camera_right(1);
+        }
+
         bitmap4.clear(0);
         angle += increment;
         if (angle > NewNum(1)) {
             angle = NewNum(0);
         }
 
-        camera.set_y_rotation(CAMERALOCATIONS[a][2]);
-        camera.x = CAMERALOCATIONS[a][0];
-        camera.z = CAMERALOCATIONS[a][1];
-
-        a += 1;
-        if a > 255 {
-            a = 0;
-        }
-
-        //constant vertical offset
-        /*
-        camera.set_y_rotation(NewNum(0));
-        camera.x = NewNum(0);
-        camera.z = NewNum(-3);
-        */
+        player.update_camera_position();
 
         for i in 0..2 {
-            //entityArray[i].set_z_rotation(angle);
-            //entityArray[i].set_y_rotation(angle);
+            entityArray[i].set_x_offset(player.x);
+            entityArray[i].set_z_offset(player.z);
+
+            //entityArray[i].set_y_rotation(player.angle);
             //entityArray[i].refresh_model_matrix();
 
-            entityArray[i].render(&mut bitmap4, &camera);
+        }
+
+
+        for i in 0..4 {
+            entityArray[i].render(&mut bitmap4, &player.camera);
         }
         
         bitmap4.flip_page();

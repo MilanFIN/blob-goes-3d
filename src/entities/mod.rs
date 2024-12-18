@@ -30,12 +30,12 @@ impl EntityEnum {
     pub fn set_x_offset(&mut self, offset: Num<i32, 8>) {
         match self {
             EntityEnum::Cube(c) => c.set_x_offset(offset),
-            EntityEnum::Empty(e) => e.set_y_offset(offset),
+            EntityEnum::Empty(e) => e.set_x_offset(offset),
         }
     }
     pub fn set_y_offset(&mut self, offset: Num<i32, 8>) {
         match self {
-            EntityEnum::Cube(c) => c.set_x_offset(offset),
+            EntityEnum::Cube(c) => c.set_y_offset(offset),
             EntityEnum::Empty(e) => e.set_y_offset(offset),
         }
     }
@@ -69,7 +69,7 @@ impl EntityEnum {
             EntityEnum::Empty(e) => e.refresh_model_matrix(),
         }
     }
-    pub fn set_size(&mut self, size: i32) {
+    pub fn set_size(&mut self, size: Num<i32, 8>) {
         match self {
             EntityEnum::Cube(c) => c.set_size(size),
             EntityEnum::Empty(e) => e.set_size(size),

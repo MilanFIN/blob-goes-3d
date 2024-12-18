@@ -14,6 +14,6 @@ pub trait Entity {
     fn set_z_rotation(&mut self, z_rotation: Num<i32, 8>);
     fn refresh_model_matrix(&mut self);
 
-    fn set_size(&mut self, size: i32);
+    fn set_size(&mut self, size: Num<i32, 8>);
     fn set_vertex(&mut self, point: [Num<i32, 8>; 3], index: i32);
 }

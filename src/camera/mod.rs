@@ -1,8 +1,14 @@
 use agb::fixnum::{Num};
 
+use crate::NewNum;
+
 pub mod lut;
 
 pub struct Camera {
+    pub local_x: Num<i32, 8>,
+    pub local_y: Num<i32, 8>,
+    pub local_z: Num<i32, 8>,
+    
     pub x: Num<i32, 8>,
     pub y: Num<i32, 8>,
     pub z: Num<i32, 8>,
@@ -18,12 +24,18 @@ pub struct Camera {
 impl Camera {
     pub fn default() -> Self {
         Self {
+            local_x: NewNum(0),
+            local_y: NewNum(0),
+            local_z: NewNum(0),
+
             x: Num::new(0),
             y: Num::new(0),
             z: Num::new(0),
+
             x_angle: Num::new(0),
             y_angle: Num::new(0),
             z_angle: Num::new(0),
+            
             x_rotation_matrix: [[Num::new(0); 3]; 3],
             y_rotation_matrix: [[Num::new(0); 3]; 3],
             z_rotation_matrix: [[Num::new(0); 3]; 3],
