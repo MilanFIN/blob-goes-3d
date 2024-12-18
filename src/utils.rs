@@ -11,3 +11,12 @@ pub fn clamp(n: &mut Num<i32, 8>, min: &Num<i32, 8>, max: &Num<i32, 8>) {
         *n = *max;
     }
 }
+
+pub fn abs(a: Num<i32, 8>) -> Num<i32, 8> {
+    if (a >= NewNum(0)) {
+        return a;
+    }
+    else {
+        return -a
+    }
+}

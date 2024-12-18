@@ -18,7 +18,8 @@ use render::*;
 use super::camera;
 use camera::*;
 
-
+use super::utils;
+use utils::*;
 
 #[derive(Copy, Clone)]
 pub enum EntityEnum {
@@ -81,4 +82,49 @@ impl EntityEnum {
             EntityEnum::Empty(e) => e.render(bitmap4, camera),
         }
     }
+    pub fn distanceFromCamera(&self, camera: &Camera) -> Num<i32, 8> {
+        match self {
+            EntityEnum::Cube(c) => c.distanceFromCamera(camera),
+            EntityEnum::Empty(e) => e.distanceFromCamera(camera),
+        }
+    }
 }
+
+fn partition(
+    entity_render_order: &mut [usize],
+    entity_array: &[EntityEnum],
+    low: usize,
+    high: usize,
+    camera: &Camera,
+) -> usize {
+    let pivot_distance = entity_array[entity_render_order[high]].distanceFromCamera(camera);
+    let mut i = low as isize - 1; // Use `isize` to allow `-1` for initialization
+
+    for j in low..high {
+        if entity_array[entity_render_order[j]].distanceFromCamera(camera) >= pivot_distance {
+            i += 1;
+            entity_render_order.swap(i as usize, j);
+        }
+    }
+
+    entity_render_order.swap((i + 1) as usize, high);
+    (i + 1) as usize
+}
+
+pub fn quick_sort(
+    entity_render_order: &mut [usize],
+    entity_array: &[EntityEnum],
+    low: usize,
+    high: usize,
+    camera: &Camera,
+) {
+    if low < high {
+        let pi = partition(entity_render_order, entity_array, low, high, camera);
+
+        if pi > 0 {
+            quick_sort(entity_render_order, entity_array, low, pi - 1, camera);
+        }
+        quick_sort(entity_render_order, entity_array, pi + 1, high, camera);
+    }
+}
+

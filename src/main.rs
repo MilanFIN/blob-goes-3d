@@ -58,6 +58,8 @@ fn main(mut gba: agb::Gba) -> ! {
 
     //todo: use these
     let mut entityArray: [EntityEnum; 4] = [EntityEnum::Empty(Empty::default()); 4];
+    let mut entityRenderOrder: [usize; 4] = [0;4];
+
     for i in 0..4 {
         entityArray[i] = EntityEnum::Cube(Cube::default());
         entityArray[i].set_z_offset(NewNum(0));
@@ -68,15 +70,21 @@ fn main(mut gba: agb::Gba) -> ! {
 
         entityArray[i].set_size(NewNum(2));
         entityArray[i].refresh_model_matrix();
+
+        entityRenderOrder[i] = i;
     }
 
     //player entities
     entityArray[0].set_size(NewNum(1));
     entityArray[0].set_y_offset(NewNum(0));
+    entityArray[0].set_y_rotation(Num::from_raw(64));
+
     entityArray[0].refresh_model_matrix();
 
     entityArray[1].set_size(Num::from_f32(0.5));
     entityArray[1].set_y_offset(Num::from_raw(-192));
+    entityArray[1].set_y_rotation(Num::from_raw(64));
+
     entityArray[1].refresh_model_matrix();
 
 
@@ -123,18 +131,17 @@ fn main(mut gba: agb::Gba) -> ! {
 
         player.update_camera_position();
 
+        //rotate player body blocks and move them where the player is
         for i in 0..2 {
             entityArray[i].set_x_offset(player.x);
             entityArray[i].set_z_offset(player.z);
-
-            //entityArray[i].set_y_rotation(player.angle);
-            //entityArray[i].refresh_model_matrix();
-
+            entityArray[i].set_y_rotation(-player.angle);
+            entityArray[i].refresh_model_matrix();
         }
 
-
+        quick_sort(&mut entityRenderOrder, &entityArray, 0, 3, &player.camera);
         for i in 0..4 {
-            entityArray[i].render(&mut bitmap4, &player.camera);
+            entityArray[entityRenderOrder[i]].render(&mut bitmap4, &player.camera);
         }
         
         bitmap4.flip_page();

@@ -16,4 +16,5 @@ pub trait Entity {
 
     fn set_size(&mut self, size: Num<i32, 8>);
     fn set_vertex(&mut self, point: [Num<i32, 8>; 3], index: i32);
+    fn distanceFromCamera(&self, camera: &Camera) -> Num<i32, 8> ;
 }

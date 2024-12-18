@@ -1,6 +1,6 @@
 use agb::fixnum::Num;
 
-use super::entity;
+use super::{entity, NewNum};
 use entity::*;
 
 use super::Camera;
@@ -18,6 +18,9 @@ impl Entity for Empty {
     fn set_z_rotation(&mut self, z_rotation: Num<i32, 8>) {}
     fn refresh_model_matrix(&mut self) {}
     fn set_vertex(&mut self, point: [Num<i32, 8>; 3], index: i32) {}
+    fn distanceFromCamera(&self, camera: &Camera) -> Num<i32, 8> {
+        return NewNum(999);
+    }
 }
 impl Empty {
     pub fn default() -> Self {

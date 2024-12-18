@@ -2,13 +2,14 @@ use agb::fixnum::Num;
 
 use crate::NewNum;
 
-use super::Entity;
-use super::Camera;
 use super::math;
-use math::*;
 use super::render;
+use super::Camera;
+use super::Entity;
+use super::utils;
+use math::*;
 use render::*;
-
+use utils::*;
 
 #[derive(Copy, Clone)]
 pub struct Cube {
@@ -44,6 +45,7 @@ impl Cube {
             z_rotation_matrix: [[Num::new(0); 3]; 3],
         }
     }
+
 }
 
 impl Entity for Cube {
@@ -60,7 +62,7 @@ impl Entity for Cube {
     }
 
     fn set_size(&mut self, size: Num<i32, 8>) {
-        let radius: Num<i32, 8> = size / 2;//size /NewNum(2);
+        let radius: Num<i32, 8> = size / 2; //size /NewNum(2);
         self.points = [
             [(radius), (radius), (radius)],
             [(-radius), (radius), (radius)],
@@ -145,7 +147,6 @@ impl Entity for Cube {
             // might want to perform world rotation here later on
             //in that case, there would be a common rotx, y and z for all objects to rotate the scene around
 
-            
             //perspective
             let z: Num<i32, 8> = translated_point[2];
             let zero: Num<i32, 8> = Num::new(0);
@@ -269,5 +270,12 @@ impl Entity for Cube {
                 3,
             );
         }
+    }
+    
+
+    fn distanceFromCamera(&self, camera: &Camera) -> Num<i32, 8> {
+        return abs(self.x_offset - camera.x)
+            + abs(self.y_offset - camera.y)
+            + abs(self.z_offset - camera.z);
     }
 }

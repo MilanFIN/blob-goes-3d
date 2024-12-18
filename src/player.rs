@@ -34,6 +34,7 @@ impl Player {
 		self.angle = CAMERALOCATIONS[viewDir][2];
 		self.x += self.angle.cos();
 		self.z += self.angle.sin();
+
 	}
 	
 	pub fn back(&mut self) {
@@ -41,8 +42,6 @@ impl Player {
 		if (viewDir > 255) {
 			viewDir -= 255;
 		}
-		self.angle = CAMERALOCATIONS[viewDir][2];
-
 		self.angle = CAMERALOCATIONS[viewDir][2];
 		self.x -= self.angle.cos();
 		self.z -= self.angle.sin();
