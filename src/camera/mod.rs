@@ -1,6 +1,6 @@
-use agb::fixnum::{Num};
+use agb::fixnum::Num;
 
-use crate::NewNum;
+use crate::new_num;
 
 pub mod lut;
 
@@ -24,9 +24,9 @@ pub struct Camera {
 impl Camera {
     pub fn default() -> Self {
         Self {
-            local_x: NewNum(0),
-            local_y: NewNum(0),
-            local_z: NewNum(0),
+            local_x: new_num(0),
+            local_y: new_num(0),
+            local_z: new_num(0),
 
             x: Num::new(0),
             y: Num::new(0),

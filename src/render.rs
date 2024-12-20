@@ -1,11 +1,12 @@
 use agb::fixnum::Num;
 
 
-use crate::{math};
+use crate::math;
 use math::*;
-use crate::{utils};
+use crate::utils;
 use utils::*;
 
+#[allow(dead_code)]
 pub fn draw_line(
     bitmap: &mut agb::display::bitmap4::Bitmap4,
     mut x1: i32,
@@ -17,15 +18,15 @@ pub fn draw_line(
     let dx: i32 = (x2 - x1).abs();
     let dy: i32 = (y2 - y1).abs();
 
-    let mut sx: i32;
-    let mut sy: i32;
+    let sx: i32;
+    let sy: i32;
 
-    if (x1 < x2) {
+    if x1 < x2 {
         sx = 1
     } else {
         sx = -1
     }
-    if (y1 < y2) {
+    if y1 < y2 {
         sy = 1
     } else {
         sy = -1;
@@ -33,27 +34,28 @@ pub fn draw_line(
 
     let mut err: i32 = dx - dy;
 
-    while (true) {
+    loop {
         bitmap.draw_point(x1, y1, color);
-        if (x1 == x2 && y1 == y2) {
+        if x1 == x2 && y1 == y2 {
             break;
         }
 
         let e2: i32 = 2 * err;
-        if (e2 > -dy) {
+        if e2 > -dy {
             err -= dy;
             x1 += sx
         }
-        if (e2 < dx) {
+        if e2 < dx {
             err += dx;
             y1 += sy;
         }
     }
 }
 
+#[allow(dead_code)]
 pub fn draw_face_outline(
     bitmap4: &mut agb::display::bitmap4::Bitmap4,
-    screenPoints: [[i32; 2]; 8],
+    screen_points: [[i32; 2]; 8],
     p1: usize,
     p2: usize,
     p3: usize,
@@ -61,73 +63,69 @@ pub fn draw_face_outline(
 ) {
     draw_line(
         bitmap4,
-        screenPoints[p1][0],
-        screenPoints[p1][1],
-        screenPoints[p2][0],
-        screenPoints[p2][1],
+        screen_points[p1][0],
+        screen_points[p1][1],
+        screen_points[p2][0],
+        screen_points[p2][1],
         1,
     );
     draw_line(
         bitmap4,
-        screenPoints[p2][0],
-        screenPoints[p2][1],
-        screenPoints[p3][0],
-        screenPoints[p3][1],
+        screen_points[p2][0],
+        screen_points[p2][1],
+        screen_points[p3][0],
+        screen_points[p3][1],
         1,
     );
     draw_line(
         bitmap4,
-        screenPoints[p3][0],
-        screenPoints[p3][1],
-        screenPoints[p4][0],
-        screenPoints[p4][1],
+        screen_points[p3][0],
+        screen_points[p3][1],
+        screen_points[p4][0],
+        screen_points[p4][1],
         1,
     );
     draw_line(
         bitmap4,
-        screenPoints[p4][0],
-        screenPoints[p4][1],
-        screenPoints[p1][0],
-        screenPoints[p1][1],
+        screen_points[p4][0],
+        screen_points[p4][1],
+        screen_points[p1][0],
+        screen_points[p1][1],
         1,
     );
 }
 
 //return true if visible, presume points to be defined in counter clockwise direction
-pub fn backFaceCulling(
+pub fn back_face_culling(
     &points: &[[Num<i32, 8>; 3]; 8],
     p1: usize,
     p2: usize,
     p3: usize,
 ) -> bool {
 
-    /*if (points[p1][2] < NewNum(0) || points[p2][2] < NewNum(0) || points[p3][2] < NewNum(0)) {
-        return false
-    }*/
+    let v12: [Num<i32, 8>; 3] = vector_sub(points[p2], points[p1]);
+    let v23: [Num<i32, 8>; 3] = vector_sub(points[p3], points[p2]);
 
-    let v12: [Num<i32, 8>; 3] = vectorSub(points[p2], points[p1]);
-    let v23: [Num<i32, 8>; 3] = vectorSub(points[p3], points[p2]);
-
-    let normal: [Num<i32, 8>; 3] = vectorCross(v12, v23);
+    let normal: [Num<i32, 8>; 3] = vector_cross(v12, v23);
 
     //get center of the three polygons
-    let polygonCenter: [Num<i32, 8>; 3] = [
-        (points[p1][0] + points[p2][0] + points[p3][0]) / NewNum(3),
-        (points[p1][1] + points[p2][1] + points[p3][1]) / NewNum(3),
-        (points[p1][2] + points[p2][2] + points[p3][2]) / NewNum(3),
+    let polygon_center: [Num<i32, 8>; 3] = [
+        (points[p1][0] + points[p2][0] + points[p3][0]) / new_num(3),
+        (points[p1][1] + points[p2][1] + points[p3][1]) / new_num(3),
+        (points[p1][2] + points[p2][2] + points[p3][2]) / new_num(3),
     ];
 
     //doing this for all points instead
     //behind camera, so not visible
-    if (polygonCenter[2] < NewNum(1)) {
+    if polygon_center[2] < new_num(1) {
         return false;
     }
 
     //calculate view direction towards the center of the polygon
-    let viewDir: [Num<i32, 8>; 3] = normalize(polygonCenter);
+    let view_dir: [Num<i32, 8>; 3] = normalize(polygon_center);
 
-    let dotProd: Num<i32, 8> = vectorDot(normal, viewDir).change_base();
-    return dotProd < NewNum(0);
+    let dot_prod: Num<i32, 8> = vector_dot(normal, view_dir).change_base();
+    return dot_prod < new_num(0);
 }
 
 pub fn draw_h_line(
@@ -141,7 +139,7 @@ pub fn draw_h_line(
     let (mut start, mut end) = if x1 <= x2 { (x1, x2) } else { (x2, x1) };
 
     start = if start < 0 { 0 } else { start };
-    end = if (end > 239) { 239 } else { end };
+    end = if end > 239 { 239 } else { end };
 
     // Adjust start to be the first even number in the range
     start = if start % 2 == 0 { start } else { start + 1 };
@@ -163,30 +161,30 @@ pub fn draw_flat_bottom_triangle(
     let mut div1 = p2[1] - p1[1];
     let mut div2 = p3[1] - p1[1];
 
-    if div1 < NewNum(3) {
-        div1 = NewNum(3);
+    if div1 < new_num(3) {
+        div1 = new_num(3);
     }
-    if div2 < NewNum(3) {
-        div2 = NewNum(3);
+    if div2 < new_num(3) {
+        div2 = new_num(3);
     }
 
     let invslope1: Num<i32, 8> = (p2[0] - p1[0]) / (div1);
     let invslope2: Num<i32, 8> = (p3[0] - p1[0]) / (div2);
-    let mut curx1: Num<i32, 8> = (p1[0]);
-    let mut curx2: Num<i32, 8> = (p1[0]);
+    let mut curx1: Num<i32, 8> = p1[0];
+    let mut curx2: Num<i32, 8> = p1[0];
 
-    let mut yTop: i32 = p1[1].trunc();
-    let yBottom: i32 = p3[1].trunc();
+    let mut y_top: i32 = p1[1].trunc();
+    let y_bottom: i32 = p3[1].trunc();
 
-    let yTopDifference = if yTop < 0 { 0 - yTop } else { 0 };
-    yTop += yTopDifference;
+    let y_top_difference = if y_top < 0 { 0 - y_top } else { 0 };
+    y_top += y_top_difference;
 
-    curx1 += invslope1 * yTopDifference;
-    curx2 += invslope2 * yTopDifference;
+    curx1 += invslope1 * y_top_difference;
+    curx2 += invslope2 * y_top_difference;
 
     // Iterate over the scanlines from the top (p1 and p2) down to p3
-    for scanline_y in yTop..=yBottom {
-        if (scanline_y > 159) {
+    for scanline_y in y_top..=y_bottom {
+        if scanline_y > 159 {
             break;
         }
         draw_h_line(bitmap4, curx1.trunc(), curx2.trunc(), scanline_y, color);
@@ -204,32 +202,32 @@ pub fn draw_flat_top_triangle(
 ) {
     let mut div1 = p3[1] - p1[1];
     let mut div2 = p3[1] - p2[1];
-    if (div1 < NewNum(3)) {
-        div1 = NewNum(3);
+    if div1 < new_num(3) {
+        div1 = new_num(3);
     }
-    if (div2 < NewNum(3)) {
-        div2 = NewNum(3);
+    if div2 < new_num(3) {
+        div2 = new_num(3);
     }
     // Calculate the slopes (invslope1 and invslope2)
     let invslope1: Num<i32, 8> = (p3[0] - p1[0]) / (div1);
     let invslope2: Num<i32, 8> = (p3[0] - p2[0]) / (div2);
 
     // Initialize the starting x-coordinates at the top vertices
-    let mut curx1: Num<i32, 8> = (p1[0]);
-    let mut curx2: Num<i32, 8> = (p2[0]);
+    let mut curx1: Num<i32, 8> = p1[0];
+    let mut curx2: Num<i32, 8> = p2[0];
 
-    let mut yTop: i32 = p1[1].trunc();
-    let yBottom: i32 = p3[1].trunc();
+    let mut y_top: i32 = p1[1].trunc();
+    let y_bottom: i32 = p3[1].trunc();
 
-    let yTopDifference = if yTop < 0 { 0 - yTop } else { 0 };
-    yTop += yTopDifference;
+    let y_top_difference = if y_top < 0 { 0 - y_top } else { 0 };
+    y_top += y_top_difference;
 
-    curx1 += invslope1 * yTopDifference;
-    curx2 += invslope2 * yTopDifference;
+    curx1 += invslope1 * y_top_difference;
+    curx2 += invslope2 * y_top_difference;
 
     // Iterate over the scanlines from the top (p1 and p2) down to p3
-    for scanline_y in yTop..=yBottom {
-        if (scanline_y > 159) {
+    for scanline_y in y_top..=y_bottom {
+        if scanline_y > 159 {
             break;
         }
         draw_h_line(bitmap4, curx1.trunc(), curx2.trunc(), scanline_y, color);
@@ -276,45 +274,45 @@ pub fn draw_triangle(
     mut p3: [Num<i32, 8>; 2],
     color: u8,
 ) {
-    let zero: Num<i32, 8> = NewNum(0);
-    let xMax: Num<i32, 8> = NewNum(240);
-    let yMax: Num<i32, 8> = NewNum(160);
+    let zero: Num<i32, 8> = new_num(0);
+    let x_max: Num<i32, 8> = new_num(240);
+    let y_max: Num<i32, 8> = new_num(160);
     
     //jank way to avoid giant polygons near zero plane
-    if (p1[0] > NewNum(1000) || p1[0] < NewNum(-100)) {
+    if p1[0] > new_num(1000) || p1[0] < new_num(-100) {
         return
     }
-    if (p2[0] > NewNum(1000) || p2[0] < NewNum(-100)) {
+    if p2[0] > new_num(1000) || p2[0] < new_num(-100) {
         return
     }   
-    if (p3[0] > NewNum(1000) || p3[0] < NewNum(-100)) {
+    if p3[0] > new_num(1000) || p3[0] < new_num(-100) {
         return
     }    
-    if (p1[1] > NewNum(1000) || p1[1] < NewNum(-100)) {
+    if p1[1] > new_num(1000) || p1[1] < new_num(-100) {
         return
     }
-    if (p2[1] > NewNum(1000) || p2[1] < NewNum(-100)) {
+    if p2[1] > new_num(1000) || p2[1] < new_num(-100) {
         return
-    }   if (p3[1] > NewNum(1000) || p3[1] < NewNum(-100)) {
+    }   if p3[1] > new_num(1000) || p3[1] < new_num(-100) {
         return
     }
 
     //first check out if the triangle is completely out of view
-    if (p1[0] < zero && p2[0] < zero && p3[0] < zero
+    if p1[0] < zero && p2[0] < zero && p3[0] < zero
         || p1[1] < zero && p2[1] < zero && p3[1] < zero
-        || p1[0] > xMax && p2[0] > xMax && p3[0] > xMax
-        || p1[1] > yMax && p2[1] > yMax && p3[1] > yMax)
+        || p1[0] > x_max && p2[0] > x_max && p3[0] > x_max
+        || p1[1] > y_max && p2[1] > y_max && p3[1] > y_max
     {
         return;
     }
 
     sort_points(&mut p1, &mut p2, &mut p3);
     //flat top triangle
-    if (p1[1] == p2[1]) {
+    if p1[1] == p2[1] {
         draw_flat_top_triangle(bitmap4, p1, p2, p3, color);
     }
     //flat bottom triangle
-    else if (p2[1] == p3[1]) {
+    else if p2[1] == p3[1] {
         draw_flat_bottom_triangle(bitmap4, p1, p2, p3, color);
     } else {
         let p4x: Num<i32, 8> = p1[0] + (p2[1] - p1[1]) / (p3[1] - p1[1]) * (p3[0] - p1[0]);

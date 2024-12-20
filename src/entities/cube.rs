@@ -1,6 +1,6 @@
 use agb::fixnum::Num;
 
-use crate::NewNum;
+use crate::new_num;
 
 use super::math;
 use super::render;
@@ -32,17 +32,17 @@ pub struct Cube {
 impl Cube {
     pub fn default() -> Self {
         Self {
-            x_offset: Num::new(0),
-            y_offset: Num::new(0),
-            z_offset: Num::new(0),
-            x_rotation: Num::new(0),
-            y_rotation: Num::new(0),
-            z_rotation: Num::new(0),
-            points: [[Num::new(0); 3]; 8],
-            model_rotated_points: [[Num::new(0); 3]; 8],
-            x_rotation_matrix: [[Num::new(0); 3]; 3],
-            y_rotation_matrix: [[Num::new(0); 3]; 3],
-            z_rotation_matrix: [[Num::new(0); 3]; 3],
+            x_offset: new_num(0),
+            y_offset: new_num(0),
+            z_offset: new_num(0),
+            x_rotation: new_num(0),
+            y_rotation: new_num(0),
+            z_rotation: new_num(0),
+            points: [[new_num(0); 3]; 8],
+            model_rotated_points: [[new_num(0); 3]; 8],
+            x_rotation_matrix: [[new_num(0); 3]; 3],
+            y_rotation_matrix: [[new_num(0); 3]; 3],
+            z_rotation_matrix: [[new_num(0); 3]; 3],
         }
     }
 
@@ -62,7 +62,7 @@ impl Entity for Cube {
     }
 
     fn set_size(&mut self, size: Num<i32, 8>) {
-        let radius: Num<i32, 8> = size / 2; //size /NewNum(2);
+        let radius: Num<i32, 8> = size / 2; 
         self.points = [
             [(radius), (radius), (radius)],
             [(-radius), (radius), (radius)],
@@ -114,7 +114,7 @@ impl Entity for Cube {
         }
     }
 
-    fn set_vertex(&mut self, point: [Num<i32, 8>; 3], index: i32) {
+    fn set_vertex(&mut self, _point: [Num<i32, 8>; 3], _index: i32) {
         //not implemented
     }
 
@@ -124,13 +124,12 @@ impl Entity for Cube {
         let scale: Num<i32, 8> = Num::new(30); //100;
         let middle: [Num<i32, 8>; 2] = [Num::new(width / 2), Num::new(height / 2)]; // x, y
 
-        let mut screenPoints: [[Num<i32, 8>; 2]; 8] = [[Num::new(0), Num::new(0)]; 8];
-        let mut translatedPoints: [[Num<i32, 8>; 3]; 8] =
+        let mut screen_points: [[Num<i32, 8>; 2]; 8] = [[Num::new(0), Num::new(0)]; 8];
+        let mut translated_points: [[Num<i32, 8>; 3]; 8] =
             [[Num::new(0), Num::new(0), Num::new(0)]; 8];
 
-        let mut i = 0;
 
-        for point in &self.points {
+        for i in 0..self.model_rotated_points.len(){
             /*let mut rotated_point: [Num<i32, 8>; 3] = matmul(self.x_rotation_matrix, *point);
             rotated_point = matmul(self.y_rotation_matrix, rotated_point);
             rotated_point = matmul(self.z_rotation_matrix, rotated_point);*/
@@ -153,7 +152,7 @@ impl Entity for Cube {
             let x: Num<i32, 8>;
             let y: Num<i32, 8>;
 
-            if (z != zero) {
+            if z != zero {
                 let perspective_scale: Num<i32, 8> = scale / z;
                 x = (translated_point[0] * perspective_scale) + middle[0];
                 y = (translated_point[1] * perspective_scale) + middle[1];
@@ -162,118 +161,117 @@ impl Entity for Cube {
                 y = middle[1];
             }
 
-            screenPoints[i] = [x, y];
-            translatedPoints[i] = translated_point;
-            i += 1;
+            screen_points[i] = [x, y];
+            translated_points[i] = translated_point;
         }
-        if (backFaceCulling(&translatedPoints, 0, 1, 2)) {
+        if back_face_culling(&translated_points, 0, 1, 2) {
             //draw_face_outline(&mut bitmap4, screenPoints, 0, 1, 2, 3);
             draw_triangle(
                 bitmap4,
-                screenPoints[0],
-                screenPoints[1],
-                screenPoints[2],
+                screen_points[0],
+                screen_points[1],
+                screen_points[2],
                 1,
             );
             draw_triangle(
                 bitmap4,
-                screenPoints[0],
-                screenPoints[2],
-                screenPoints[3],
+                screen_points[0],
+                screen_points[2],
+                screen_points[3],
                 1,
             );
         }
-        if (backFaceCulling(&translatedPoints, 7, 6, 5)) {
+        if back_face_culling(&translated_points, 7, 6, 5) {
             //draw_face_outline(&mut bitmap4, screenPoints, 7, 6, 5, 4);
             draw_triangle(
                 bitmap4,
-                screenPoints[7],
-                screenPoints[6],
-                screenPoints[5],
+                screen_points[7],
+                screen_points[6],
+                screen_points[5],
                 1,
             );
             draw_triangle(
                 bitmap4,
-                screenPoints[7],
-                screenPoints[5],
-                screenPoints[4],
+                screen_points[7],
+                screen_points[5],
+                screen_points[4],
                 1,
             );
         }
 
-        if (backFaceCulling(&translatedPoints, 0, 3, 7)) {
+        if back_face_culling(&translated_points, 0, 3, 7) {
             //draw_face_outline(&mut bitmap4, screenPoints, 0, 3, 7, 4);
             draw_triangle(
                 bitmap4,
-                screenPoints[0],
-                screenPoints[3],
-                screenPoints[7],
+                screen_points[0],
+                screen_points[3],
+                screen_points[7],
                 2,
             );
             draw_triangle(
                 bitmap4,
-                screenPoints[0],
-                screenPoints[7],
-                screenPoints[4],
+                screen_points[0],
+                screen_points[7],
+                screen_points[4],
                 2,
             );
         }
-        if (backFaceCulling(&translatedPoints, 1, 5, 6)) {
+        if back_face_culling(&translated_points, 1, 5, 6) {
             //draw_face_outline(&mut bitmap4, screenPoints, 1, 5, 6, 2);
             draw_triangle(
                 bitmap4,
-                screenPoints[1],
-                screenPoints[5],
-                screenPoints[6],
+                screen_points[1],
+                screen_points[5],
+                screen_points[6],
                 2,
             );
             draw_triangle(
                 bitmap4,
-                screenPoints[1],
-                screenPoints[6],
-                screenPoints[2],
+                screen_points[1],
+                screen_points[6],
+                screen_points[2],
                 2,
             );
         }
 
-        if (backFaceCulling(&translatedPoints, 7, 3, 2)) {
+        if back_face_culling(&translated_points, 7, 3, 2) {
             //draw_face_outline(&mut bitmap4, screenPoints, 7, 3, 2, 6);
             draw_triangle(
                 bitmap4,
-                screenPoints[7],
-                screenPoints[3],
-                screenPoints[2],
+                screen_points[7],
+                screen_points[3],
+                screen_points[2],
                 3,
             );
             draw_triangle(
                 bitmap4,
-                screenPoints[7],
-                screenPoints[2],
-                screenPoints[6],
+                screen_points[7],
+                screen_points[2],
+                screen_points[6],
                 3,
             );
         }
-        if (backFaceCulling(&translatedPoints, 0, 4, 5)) {
+        if back_face_culling(&translated_points, 0, 4, 5) {
             //draw_face_outline(&mut bitmap4, screenPoints, 0, 4, 5, 1);
             draw_triangle(
                 bitmap4,
-                screenPoints[0],
-                screenPoints[4],
-                screenPoints[5],
+                screen_points[0],
+                screen_points[4],
+                screen_points[5],
                 3,
             );
             draw_triangle(
                 bitmap4,
-                screenPoints[0],
-                screenPoints[5],
-                screenPoints[1],
+                screen_points[0],
+                screen_points[5],
+                screen_points[1],
                 3,
             );
         }
     }
     
 
-    fn distanceFromCamera(&self, camera: &Camera) -> Num<i32, 8> {
+    fn distance_from_camera(&self, camera: &Camera) -> Num<i32, 8> {
         return abs(self.x_offset - camera.x)
             + abs(self.y_offset - camera.y)
             + abs(self.z_offset - camera.z);

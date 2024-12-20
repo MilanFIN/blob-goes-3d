@@ -1,4 +1,4 @@
-use agb::fixnum::{Num};
+use agb::fixnum::Num;
 
 pub const CAMERALOCATIONS: [[Num<i32, 8>; 3]; 256] = [
     //x_off, z_off, x_angle

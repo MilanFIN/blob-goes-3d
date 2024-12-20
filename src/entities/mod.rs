@@ -10,10 +10,7 @@ pub mod empty;
 use empty::*;
 
 use super::math;
-use math::*;
-
 use super::render;
-use render::*;
 
 use super::camera;
 use camera::*;
@@ -76,16 +73,23 @@ impl EntityEnum {
             EntityEnum::Empty(e) => e.set_size(size),
         }
     }
+    #[allow(dead_code)]
+    pub fn set_vertex(&mut self, point: [Num<i32, 8>; 3], index: i32) {
+        match self {
+            EntityEnum::Cube(c) => c.set_vertex(point, index),
+            EntityEnum::Empty(e) => e.set_vertex(point, index),
+        }
+    }
     pub fn render(&self, bitmap4: &mut agb::display::bitmap4::Bitmap4, camera: &Camera) {
         match self {
             EntityEnum::Cube(c) => c.render(bitmap4, camera),
             EntityEnum::Empty(e) => e.render(bitmap4, camera),
         }
     }
-    pub fn distanceFromCamera(&self, camera: &Camera) -> Num<i32, 8> {
+    pub fn distance_from_camera(&self, camera: &Camera) -> Num<i32, 8> {
         match self {
-            EntityEnum::Cube(c) => c.distanceFromCamera(camera),
-            EntityEnum::Empty(e) => e.distanceFromCamera(camera),
+            EntityEnum::Cube(c) => c.distance_from_camera(camera),
+            EntityEnum::Empty(e) => e.distance_from_camera(camera),
         }
     }
 }
@@ -97,11 +101,11 @@ fn partition(
     high: usize,
     camera: &Camera,
 ) -> usize {
-    let pivot_distance = entity_array[entity_render_order[high]].distanceFromCamera(camera);
+    let pivot_distance = entity_array[entity_render_order[high]].distance_from_camera(camera);
     let mut i = low as isize - 1; // Use `isize` to allow `-1` for initialization
 
     for j in low..high {
-        if entity_array[entity_render_order[j]].distanceFromCamera(camera) >= pivot_distance {
+        if entity_array[entity_render_order[j]].distance_from_camera(camera) >= pivot_distance {
             i += 1;
             entity_render_order.swap(i as usize, j);
         }
