@@ -1,4 +1,3 @@
-use agb::fixnum::Num;
 
 pub mod entity;
 use entity::*;
@@ -8,6 +7,7 @@ use cube::*;
 
 pub mod empty;
 use empty::*;
+use serde::Deserialize;
 
 use super::math;
 use super::render;
@@ -15,47 +15,48 @@ use super::render;
 use super::camera;
 use camera::*;
 
-use super::utils;
-use utils::*;
+use crate::fixed;
+use fixed::*;
 
-#[derive(Copy, Clone)]
+
+#[derive(Copy, Clone, Deserialize)]
 pub enum EntityEnum {
     Cube(Cube),
     Empty(Empty),
 }
 
 impl EntityEnum {
-    pub fn set_x_offset(&mut self, offset: Num<i32, 8>) {
+    pub fn set_x_offset(&mut self, offset: Fixed) {
         match self {
             EntityEnum::Cube(c) => c.set_x_offset(offset),
             EntityEnum::Empty(e) => e.set_x_offset(offset),
         }
     }
-    pub fn set_y_offset(&mut self, offset: Num<i32, 8>) {
+    pub fn set_y_offset(&mut self, offset: Fixed) {
         match self {
             EntityEnum::Cube(c) => c.set_y_offset(offset),
             EntityEnum::Empty(e) => e.set_y_offset(offset),
         }
     }
-    pub fn set_z_offset(&mut self, offset: Num<i32, 8>) {
+    pub fn set_z_offset(&mut self, offset: Fixed) {
         match self {
             EntityEnum::Cube(c) => c.set_z_offset(offset),
             EntityEnum::Empty(e) => e.set_z_offset(offset),
         }
     }
-    pub fn set_x_rotation(&mut self, rot: Num<i32, 8>) {
+    pub fn set_x_rotation(&mut self, rot: Fixed) {
         match self {
             EntityEnum::Cube(c) => c.set_x_rotation(rot),
             EntityEnum::Empty(e) => e.set_x_rotation(rot),
         }
     }
-    pub fn set_y_rotation(&mut self, rot: Num<i32, 8>) {
+    pub fn set_y_rotation(&mut self, rot: Fixed) {
         match self {
             EntityEnum::Cube(c) => c.set_y_rotation(rot),
             EntityEnum::Empty(e) => e.set_y_rotation(rot),
         }
     }
-    pub fn set_z_rotation(&mut self, rot: Num<i32, 8>) {
+    pub fn set_z_rotation(&mut self, rot: Fixed) {
         match self {
             EntityEnum::Cube(c) => c.set_z_rotation(rot),
             EntityEnum::Empty(e) => e.set_z_rotation(rot),
@@ -67,14 +68,14 @@ impl EntityEnum {
             EntityEnum::Empty(e) => e.refresh_model_matrix(),
         }
     }
-    pub fn set_size(&mut self, size: Num<i32, 8>) {
+    pub fn set_size(&mut self, size: Fixed) {
         match self {
             EntityEnum::Cube(c) => c.set_size(size),
             EntityEnum::Empty(e) => e.set_size(size),
         }
     }
     #[allow(dead_code)]
-    pub fn set_vertex(&mut self, point: [Num<i32, 8>; 3], index: i32) {
+    pub fn set_vertex(&mut self, point: [Fixed; 3], index: i32) {
         match self {
             EntityEnum::Cube(c) => c.set_vertex(point, index),
             EntityEnum::Empty(e) => e.set_vertex(point, index),
@@ -86,7 +87,7 @@ impl EntityEnum {
             EntityEnum::Empty(e) => e.render(bitmap4, camera),
         }
     }
-    pub fn distance_from_camera(&self, camera: &Camera) -> Num<i32, 8> {
+    pub fn distance_from_camera(&self, camera: &Camera) -> Fixed {
         match self {
             EntityEnum::Cube(c) => c.distance_from_camera(camera),
             EntityEnum::Empty(e) => e.distance_from_camera(camera),

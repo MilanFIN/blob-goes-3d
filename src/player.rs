@@ -1,15 +1,17 @@
-use agb::fixnum::Num;
 use lut::CAMERALOCATIONS;
 
-use crate::{camera, new_num};
+use crate::camera;
 use camera::*;
 
-pub struct Player {
-    pub x: Num<i32, 8>,
-    pub y: Num<i32, 8>,
-    pub z: Num<i32, 8>,
+use crate::fixed;
+use fixed::*;
 
-    pub angle: Num<i32, 8>,
+pub struct Player {
+    pub x: Fixed,
+    pub y: Fixed,
+    pub z: Fixed,
+
+    pub angle: Fixed,
     camera_angle: usize,
     pub camera: Camera,
 }
@@ -17,10 +19,10 @@ pub struct Player {
 impl Player {
     pub fn default() -> Self {
         Self {
-            x: new_num(0),
-            y: new_num(0),
-            z: new_num(0),
-            angle: new_num(0),
+            x: Fixed::const_new(0),
+            y: Fixed::const_new(0),
+            z: Fixed::const_new(0),
+            angle: Fixed::const_new(0),
             camera_angle: 0,
             camera: Camera::default(),
         }

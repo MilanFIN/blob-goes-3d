@@ -1,10 +1,9 @@
-use agb::fixnum::Num;
 
 
 use crate::math;
 use math::*;
-use crate::utils;
-use utils::*;
+use crate::fixed;
+use fixed::*;
 
 #[allow(dead_code)]
 pub fn draw_line(
@@ -97,35 +96,35 @@ pub fn draw_face_outline(
 
 //return true if visible, presume points to be defined in counter clockwise direction
 pub fn back_face_culling(
-    &points: &[[Num<i32, 8>; 3]; 8],
+    &points: &[[Fixed; 3]; 8],
     p1: usize,
     p2: usize,
     p3: usize,
 ) -> bool {
 
-    let v12: [Num<i32, 8>; 3] = vector_sub(points[p2], points[p1]);
-    let v23: [Num<i32, 8>; 3] = vector_sub(points[p3], points[p2]);
+    let v12: [Fixed; 3] = vector_sub(points[p2], points[p1]);
+    let v23: [Fixed; 3] = vector_sub(points[p3], points[p2]);
 
-    let normal: [Num<i32, 8>; 3] = vector_cross(v12, v23);
+    let normal: [Fixed; 3] = vector_cross(v12, v23);
 
     //get center of the three polygons
-    let polygon_center: [Num<i32, 8>; 3] = [
-        (points[p1][0] + points[p2][0] + points[p3][0]) / new_num(3),
-        (points[p1][1] + points[p2][1] + points[p3][1]) / new_num(3),
-        (points[p1][2] + points[p2][2] + points[p3][2]) / new_num(3),
+    let polygon_center: [Fixed; 3] = [
+        (points[p1][0] + points[p2][0] + points[p3][0]) / 3,
+        (points[p1][1] + points[p2][1] + points[p3][1]) / 3,
+        (points[p1][2] + points[p2][2] + points[p3][2]) / 3,
     ];
 
     //doing this for all points instead
     //behind camera, so not visible
-    if polygon_center[2] < new_num(1) {
+    if polygon_center[2] < Fixed::const_new(1) {
         return false;
     }
 
     //calculate view direction towards the center of the polygon
-    let view_dir: [Num<i32, 8>; 3] = normalize(polygon_center);
+    let view_dir: [Fixed; 3] = normalize(polygon_center);
 
-    let dot_prod: Num<i32, 8> = vector_dot(normal, view_dir).change_base();
-    return dot_prod < new_num(0);
+    let dot_prod: Fixed = vector_dot(normal, view_dir);
+    return dot_prod < Fixed::const_new(0);
 }
 
 pub fn draw_h_line(
@@ -153,25 +152,25 @@ pub fn draw_h_line(
 
 pub fn draw_flat_bottom_triangle(
     bitmap4: &mut agb::display::bitmap4::Bitmap4,
-    p1: [Num<i32, 8>; 2],
-    p2: [Num<i32, 8>; 2],
-    p3: [Num<i32, 8>; 2],
+    p1: [Fixed; 2],
+    p2: [Fixed; 2],
+    p3: [Fixed; 2],
     color: u8,
 ) {
     let mut div1 = p2[1] - p1[1];
     let mut div2 = p3[1] - p1[1];
 
-    if div1 < new_num(3) {
-        div1 = new_num(3);
+    if div1 < Fixed::const_new(3) {
+        div1 = Fixed::const_new(3);
     }
-    if div2 < new_num(3) {
-        div2 = new_num(3);
+    if div2 < Fixed::const_new(3) {
+        div2 = Fixed::const_new(3);
     }
 
-    let invslope1: Num<i32, 8> = (p2[0] - p1[0]) / (div1);
-    let invslope2: Num<i32, 8> = (p3[0] - p1[0]) / (div2);
-    let mut curx1: Num<i32, 8> = p1[0];
-    let mut curx2: Num<i32, 8> = p1[0];
+    let invslope1: Fixed = (p2[0] - p1[0]) / (div1);
+    let invslope2: Fixed = (p3[0] - p1[0]) / (div2);
+    let mut curx1: Fixed = p1[0];
+    let mut curx2: Fixed = p1[0];
 
     let mut y_top: i32 = p1[1].trunc();
     let y_bottom: i32 = p3[1].trunc();
@@ -195,26 +194,26 @@ pub fn draw_flat_bottom_triangle(
 
 pub fn draw_flat_top_triangle(
     bitmap4: &mut agb::display::bitmap4::Bitmap4,
-    p1: [Num<i32, 8>; 2],
-    p2: [Num<i32, 8>; 2],
-    p3: [Num<i32, 8>; 2],
+    p1: [Fixed; 2],
+    p2: [Fixed; 2],
+    p3: [Fixed; 2],
     color: u8,
 ) {
     let mut div1 = p3[1] - p1[1];
     let mut div2 = p3[1] - p2[1];
-    if div1 < new_num(3) {
-        div1 = new_num(3);
+    if div1 < Fixed::const_new(3) {
+        div1 = Fixed::const_new(3);
     }
-    if div2 < new_num(3) {
-        div2 = new_num(3);
+    if div2 < Fixed::const_new(3) {
+        div2 = Fixed::const_new(3);
     }
     // Calculate the slopes (invslope1 and invslope2)
-    let invslope1: Num<i32, 8> = (p3[0] - p1[0]) / (div1);
-    let invslope2: Num<i32, 8> = (p3[0] - p2[0]) / (div2);
+    let invslope1: Fixed = (p3[0] - p1[0]) / (div1);
+    let invslope2: Fixed = (p3[0] - p2[0]) / (div2);
 
     // Initialize the starting x-coordinates at the top vertices
-    let mut curx1: Num<i32, 8> = p1[0];
-    let mut curx2: Num<i32, 8> = p2[0];
+    let mut curx1: Fixed = p1[0];
+    let mut curx2: Fixed = p2[0];
 
     let mut y_top: i32 = p1[1].trunc();
     let y_bottom: i32 = p3[1].trunc();
@@ -237,21 +236,21 @@ pub fn draw_flat_top_triangle(
 }
 
 pub fn sort_points(
-    p1: &mut [Num<i32, 8>; 2],
-    p2: &mut [Num<i32, 8>; 2],
-    p3: &mut [Num<i32, 8>; 2],
+    p1: &mut [Fixed; 2],
+    p2: &mut [Fixed; 2],
+    p3: &mut [Fixed; 2],
 ) {
     // Swap points to ensure p1 has the smallest y, then x
     if (p2[1] < p1[1]) || (p2[1] == p1[1] && p2[0] < p1[0]) {
         for i in 0..2 {
-            let temp: Num<i32, 8> = p1[i];
+            let temp: Fixed = p1[i];
             p1[i] = p2[i];
             p2[i] = temp;
         }
     }
     if (p3[1] < p1[1]) || (p3[1] == p1[1] && p3[0] < p1[0]) {
         for i in 0..2 {
-            let temp: Num<i32, 8> = p1[i];
+            let temp: Fixed = p1[i];
             p1[i] = p3[i];
             p3[i] = temp;
         }
@@ -259,7 +258,7 @@ pub fn sort_points(
     // Ensure p2 is the middle and p3 is the largest
     if (p3[1] < p2[1]) || (p3[1] == p2[1] && p3[0] < p2[0]) {
         for i in 0..2 {
-            let temp: Num<i32, 8> = p2[i];
+            let temp: Fixed = p2[i];
             p2[i] = p3[i];
             p3[i] = temp;
         }
@@ -269,31 +268,31 @@ pub fn sort_points(
 
 pub fn draw_triangle(
     bitmap4: &mut agb::display::bitmap4::Bitmap4,
-    mut p1: [Num<i32, 8>; 2],
-    mut p2: [Num<i32, 8>; 2],
-    mut p3: [Num<i32, 8>; 2],
+    mut p1: [Fixed; 2],
+    mut p2: [Fixed; 2],
+    mut p3: [Fixed; 2],
     color: u8,
 ) {
-    let zero: Num<i32, 8> = new_num(0);
-    let x_max: Num<i32, 8> = new_num(240);
-    let y_max: Num<i32, 8> = new_num(160);
+    let zero: Fixed = Fixed::const_new(0);
+    let x_max: Fixed = Fixed::const_new(240);
+    let y_max: Fixed = Fixed::const_new(160);
     
     //jank way to avoid giant polygons near zero plane
-    if p1[0] > new_num(1000) || p1[0] < new_num(-100) {
+    if p1[0] > Fixed::const_new(1000) || p1[0] < Fixed::const_new(-100) {
         return
     }
-    if p2[0] > new_num(1000) || p2[0] < new_num(-100) {
+    if p2[0] > Fixed::const_new(1000) || p2[0] < Fixed::const_new(-100) {
         return
     }   
-    if p3[0] > new_num(1000) || p3[0] < new_num(-100) {
+    if p3[0] > Fixed::const_new(1000) || p3[0] < Fixed::const_new(-100) {
         return
     }    
-    if p1[1] > new_num(1000) || p1[1] < new_num(-100) {
+    if p1[1] > Fixed::const_new(1000) || p1[1] < Fixed::const_new(-100) {
         return
     }
-    if p2[1] > new_num(1000) || p2[1] < new_num(-100) {
+    if p2[1] > Fixed::const_new(1000) || p2[1] < Fixed::const_new(-100) {
         return
-    }   if p3[1] > new_num(1000) || p3[1] < new_num(-100) {
+    }   if p3[1] > Fixed::const_new(1000) || p3[1] < Fixed::const_new(-100) {
         return
     }
 
@@ -315,7 +314,7 @@ pub fn draw_triangle(
     else if p2[1] == p3[1] {
         draw_flat_bottom_triangle(bitmap4, p1, p2, p3, color);
     } else {
-        let p4x: Num<i32, 8> = p1[0] + (p2[1] - p1[1]) / (p3[1] - p1[1]) * (p3[0] - p1[0]);
+        let p4x: Fixed = p1[0] + (p2[1] - p1[1]) / (p3[1] - p1[1]) * (p3[0] - p1[0]);
         draw_flat_bottom_triangle(bitmap4, p1, p2, [p4x, p2[1]], color);
         draw_flat_top_triangle(bitmap4, p2, [p4x, p2[1]], p3, color);
     }

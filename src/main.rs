@@ -14,8 +14,13 @@
 #![cfg_attr(test, reexport_test_harness_main = "test_main")]
 #![cfg_attr(test, test_runner(agb::test_runner::test_runner))]
 
-use agb::fixnum::Num;
 use agb::input::*;
+
+/*
+use serde_json_core;
+use serde_json_core::*;
+use serde::{Deserialize, Serialize};
+*/
 
 mod entities;
 use cube::Cube;
@@ -34,11 +39,21 @@ use player::*;
 
 mod input;
 
-// The main function must take 1 arguments and never return. The agb::entry decorator
-// ensures that everything is in order. `agb` will call this after setting up the stack
-// and interrupt handlers correctly. It will also handle creating the `Gba` struct for you.
+mod fixed;
+use fixed::*;
+
+
+/*
+The main function must take 1 arguments and never return. The agb::entry decorator
+ensures that everything is in order. `agb` will call this after setting up the stack
+and interrupt handlers correctly. It will also handle creating the `Gba` struct for you.
+*/
 #[agb::entry]
 fn main(mut gba: agb::Gba) -> ! {
+
+
+
+
     let mut input = ButtonController::new();
 
     let mut bitmap4: agb::display::bitmap4::Bitmap4 = gba.display.video.bitmap4();
@@ -48,8 +63,8 @@ fn main(mut gba: agb::Gba) -> ! {
     bitmap4.set_palette_entry(2, 0x3E0);
     bitmap4.set_palette_entry(3, 0x7C00);
 
-    let mut angle: Num<i32, 8> = new_num(0);
-    let increment: Num<i32, 8> = new_num(1) / 256;
+    let mut angle: Fixed = Fixed::const_new(0);
+    let increment: Fixed = Fixed::const_new(1) / 256;
 
     //todo: use these
     let mut entity_array: [EntityEnum; 4] = [EntityEnum::Empty(Empty::default()); 4];
@@ -72,13 +87,13 @@ fn main(mut gba: agb::Gba) -> ! {
     //player entities
     entity_array[0].set_size(new_num(1));
     entity_array[0].set_y_offset(new_num(0));
-    entity_array[0].set_y_rotation(Num::from_raw(64));
+    entity_array[0].set_y_rotation(Fixed::from_raw(64));
 
     entity_array[0].refresh_model_matrix();
 
-    entity_array[1].set_size(Num::from_f32(0.5));
-    entity_array[1].set_y_offset(Num::from_raw(-192));
-    entity_array[1].set_y_rotation(Num::from_raw(64));
+    entity_array[1].set_size(Fixed::from_f32(0.5));
+    entity_array[1].set_y_offset(Fixed::from_raw(-192));
+    entity_array[1].set_y_rotation(Fixed::from_raw(64));
 
     entity_array[1].refresh_model_matrix();
 
@@ -101,8 +116,8 @@ fn main(mut gba: agb::Gba) -> ! {
 
         bitmap4.clear(0);
         angle += increment;
-        if angle > new_num(1) {
-            angle = new_num(0);
+        if angle > Fixed::const_new(1) {
+            angle = Fixed::const_new(0);
         }
 
         player.update_camera_position();
