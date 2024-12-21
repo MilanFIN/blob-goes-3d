@@ -9,7 +9,7 @@ use crate::fixed;
 use fixed::*;
 
 
-#[derive(Copy, Clone, Deserialize)]
+#[derive(Copy, Clone, Deserialize, Debug)]
 pub struct Empty {}
 impl Entity for Empty {
     fn render(&self, _bitmap4: &mut agb::display::bitmap4::Bitmap4, _camera: &Camera) {}

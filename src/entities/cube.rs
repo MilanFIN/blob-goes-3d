@@ -10,30 +10,41 @@ use render::*;
 use crate::fixed;
 use fixed::*;
 
-#[derive(Copy, Clone, Deserialize)]
+#[derive(Copy, Clone, Deserialize, Debug)]
 pub struct Cube {
-    x_offset: Fixed,
-    y_offset: Fixed,
-    z_offset: Fixed,
+    #[serde(default = "default_fixed")]
+    x: Fixed,
+    #[serde(default = "default_fixed")]
+    y: Fixed,
+    #[serde(default = "default_fixed")]
+    z: Fixed,
 
+    #[serde(default = "default_fixed")]
     x_rotation: Fixed,
+    #[serde(default = "default_fixed")]
     y_rotation: Fixed,
+    #[serde(default = "default_fixed")]
     z_rotation: Fixed,
 
+    #[serde(default = "default_fixed_3_8")]
     points: [[Fixed; 3]; 8],
+    #[serde(default = "default_fixed_3_8")]
     model_rotated_points: [[Fixed; 3]; 8],
 
+    #[serde(default = "default_fixed_3_3")]
     x_rotation_matrix: [[Fixed; 3]; 3],
+    #[serde(default = "default_fixed_3_3")]
     y_rotation_matrix: [[Fixed; 3]; 3],
+    #[serde(default = "default_fixed_3_3")]
     z_rotation_matrix: [[Fixed; 3]; 3],
 }
 
 impl Cube {
     pub fn default() -> Self {
         Self {
-            x_offset: Fixed::const_new(0),
-            y_offset: Fixed::const_new(0),
-            z_offset: Fixed::const_new(0),
+            x: Fixed::const_new(0),
+            y: Fixed::const_new(0),
+            z: Fixed::const_new(0),
             x_rotation: Fixed::const_new(0),
             y_rotation: Fixed::const_new(0),
             z_rotation: Fixed::const_new(0),
@@ -49,15 +60,15 @@ impl Cube {
 
 impl Entity for Cube {
     fn set_x_offset(&mut self, x_offset: Fixed) {
-        self.x_offset = x_offset;
+        self.x = x_offset;
     }
 
     fn set_y_offset(&mut self, y_offset: Fixed) {
-        self.y_offset = y_offset;
+        self.y = y_offset;
     }
 
     fn set_z_offset(&mut self, z_offset: Fixed) {
-        self.z_offset = z_offset;
+        self.z = z_offset;
     }
 
     fn set_size(&mut self, size: Fixed) {
@@ -134,9 +145,9 @@ impl Entity for Cube {
             rotated_point = matmul(self.z_rotation_matrix, rotated_point);*/
 
             let mut translated_point: [Fixed; 3] = self.model_rotated_points[i];
-            translated_point[0] += self.x_offset - camera.x;
-            translated_point[1] += self.y_offset - camera.y;
-            translated_point[2] += self.z_offset - camera.z;
+            translated_point[0] += self.x - camera.x;
+            translated_point[1] += self.y - camera.y;
+            translated_point[2] += self.z - camera.z;
 
             translated_point = matmul(camera.x_rotation_matrix, translated_point);
             translated_point = matmul(camera.y_rotation_matrix, translated_point);
@@ -271,8 +282,8 @@ impl Entity for Cube {
     
 
     fn distance_from_camera(&self, camera: &Camera) -> Fixed {
-        return (self.x_offset - camera.x).abs()
-            + (self.y_offset - camera.y).abs()
-            + (self.z_offset - camera.z).abs();
+        return (self.x - camera.x).abs()
+            + (self.y - camera.y).abs()
+            + (self.z - camera.z).abs();
     }
 }

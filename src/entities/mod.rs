@@ -9,6 +9,7 @@ pub mod empty;
 use empty::*;
 use serde::Deserialize;
 
+
 use super::math;
 use super::render;
 
@@ -19,9 +20,13 @@ use crate::fixed;
 use fixed::*;
 
 
-#[derive(Copy, Clone, Deserialize)]
+
+#[derive(Copy, Clone, Deserialize,Debug)]
+#[serde(tag = "type", content = "data")]
 pub enum EntityEnum {
+    #[serde(rename = "cube")]
     Cube(Cube),
+    #[serde(rename = "empty")]
     Empty(Empty),
 }
 

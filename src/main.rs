@@ -42,6 +42,9 @@ mod input;
 mod fixed;
 use fixed::*;
 
+mod levels;
+use serde_json_core::from_slice;
+
 
 /*
 The main function must take 1 arguments and never return. The agb::entry decorator
@@ -50,9 +53,6 @@ and interrupt handlers correctly. It will also handle creating the `Gba` struct 
 */
 #[agb::entry]
 fn main(mut gba: agb::Gba) -> ! {
-
-
-
 
     let mut input = ButtonController::new();
 
@@ -70,7 +70,12 @@ fn main(mut gba: agb::Gba) -> ! {
     let mut entity_array: [EntityEnum; 4] = [EntityEnum::Empty(Empty::default()); 4];
     let mut entity_render_order: [usize; 4] = [0; 4];
 
-    for i in 0..4 {
+
+    let message_bytes = levels::LEVELS[1].trim().as_bytes();
+    let (cubes, _): ([EntityEnum; 2], _) = from_slice(message_bytes).unwrap();
+
+
+    for i in 0..2 {
         entity_array[i] = EntityEnum::Cube(Cube::default());
         entity_array[i].set_z_offset(new_num(0));
         entity_array[i].set_x_rotation(new_num(0));
@@ -82,6 +87,20 @@ fn main(mut gba: agb::Gba) -> ! {
         entity_array[i].refresh_model_matrix();
 
         entity_render_order[i] = i;
+    }
+
+    for i in 2..4 {
+        entity_array[i] = cubes[i-2];
+        entity_array[i].set_x_rotation(new_num(0));
+        entity_array[i].set_y_rotation(new_num(0));
+        entity_array[i].set_z_rotation(new_num(0));
+        //always call after modifying rotation
+
+        entity_array[i].set_size(new_num(2));
+        entity_array[i].refresh_model_matrix();
+
+        entity_render_order[i] = i;
+
     }
 
     //player entities
@@ -98,8 +117,8 @@ fn main(mut gba: agb::Gba) -> ! {
     entity_array[1].refresh_model_matrix();
 
     //rest of the blocks
-    entity_array[2].set_x_offset(new_num(5));
-    entity_array[3].set_x_offset(new_num(-5));
+    //entity_array[2].set_x_offset(new_num(5));
+    //entity_array[3].set_x_offset(new_num(-5));
     let mut player = Player::default();
 
     player.camera.set_x_rotation(new_num(0));

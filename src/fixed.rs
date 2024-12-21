@@ -11,6 +11,18 @@ use core::ops::{Add, AddAssign, Sub, SubAssign, Mul, MulAssign, Div, DivAssign};
 pub struct Fixed(Num<i32, 8>);
 
 
+pub fn default_fixed() -> Fixed {
+    Fixed::new(0)
+}
+
+pub fn default_fixed_3_8() -> [[Fixed; 3]; 8] {
+    [[Fixed::const_new(0); 3]; 8]
+}
+
+pub fn default_fixed_3_3() -> [[Fixed; 3]; 3] {
+    [[Fixed::const_new(0); 3]; 3]
+}
+
 pub const fn i32_to_fixed(m:i32) -> Fixed {
     return Fixed(Num::from_raw(m << 8));
 }
@@ -43,22 +55,24 @@ impl Fixed {
     }
 }
 
-// Implement `Deserialize` for the wrapper
-// Create a fixed, and divide by 100
 impl<'de> Deserialize<'de> for Fixed {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
     {
-        let value = i32::deserialize(deserializer)?;
-        Ok(Fixed(Num::new(value) / 100))
+        // Deserialize the value as a f64
+        let value = f32::deserialize(deserializer)?;
+        //let valuei = (value * 100.0) as i32;
+        let valuen: Num<i32, 8> = Num::from_f32(value);
+        //Num::new(valuei) / 100;
+        // Convert the floating-point value into your Fixed point representation
+        Ok(Fixed(valuen))
     }
 }
 
 ///
 /// BASIC OPERATIONS
 /// 
-
 
 impl Neg for Fixed {
     type Output = Self;
