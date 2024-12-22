@@ -11,6 +11,7 @@ pub trait Entity {
     fn set_x_rotation(&mut self, x_rotation: Fixed);
     fn set_y_rotation(&mut self, y_rotation: Fixed);
     fn set_z_rotation(&mut self, z_rotation: Fixed);
+    fn recalculate_points(&mut self);
     fn refresh_model_matrix(&mut self);
 
     fn set_size(&mut self, size: Fixed);

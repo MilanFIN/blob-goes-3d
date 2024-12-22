@@ -79,6 +79,12 @@ impl EntityEnum {
             EntityEnum::Empty(e) => e.set_size(size),
         }
     }
+    pub fn recalculate_points(&mut self) {
+        match self {
+            EntityEnum::Cube(c) => c.recalculate_points(),
+            EntityEnum::Empty(e) => e.recalculate_points(),
+        }
+    }
     #[allow(dead_code)]
     pub fn set_vertex(&mut self, point: [Fixed; 3], index: i32) {
         match self {

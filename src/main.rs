@@ -96,7 +96,7 @@ fn main(mut gba: agb::Gba) -> ! {
         entity_array[i].set_z_rotation(new_num(0));
         //always call after modifying rotation
 
-        entity_array[i].set_size(new_num(2));
+        entity_array[i].recalculate_points();
         entity_array[i].refresh_model_matrix();
 
         entity_render_order[i] = i;

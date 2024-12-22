@@ -20,6 +20,9 @@ pub struct Cube {
     z: Fixed,
 
     #[serde(default = "default_fixed")]
+    size: Fixed,
+
+    #[serde(default = "default_fixed")]
     x_rotation: Fixed,
     #[serde(default = "default_fixed")]
     y_rotation: Fixed,
@@ -45,6 +48,7 @@ impl Cube {
             x: Fixed::const_new(0),
             y: Fixed::const_new(0),
             z: Fixed::const_new(0),
+            size: Fixed::const_new(1),
             x_rotation: Fixed::const_new(0),
             y_rotation: Fixed::const_new(0),
             z_rotation: Fixed::const_new(0),
@@ -72,16 +76,20 @@ impl Entity for Cube {
     }
 
     fn set_size(&mut self, size: Fixed) {
-        let radius: Fixed = size / 2; 
+        self.size = size / 2; 
+        self.recalculate_points();
+    }
+
+    fn recalculate_points(&mut self) {
         self.points = [
-            [(radius), (radius), (radius)],
-            [(-radius), (radius), (radius)],
-            [(-radius), (-radius), (radius)],
-            [(radius), (-radius), (radius)],
-            [(radius), (radius), (-radius)],
-            [(-radius), (radius), (-radius)],
-            [(-radius), (-radius), (-radius)],
-            [(radius), (-radius), (-radius)],
+            [(self.size), (self.size), (self.size)],
+            [(-self.size), (self.size), (self.size)],
+            [(-self.size), (-self.size), (self.size)],
+            [(self.size), (-self.size), (self.size)],
+            [(self.size), (self.size), (-self.size)],
+            [(-self.size), (self.size), (-self.size)],
+            [(-self.size), (-self.size), (-self.size)],
+            [(self.size), (-self.size), (-self.size)],
         ];
     }
 
@@ -286,4 +294,6 @@ impl Entity for Cube {
             + (self.y - camera.y).abs()
             + (self.z - camera.z).abs();
     }
+    
+
 }
