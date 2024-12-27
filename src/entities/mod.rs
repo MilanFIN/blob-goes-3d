@@ -1,14 +1,15 @@
-
 pub mod entity;
 use entity::*;
 
 pub mod cube;
 use cube::*;
 
+pub mod rectangle;
+use rectangle::*;
+
 pub mod empty;
 use empty::*;
 use serde::Deserialize;
-
 
 use super::math;
 use super::render;
@@ -19,13 +20,13 @@ use camera::*;
 use crate::fixed;
 use fixed::*;
 
-
-
-#[derive(Copy, Clone, Deserialize,Debug)]
+#[derive(Copy, Clone, Deserialize, Debug)]
 #[serde(tag = "type", content = "data")]
 pub enum EntityEnum {
     #[serde(rename = "cube")]
     Cube(Cube),
+    #[serde(rename = "rectangle")]
+    Rectangle(Rectangle),
     #[serde(rename = "empty")]
     Empty(Empty),
 }
@@ -34,74 +35,88 @@ impl EntityEnum {
     pub fn set_x_offset(&mut self, offset: Fixed) {
         match self {
             EntityEnum::Cube(c) => c.set_x_offset(offset),
-            EntityEnum::Empty(e) => e.set_x_offset(offset),
+            EntityEnum::Rectangle(r) => r.set_x_offset(offset),
+            EntityEnum::Empty(_e) => {},
         }
     }
     pub fn set_y_offset(&mut self, offset: Fixed) {
         match self {
             EntityEnum::Cube(c) => c.set_y_offset(offset),
-            EntityEnum::Empty(e) => e.set_y_offset(offset),
+            EntityEnum::Rectangle(r) => r.set_y_offset(offset),
+            EntityEnum::Empty(_e) => {},
         }
     }
     pub fn set_z_offset(&mut self, offset: Fixed) {
         match self {
             EntityEnum::Cube(c) => c.set_z_offset(offset),
-            EntityEnum::Empty(e) => e.set_z_offset(offset),
+            EntityEnum::Rectangle(r) => r.set_z_offset(offset),
+            EntityEnum::Empty(_e) => {},
         }
     }
     pub fn set_x_rotation(&mut self, rot: Fixed) {
         match self {
             EntityEnum::Cube(c) => c.set_x_rotation(rot),
-            EntityEnum::Empty(e) => e.set_x_rotation(rot),
+            EntityEnum::Rectangle(r) => r.set_x_rotation(rot),
+            EntityEnum::Empty(_e) => {},
         }
     }
     pub fn set_y_rotation(&mut self, rot: Fixed) {
         match self {
             EntityEnum::Cube(c) => c.set_y_rotation(rot),
-            EntityEnum::Empty(e) => e.set_y_rotation(rot),
+            EntityEnum::Rectangle(r) => r.set_y_rotation(rot),
+            EntityEnum::Empty(_e) => {},
         }
     }
     pub fn set_z_rotation(&mut self, rot: Fixed) {
         match self {
             EntityEnum::Cube(c) => c.set_z_rotation(rot),
-            EntityEnum::Empty(e) => e.set_z_rotation(rot),
+            EntityEnum::Rectangle(r) => r.set_z_rotation(rot),
+            EntityEnum::Empty(_e) => {},
         }
     }
     pub fn refresh_model_matrix(&mut self) {
         match self {
             EntityEnum::Cube(c) => c.refresh_model_matrix(),
-            EntityEnum::Empty(e) => e.refresh_model_matrix(),
+            EntityEnum::Rectangle(r) => r.refresh_model_matrix(),
+            EntityEnum::Empty(_e) => {},
         }
     }
+    //todo: rename to set_scale at some point to recalculate points at a different scale from original size
     pub fn set_size(&mut self, size: Fixed) {
         match self {
             EntityEnum::Cube(c) => c.set_size(size),
-            EntityEnum::Empty(e) => e.set_size(size),
+            //not implemented
+            EntityEnum::Rectangle(_r) => {},
+            EntityEnum::Empty(_e) => {},
         }
     }
     pub fn recalculate_points(&mut self) {
         match self {
             EntityEnum::Cube(c) => c.recalculate_points(),
-            EntityEnum::Empty(e) => e.recalculate_points(),
+            EntityEnum::Rectangle(r) => r.recalculate_points(),
+            EntityEnum::Empty(_e) => {},
         }
     }
     #[allow(dead_code)]
     pub fn set_vertex(&mut self, point: [Fixed; 3], index: i32) {
         match self {
             EntityEnum::Cube(c) => c.set_vertex(point, index),
-            EntityEnum::Empty(e) => e.set_vertex(point, index),
+            EntityEnum::Rectangle(r) => r.set_vertex(point, index),
+            EntityEnum::Empty(_e) => {},
         }
     }
     pub fn render(&self, bitmap4: &mut agb::display::bitmap4::Bitmap4, camera: &Camera) {
         match self {
             EntityEnum::Cube(c) => c.render(bitmap4, camera),
-            EntityEnum::Empty(e) => e.render(bitmap4, camera),
+            EntityEnum::Rectangle(r) => r.render(bitmap4, camera),
+            EntityEnum::Empty(_e) => {},
         }
     }
     pub fn distance_from_camera(&self, camera: &Camera) -> Fixed {
         match self {
             EntityEnum::Cube(c) => c.distance_from_camera(camera),
-            EntityEnum::Empty(e) => e.distance_from_camera(camera),
+            EntityEnum::Rectangle(r) => r.distance_from_camera(camera),
+            EntityEnum::Empty(_e) => {Fixed::const_new(999)},
         }
     }
 }
@@ -143,4 +158,3 @@ pub fn quick_sort(
         quick_sort(entity_render_order, entity_array, pi + 1, high, camera);
     }
 }
-
