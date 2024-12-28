@@ -6,10 +6,13 @@ use camera::*;
 use crate::fixed;
 use fixed::*;
 
+const GRAVITY: Fixed = Fixed::from_raw(32);
+
 pub struct Player {
     pub x: Fixed,
     pub y: Fixed,
     pub z: Fixed,
+    yspeed: Fixed,
 
     pub angle: Fixed,
     camera_angle: usize,
@@ -23,6 +26,7 @@ impl Player {
             y: Fixed::const_new(0),
             z: Fixed::const_new(0),
             angle: Fixed::const_new(0),
+            yspeed: Fixed::const_new(0),
             camera_angle: 0,
             camera: Camera::default(),
         }
@@ -77,7 +81,7 @@ impl Player {
         self.z += self.angle.sin();
     }
 
-	pub fn back_right(&mut self) {
+    pub fn back_right(&mut self) {
         let mut view_dir: usize = self.camera_angle + 224;
         if view_dir > 255 {
             view_dir -= 255;
@@ -124,4 +128,25 @@ impl Player {
         self.camera.y = self.camera.local_y + self.y;
         self.camera.z = self.camera.local_z + self.z;
     }
+
+    pub fn land(&mut self) {
+        self.yspeed = Fixed::const_new(0);
+        
+    }
+
+    pub fn fall(&mut self, ylimit: Fixed) {
+        if (self.y < ylimit) {
+            self.y += self.yspeed;
+            if (self.y > ylimit) {
+                self.y = ylimit;
+                self.land();
+            }
+            self.yspeed += GRAVITY;
+        }
+        else {
+            self.land();
+        }
+
+    }
+
 }

@@ -142,11 +142,19 @@ impl DivAssign for Fixed {
 // Implement `Mul` for Fixed * i32
 impl Mul<i32> for Fixed {
     type Output = Self;
-
     fn mul(self, other: i32) -> Self {
         Fixed(self.0 * other)
     }
 }
+
+// Implement `Mul` for Fixed * usize
+impl Mul<usize> for Fixed {
+    type Output = Self;
+    fn mul(self, other: usize) -> Self {
+        Fixed(self.0 * other as i32)
+    }
+}
+
 
 // Implement MulAssign
 impl MulAssign<i32> for Fixed {

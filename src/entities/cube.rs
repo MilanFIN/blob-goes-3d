@@ -2,6 +2,7 @@ use serde::Deserialize;
 
 use super::math;
 use super::render;
+use super::BoundingRect;
 use super::Camera;
 use super::Entity;
 use math::*;
@@ -40,6 +41,10 @@ pub struct Cube {
     y_rotation_matrix: [[Fixed; 3]; 3],
     #[serde(default = "default_fixed_3_3")]
     z_rotation_matrix: [[Fixed; 3]; 3],
+
+    #[serde(default = "default_fixed_3_8")]
+    world_points: [[Fixed; 3]; 8],
+
 }
 
 impl Cube {
@@ -57,9 +62,10 @@ impl Cube {
             x_rotation_matrix: [[Fixed::const_new(0); 3]; 3],
             y_rotation_matrix: [[Fixed::const_new(0); 3]; 3],
             z_rotation_matrix: [[Fixed::const_new(0); 3]; 3],
+            world_points: [[Fixed::const_new(0); 3]; 8],
+
         }
     }
-
 }
 
 impl Entity for Cube {
@@ -76,7 +82,7 @@ impl Entity for Cube {
     }
 
     fn set_size(&mut self, size: Fixed) {
-        self.size = size / 2; 
+        self.size = size / 2;
         self.recalculate_points();
     }
 
@@ -96,27 +102,63 @@ impl Entity for Cube {
     fn set_x_rotation(&mut self, x_rotation: Fixed) {
         self.x_rotation = x_rotation;
         self.x_rotation_matrix = [
-            [Fixed::const_new(1), Fixed::const_new(0), Fixed::const_new(0)],
-            [Fixed::const_new(0), self.x_rotation.cos(), -self.x_rotation.sin()],
-            [Fixed::const_new(0), self.x_rotation.sin(), self.x_rotation.cos()],
+            [
+                Fixed::const_new(1),
+                Fixed::const_new(0),
+                Fixed::const_new(0),
+            ],
+            [
+                Fixed::const_new(0),
+                self.x_rotation.cos(),
+                -self.x_rotation.sin(),
+            ],
+            [
+                Fixed::const_new(0),
+                self.x_rotation.sin(),
+                self.x_rotation.cos(),
+            ],
         ];
     }
 
     fn set_y_rotation(&mut self, y_rotation: Fixed) {
         self.y_rotation = y_rotation;
         self.y_rotation_matrix = [
-            [self.y_rotation.cos(), Fixed::const_new(0), self.y_rotation.sin()],
-            [Fixed::const_new(0), Fixed::const_new(1), Fixed::const_new(0)],
-            [-self.y_rotation.sin(), Fixed::const_new(0), self.y_rotation.cos()],
+            [
+                self.y_rotation.cos(),
+                Fixed::const_new(0),
+                self.y_rotation.sin(),
+            ],
+            [
+                Fixed::const_new(0),
+                Fixed::const_new(1),
+                Fixed::const_new(0),
+            ],
+            [
+                -self.y_rotation.sin(),
+                Fixed::const_new(0),
+                self.y_rotation.cos(),
+            ],
         ];
     }
 
     fn set_z_rotation(&mut self, z_rotation: Fixed) {
         self.z_rotation = z_rotation;
         self.z_rotation_matrix = [
-            [self.z_rotation.cos(), -self.z_rotation.sin(), Fixed::const_new(0)],
-            [self.z_rotation.sin(), self.z_rotation.cos(), Fixed::const_new(0)],
-            [Fixed::const_new(0), Fixed::const_new(0), Fixed::const_new(1)],
+            [
+                self.z_rotation.cos(),
+                -self.z_rotation.sin(),
+                Fixed::const_new(0),
+            ],
+            [
+                self.z_rotation.sin(),
+                self.z_rotation.cos(),
+                Fixed::const_new(0),
+            ],
+            [
+                Fixed::const_new(0),
+                Fixed::const_new(0),
+                Fixed::const_new(1),
+            ],
         ];
     }
 
@@ -136,18 +178,20 @@ impl Entity for Cube {
         //not implemented
     }
 
-    fn render(&self, bitmap4: &mut agb::display::bitmap4::Bitmap4, camera: &Camera) {
+    fn render(&mut self, bitmap4: &mut agb::display::bitmap4::Bitmap4, camera: &Camera) {
         let width: i32 = 240;
         let height: i32 = 160;
         let scale: Fixed = Fixed::const_new(30); //100;
         let middle: [Fixed; 2] = [Fixed::const_new(width / 2), Fixed::const_new(height / 2)]; // x, y
 
         let mut screen_points: [[Fixed; 2]; 8] = [[Fixed::const_new(0), Fixed::const_new(0)]; 8];
-        let mut translated_points: [[Fixed; 3]; 8] =
-            [[Fixed::const_new(0), Fixed::const_new(0), Fixed::const_new(0)]; 8];
+        let mut translated_points: [[Fixed; 3]; 8] = [[
+            Fixed::const_new(0),
+            Fixed::const_new(0),
+            Fixed::const_new(0),
+        ]; 8];
 
-
-        for i in 0..self.model_rotated_points.len(){
+        for i in 0..self.model_rotated_points.len() {
             /*let mut rotated_point: [Fixed; 3] = matmul(self.x_rotation_matrix, *point);
             rotated_point = matmul(self.y_rotation_matrix, rotated_point);
             rotated_point = matmul(self.z_rotation_matrix, rotated_point);*/
@@ -181,6 +225,7 @@ impl Entity for Cube {
 
             screen_points[i] = [x, y];
             translated_points[i] = translated_point;
+            self.world_points[i] = translated_point;
         }
         if back_face_culling(&translated_points, 0, 1, 2) {
             //draw_face_outline(&mut bitmap4, screenPoints, 0, 1, 2, 3);
@@ -287,13 +332,82 @@ impl Entity for Cube {
             );
         }
     }
-    
 
     fn distance_from_camera(&self, camera: &Camera) -> Fixed {
-        return (self.x - camera.x).abs()
-            + (self.y - camera.y).abs()
-            + (self.z - camera.z).abs();
+        return (self.x - camera.x).abs() + (self.y - camera.y).abs() + (self.z - camera.z).abs();
     }
-    
 
+    fn bottom_bounding_rect(&self) -> BoundingRect {
+        BoundingRect {
+            data: [
+                [self.world_points[0][0], self.world_points[0][2]],
+                [self.world_points[1][0], self.world_points[1][2]],
+                [self.world_points[5][0], self.world_points[5][2]],
+                [self.world_points[4][0], self.world_points[4][2]],
+            ],
+            z: self.world_points[2][1]
+
+        }
+    }
+
+    fn peak_rect_overlap(&self, rect: &BoundingRect) -> Fixed {
+        let top: BoundingRect = BoundingRect {
+            data: [
+                [self.world_points[3][0], self.world_points[3][2]],
+                [self.world_points[2][0], self.world_points[2][2]],
+                [self.world_points[6][0], self.world_points[6][2]],
+                [self.world_points[7][0], self.world_points[7][2]],
+            ],
+            z: self.world_points[0][1]
+        };
+
+        if (top.z > rect.z) {
+            return Fixed::const_new(999);
+        }
+
+        for i in 0..4 {
+            let v0: [Fixed; 2] = vector_sub_2d(rect.data[0], top.data[i]);
+            let v1: [Fixed; 2] = vector_sub_2d(rect.data[1], top.data[i]);
+            let v2: [Fixed; 2] = vector_sub_2d(rect.data[2], top.data[i]);
+            let v3: [Fixed; 2] = vector_sub_2d(rect.data[3], top.data[i]);
+
+            /*let cross1 = cross_product(v0, v1);
+            let cross2 = cross_product(v1, v2);
+            let cross3 = cross_product(v2, v3);
+            let cross4 = cross_product(v3, v0);*/
+            let cross1 = cross_product(rect.data[0], rect.data[1], top.data[i]);
+            let cross2 = cross_product(rect.data[1], rect.data[2], top.data[i]);
+            let cross3 = cross_product(rect.data[2], rect.data[3], top.data[i]);
+            let cross4 = cross_product(rect.data[3], rect.data[0], top.data[i]);
+            const z: Fixed = Fixed::const_new(0);
+            if (cross1 >= z && cross2 >= z && cross3 >= z && cross4 >= z)
+                || (cross1 <= z && cross2 <= z && cross3 <= z && cross4 <= z)
+            {
+                return top.z;
+            }
+        }
+        for i in 0..4 {
+            let v0: [Fixed; 2] = vector_sub_2d(top.data[0], rect.data[i]);
+            let v1: [Fixed; 2] = vector_sub_2d(top.data[1], rect.data[i]);
+            let v2: [Fixed; 2] = vector_sub_2d(top.data[2], rect.data[i]);
+            let v3: [Fixed; 2] = vector_sub_2d(top.data[3], rect.data[i]);
+
+            /*let cross1 = cross_product(v0, v1);
+            let cross2 = cross_product(v1, v2);
+            let cross3 = cross_product(v2, v3);
+            let cross4 = cross_product(v3, v0);*/
+            let cross1 = cross_product(top.data[0], top.data[1], rect.data[i]);
+            let cross2 = cross_product(top.data[1], top.data[2], rect.data[i]);
+            let cross3 = cross_product(top.data[2], top.data[3], rect.data[i]);
+            let cross4 = cross_product(top.data[3], top.data[0], rect.data[i]);
+
+            const z: Fixed = Fixed::const_new(0);
+            if (cross1 >= z && cross2 >= z && cross3 >= z && cross4 >= z)
+                || (cross1 <= z && cross2 <= z && cross3 <= z && cross4 <= z)
+            {
+                return top.z;
+            }
+        }
+        return Fixed::const_new(999);
+    }
 }

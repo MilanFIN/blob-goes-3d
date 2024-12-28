@@ -126,7 +126,9 @@ fn main(mut gba: agb::Gba) -> ! {
     player.camera.set_z_rotation(new_num(0));
     player.camera.local_y = new_num(-3);
 
-    player.x = new_num(5);
+    player.y = new_num(-10);//new_num(5);
+    player.camera_left(0);
+
 
     loop {
         input.update();
@@ -139,12 +141,17 @@ fn main(mut gba: agb::Gba) -> ! {
             angle = Fixed::const_new(0);
         }
 
+        let groundlevel: Fixed = check_support_below(&entity_array, 0);
+        player.fall(groundlevel);
+
         player.update_camera_position();
 
         //rotate player body blocks and move them where the player is
         for i in 0..2 {
             entity_array[i].set_x_offset(player.x);
+            entity_array[i].set_y_offset(player.y + Fixed::from_raw(-128) + Fixed::from_raw(-192) * i);
             entity_array[i].set_z_offset(player.z);
+
             entity_array[i].set_y_rotation(-player.angle);
             entity_array[i].refresh_model_matrix();
         }

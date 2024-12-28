@@ -12,7 +12,7 @@ pub fn matmul(matrix: [[Fixed; 3]; 3], vector: [Fixed; 3]) -> [Fixed; 3] {
     return result;
 }
 
-pub fn vector_cross(vec1: [Fixed; 3], vec2: [Fixed; 3]) -> [Fixed; 3] {
+pub fn vector_cross_3d(vec1: [Fixed; 3], vec2: [Fixed; 3]) -> [Fixed; 3] {
     let mut result: [Fixed; 3] = [Fixed::const_new(0); 3];
 
     // Cross product formula
@@ -22,6 +22,14 @@ pub fn vector_cross(vec1: [Fixed; 3], vec2: [Fixed; 3]) -> [Fixed; 3] {
 
     return result;
 }
+
+pub fn cross_product(p1: [Fixed; 2], p2: [Fixed; 2], p3: [Fixed;2]) -> Fixed {
+    //(p2 - p1) x (p3 - p1)
+    //return (vec2[])
+    return (p2[0] - p1[0]) * (p3[1] - p1[1]) - (p2[1] - p1[1]) * (p3[0] - p1[0])
+    //return vec1[0] * vec2[1] - vec1[1] * vec2[0]; // x component
+}
+
 
 pub fn vector_dot(vec1: [Fixed; 3], vec2: [Fixed; 3]) -> Fixed {
     let mut result: Fixed = Fixed::const_new(0);
@@ -44,7 +52,6 @@ pub fn vector_add(vec1: [Fixed; 3], vec2: [Fixed; 3]) -> [Fixed; 3] {
     return result;
 }
 
-
 pub fn vector_sub(vec1: [Fixed; 3], vec2: [Fixed; 3]) -> [Fixed; 3] {
     let mut result: [Fixed; 3] = [Fixed::const_new(0); 3];
 
@@ -53,6 +60,11 @@ pub fn vector_sub(vec1: [Fixed; 3], vec2: [Fixed; 3]) -> [Fixed; 3] {
     }
 
     return result;
+}
+
+pub fn vector_sub_2d(p1: [Fixed;2], p2: [Fixed;2]) -> [Fixed;2] {
+    return [p1[0] - p2[0], p1[1] - p2[1]]
+
 }
 
 
@@ -64,5 +76,5 @@ pub fn normalize(v: [Fixed; 3]) -> [Fixed; 3] {
 
 //crude approximation is => x/2 + 1/2
 pub fn fast_sqrt(n: Fixed) -> Fixed {
-    return (n/2) + (Fixed::const_new(1) / Fixed::const_new(2));
+    return (n / 2) + (Fixed::const_new(1) / Fixed::const_new(2));
 }

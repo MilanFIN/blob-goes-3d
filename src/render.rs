@@ -105,7 +105,7 @@ pub fn back_face_culling(
     let v12: [Fixed; 3] = vector_sub(points[p2], points[p1]);
     let v23: [Fixed; 3] = vector_sub(points[p3], points[p2]);
 
-    let normal: [Fixed; 3] = vector_cross(v12, v23);
+    let normal: [Fixed; 3] = vector_cross_3d(v12, v23);
 
     //get center of the three polygons
     let polygon_center: [Fixed; 3] = [

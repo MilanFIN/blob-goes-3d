@@ -9,6 +9,10 @@ use rectangle::*;
 
 pub mod empty;
 use empty::*;
+
+pub mod boundingrect;
+use boundingrect::*;
+
 use serde::Deserialize;
 
 use super::math;
@@ -19,6 +23,7 @@ use camera::*;
 
 use crate::fixed;
 use fixed::*;
+
 
 #[derive(Copy, Clone, Deserialize, Debug)]
 #[serde(tag = "type", content = "data")]
@@ -105,7 +110,7 @@ impl EntityEnum {
             EntityEnum::Empty(_e) => {},
         }
     }
-    pub fn render(&self, bitmap4: &mut agb::display::bitmap4::Bitmap4, camera: &Camera) {
+    pub fn render(&mut self, bitmap4: &mut agb::display::bitmap4::Bitmap4, camera: &Camera) {
         match self {
             EntityEnum::Cube(c) => c.render(bitmap4, camera),
             EntityEnum::Rectangle(r) => r.render(bitmap4, camera),
@@ -117,6 +122,20 @@ impl EntityEnum {
             EntityEnum::Cube(c) => c.distance_from_camera(camera),
             EntityEnum::Rectangle(r) => r.distance_from_camera(camera),
             EntityEnum::Empty(_e) => {Fixed::const_new(999)},
+        }
+    }
+    pub fn bottom_bounding_rect(&self) -> BoundingRect {
+        match self {
+            EntityEnum::Cube(c) => c.bottom_bounding_rect(),
+            EntityEnum::Rectangle(r) => r.bottom_bounding_rect(),
+            EntityEnum::Empty(_e) => {BoundingRect::default()},
+        }
+    }
+    pub fn peak_rect_overlap(&self, rect: &BoundingRect) -> Fixed {
+        match self {
+            EntityEnum::Cube(c) => c.peak_rect_overlap(rect),
+            EntityEnum::Rectangle(r) => r.peak_rect_overlap(rect),
+            EntityEnum::Empty(_e) => {Fixed::const_new(0)},
         }
     }
 }
@@ -157,4 +176,20 @@ pub fn quick_sort(
         }
         quick_sort(entity_render_order, entity_array, pi + 1, high, camera);
     }
+}
+
+//determine if the element in the entiry array has an object below it
+pub fn check_support_below(entity_array: &[EntityEnum], element: usize) -> Fixed{
+    let rect: BoundingRect = entity_array[element].bottom_bounding_rect();
+    let mut distance = Fixed::const_new(999);
+    for (i, e) in entity_array.iter().enumerate() {
+        if i != 0 && i != 1 {
+            let d: Fixed = e.peak_rect_overlap(&rect);
+            if d < distance {
+                distance = d;
+            }
+        }
+    }
+    //distance = Fixed::const_new(10);
+    return distance;
 }

@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-use super::entity;
+use super::{entity, BoundingRect};
 use entity::*;
 
 use super::Camera;
@@ -11,7 +11,7 @@ use fixed::*;
 #[derive(Copy, Clone, Deserialize, Debug)]
 pub struct Empty {}
 impl Entity for Empty {
-    fn render(&self, _bitmap4: &mut agb::display::bitmap4::Bitmap4, _camera: &Camera) {}
+    fn render(&mut self, _bitmap4: &mut agb::display::bitmap4::Bitmap4, _camera: &Camera) {}
     fn set_x_offset(&mut self, _x_offset: Fixed) {}
     fn set_y_offset(&mut self, _y_offset: Fixed) {}
     fn set_z_offset(&mut self, _z_offset: Fixed) {}
@@ -25,7 +25,13 @@ impl Entity for Empty {
     fn distance_from_camera(&self, _camera: &Camera) -> Fixed {
         return Fixed::const_new(999);
     }
+    fn bottom_bounding_rect(&self) -> BoundingRect {
+        BoundingRect::default()
+    }
 
+    fn peak_rect_overlap(&self, rect: &BoundingRect) -> Fixed {
+        Fixed::const_new(0)
+    }
 }
 
 impl Empty {
