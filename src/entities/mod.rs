@@ -181,11 +181,11 @@ pub fn quick_sort(
 //determine if the element in the entiry array has an object below it
 pub fn check_support_below(entity_array: &[EntityEnum], element: usize) -> Fixed{
     let rect: BoundingRect = entity_array[element].bottom_bounding_rect();
-    let mut distance = Fixed::const_new(999);
+    let mut distance = Fixed::const_new(-999);
     for (i, e) in entity_array.iter().enumerate() {
         if i != 0 && i != 1 {
             let d: Fixed = e.peak_rect_overlap(&rect);
-            if d < distance {
+            if d > distance {
                 distance = d;
             }
         }

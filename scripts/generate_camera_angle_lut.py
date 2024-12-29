@@ -6,7 +6,7 @@ import math
 
 # Parameters
 num_points = 256
-radius = 3  # Radius of the circle
+radius = 5  # Radius of the circle
 center_x, center_y = 0, 0  # Center of the circle
 
 # Compute and print results
@@ -28,5 +28,5 @@ for i in range(num_points):
     formatted_angle = int(i)
 
 
-    formatted_string = f"[Num::from_raw({formatted_x}), Num::from_raw({formatted_y}), Num::from_raw({formatted_angle})],"
+    formatted_string = f"[Fixed::from_raw({formatted_x}), Fixed::from_raw({formatted_y}), Fixed::from_raw({formatted_angle})],"
     print (formatted_string)

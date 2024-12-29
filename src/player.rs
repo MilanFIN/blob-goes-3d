@@ -42,7 +42,7 @@ impl Player {
     }
 
     pub fn forward_left(&mut self) {
-        let mut view_dir: usize = self.camera_angle + 96;
+        let mut view_dir: usize = self.camera_angle + 32;
         if view_dir > 255 {
             view_dir -= 255;
         }
@@ -52,7 +52,7 @@ impl Player {
     }
 
     pub fn forward_right(&mut self) {
-        let mut view_dir: usize = self.camera_angle + 32;
+        let mut view_dir: usize = self.camera_angle + 96;
         if view_dir > 255 {
             view_dir -= 255;
         }
@@ -72,7 +72,7 @@ impl Player {
     }
 
     pub fn back_left(&mut self) {
-        let mut view_dir: usize = self.camera_angle + 160;
+        let mut view_dir: usize = self.camera_angle + 224;
         if view_dir > 255 {
             view_dir -= 255;
         }
@@ -82,7 +82,7 @@ impl Player {
     }
 
     pub fn back_right(&mut self) {
-        let mut view_dir: usize = self.camera_angle + 224;
+        let mut view_dir: usize = self.camera_angle + 160;
         if view_dir > 255 {
             view_dir -= 255;
         }
@@ -93,25 +93,15 @@ impl Player {
 
     pub fn left(&mut self) {
         self.angle = CAMERALOCATIONS[self.camera_angle][2];
-        self.x -= self.angle.cos();
-        self.z -= self.angle.sin();
-    }
-    pub fn right(&mut self) {
-        self.angle = CAMERALOCATIONS[self.camera_angle][2];
         self.x += self.angle.cos();
         self.z += self.angle.sin();
     }
-    pub fn camera_left(&mut self, amount: usize) {
-        self.camera_angle += amount;
-        if self.camera_angle >= 256 {
-            self.camera_angle -= 256;
-        }
-        self.camera
-            .set_y_rotation(CAMERALOCATIONS[self.camera_angle][2]);
-        self.camera.local_x = CAMERALOCATIONS[self.camera_angle][0];
-        self.camera.local_z = CAMERALOCATIONS[self.camera_angle][1];
+    pub fn right(&mut self) {
+        self.angle = CAMERALOCATIONS[self.camera_angle][2];
+        self.x -= self.angle.cos();
+        self.z -= self.angle.sin();
     }
-    pub fn camera_right(&mut self, mut amount: usize) {
+    pub fn camera_left(&mut self, mut amount: usize) {
         if self.camera_angle < amount {
             amount -= self.camera_angle;
             self.camera_angle = 256;
@@ -121,6 +111,20 @@ impl Player {
             .set_y_rotation(CAMERALOCATIONS[self.camera_angle][2]);
         self.camera.local_x = CAMERALOCATIONS[self.camera_angle][0];
         self.camera.local_z = CAMERALOCATIONS[self.camera_angle][1];
+    }
+    pub fn camera_right(&mut self, mut amount: usize) {
+
+        self.camera_angle += amount;
+        if self.camera_angle >= 256 {
+            self.camera_angle -= 256;
+        }
+        self.camera
+            .set_y_rotation(CAMERALOCATIONS[self.camera_angle][2]);
+        self.camera.local_x = CAMERALOCATIONS[self.camera_angle][0];
+        self.camera.local_z = CAMERALOCATIONS[self.camera_angle][1];
+
+
+
     }
 
     pub fn update_camera_position(&mut self) {
@@ -135,13 +139,13 @@ impl Player {
     }
 
     pub fn fall(&mut self, ylimit: Fixed) {
-        if (self.y < ylimit) {
+        if (self.y > ylimit) {
             self.y += self.yspeed;
-            if (self.y > ylimit) {
+            if (self.y < ylimit) {
                 self.y = ylimit;
                 self.land();
             }
-            self.yspeed += GRAVITY;
+            self.yspeed -= GRAVITY;
         }
         else {
             self.land();

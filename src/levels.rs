@@ -9,10 +9,11 @@ const LEVEL1: &str = r#"
 const LEVEL2: &str = r#"
 [
     { "type": "cube", "data": { "size": 2.0, "x": 0, "y": 0, "z":10  } },
-    { "type": "rectangle", "data": { "xsize": 5, "ysize": 0.2, "zsize": 5, "x": 0, "y": 10, "z": 0 } }
+    { "type": "rectangle", "data": { "xsize": 5, "ysize": 0.2, "zsize": 5, "x": 0, "y": -10, "z": 0 } }
 ]
 "#;
 
+//    { "type": "rectangle", "data": { "xsize": 5, "ysize": 0.2, "zsize": 5, "x": 0, "y": -10, "z": 0 } }
 //    { "type": "cube", "data": { "size": 1.0, "x": 4.2, "y": 0, "z": 0 } }
 
 // The result is a constant array of string slices.
