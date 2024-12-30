@@ -20,5 +20,5 @@ pub trait Entity {
     fn set_vertex(&mut self, point: [Fixed; 3], index: i32);
     fn distance_from_camera(&self, camera: &Camera) -> Fixed;
     fn bottom_bounding_rect(&self) -> BoundingRect;
-    fn peak_rect_overlap(&self, rect: &BoundingRect) -> Fixed;
+    fn top_bounding_rect(&self) -> BoundingRect;
 }

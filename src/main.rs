@@ -121,12 +121,13 @@ fn main(mut gba: agb::Gba) -> ! {
     //entity_array[3].set_x_offset(new_num(-5));
     let mut player = Player::default();
 
-    player.camera.set_x_rotation(new_num(0));
-    player.camera.set_y_rotation(new_num(0));
-    player.camera.set_z_rotation(new_num(0));
-    player.camera.local_y = new_num(3);
+    player.camera.set_x_rotation(Fixed::from_raw(0));
+    player.camera.set_y_rotation(Fixed::from_raw(0));
+    player.camera.set_z_rotation(Fixed::from_raw(0));
+    player.camera.local_y = new_num(5);
 
     player.y = new_num(5);//new_num(5);
+    player.z = new_num(0);
     player.camera_left(0);
 
 

@@ -16,7 +16,7 @@ for i in range(num_points):
     angle_radians = math.radians(angle_degrees)
 
     # Calculate x and y coordinates on the edge of the circle
-    # Starting at (0, -3) at angle 0
+    # Starting at (0, -5) at angle 0
     x = radius * math.sin(angle_radians)  # sin controls x, starts from 0
     y = -radius * math.cos(angle_radians)  # cos controls y, starts from -3
 

@@ -28,10 +28,10 @@ impl Entity for Empty {
     fn bottom_bounding_rect(&self) -> BoundingRect {
         BoundingRect::default()
     }
-
-    fn peak_rect_overlap(&self, rect: &BoundingRect) -> Fixed {
-        Fixed::const_new(0)
+    fn top_bounding_rect(&self) -> BoundingRect {
+        BoundingRect::default()
     }
+
 }
 
 impl Empty {

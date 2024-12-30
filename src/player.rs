@@ -7,12 +7,13 @@ use crate::fixed;
 use fixed::*;
 
 const GRAVITY: Fixed = Fixed::from_raw(32);
+pub const JUMPPOWER: Fixed = Fixed::from_raw(512);
 
 pub struct Player {
     pub x: Fixed,
     pub y: Fixed,
     pub z: Fixed,
-    yspeed: Fixed,
+    pub yspeed: Fixed,
 
     pub angle: Fixed,
     camera_angle: usize,
@@ -139,7 +140,11 @@ impl Player {
     }
 
     pub fn fall(&mut self, ylimit: Fixed) {
-        if (self.y > ylimit) {
+        if (self.yspeed > Fixed::const_new(0)) {
+            self.y += self.yspeed;
+            self.yspeed -= GRAVITY;
+        }
+        else if (self.y > ylimit) {
             self.y += self.yspeed;
             if (self.y < ylimit) {
                 self.y = ylimit;

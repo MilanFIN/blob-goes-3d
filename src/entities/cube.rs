@@ -403,8 +403,8 @@ impl Entity for Cube {
         }
     }
 
-    fn peak_rect_overlap(&self, rect: &BoundingRect) -> Fixed {
-        let top: BoundingRect = BoundingRect {
+    fn top_bounding_rect(&self) -> BoundingRect {
+        BoundingRect {
             data: [
                 [self.world_points[3][0], self.world_points[3][2]],
                 [self.world_points[2][0], self.world_points[2][2]],
@@ -412,37 +412,7 @@ impl Entity for Cube {
                 [self.world_points[7][0], self.world_points[7][2]],
             ],
             z: self.world_points[0][1],
-        };
-
-        if (top.z < rect.z) {
-            return Fixed::const_new(-999);
         }
-
-        for i in 0..4 {
-            let cross1 = cross_product(rect.data[0], rect.data[1], top.data[i]);
-            let cross2 = cross_product(rect.data[1], rect.data[2], top.data[i]);
-            let cross3 = cross_product(rect.data[2], rect.data[3], top.data[i]);
-            let cross4 = cross_product(rect.data[3], rect.data[0], top.data[i]);
-            const z: Fixed = Fixed::const_new(0);
-            if (cross1 >= z && cross2 >= z && cross3 >= z && cross4 >= z)
-                || (cross1 <= z && cross2 <= z && cross3 <= z && cross4 <= z)
-            {
-                return top.z;
-            }
-        }
-        for i in 0..4 {
-            let cross1 = cross_product(top.data[0], top.data[1], rect.data[i]);
-            let cross2 = cross_product(top.data[1], top.data[2], rect.data[i]);
-            let cross3 = cross_product(top.data[2], top.data[3], rect.data[i]);
-            let cross4 = cross_product(top.data[3], top.data[0], rect.data[i]);
-
-            const z: Fixed = Fixed::const_new(0);
-            if (cross1 >= z && cross2 >= z && cross3 >= z && cross4 >= z)
-                || (cross1 <= z && cross2 <= z && cross3 <= z && cross4 <= z)
-            {
-                return top.z;
-            }
-        }
-        return Fixed::const_new(-999);
     }
+
 }
