@@ -213,7 +213,6 @@ impl Entity for Rectangle {
 
         let width: i32 = 240;
         let height: i32 = 160;
-        let scale: Fixed = Fixed::const_new(30); //100;
         let middle: [Fixed; 2] = [Fixed::const_new(width / 2), Fixed::const_new(height / 2)]; // x, y
 
         let mut screen_points: [[Fixed; 2]; 8] = [[Fixed::const_new(0), Fixed::const_new(0)]; 8];
@@ -244,12 +243,10 @@ impl Entity for Rectangle {
             // Apply projection matrix
             let projected_point = matmul_4(projection_matrix, translated_point);
 
-            let x: Fixed;
-            let y: Fixed;
             // Perform perspective divide (convert to 2D)
-            if (projected_point[3] != Fixed::const_new(0)) {
-                let x = projected_point[0] / projected_point[3];
-                let y = projected_point[1] / projected_point[3];
+            if projected_point[3] != Fixed::const_new(0) {
+                let x: Fixed = projected_point[0] / projected_point[3];
+                let y: Fixed = projected_point[1] / projected_point[3];
                 // Convert to screen space
                 screen_points[i] = [
                     (x * Fixed::const_new(width) / Fixed::const_new(2)) + middle[0],

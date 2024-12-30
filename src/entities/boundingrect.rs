@@ -14,6 +14,7 @@ impl BoundingRect {
             z: Fixed::const_new(0),
         }
 	}
+    #[allow(dead_code)]
     pub fn new(data: [[Fixed; 2]; 4], z: Fixed) -> Self {
         BoundingRect { data, z }
     }

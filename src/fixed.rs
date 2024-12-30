@@ -1,6 +1,5 @@
 
 
-use agb::display::Display;
 use agb::fixnum::Num;
 use serde::Deserialize;
 use serde::Deserializer;

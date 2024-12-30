@@ -117,11 +117,8 @@ impl Player {
 
         self.camera.local_x = CAMERALOCATIONS[self.camera_angle][0];
         self.camera.local_z = CAMERALOCATIONS[self.camera_angle][1];
-
-
-
     }
-    pub fn camera_right(&mut self, mut amount: usize) {
+    pub fn camera_right(&mut self, amount: usize) {
         self.camera_angle += amount;
         if self.camera_angle >= 256 {
             self.camera_angle -= 256;
@@ -148,18 +145,28 @@ impl Player {
     }
 
     pub fn fall(&mut self, ylimit: Fixed) {
-        if (self.yspeed > Fixed::const_new(0)) {
+        if self.y > ylimit {
             self.y += self.yspeed;
-            self.yspeed -= GRAVITY;
-        } else if (self.y > ylimit) {
-            self.y += self.yspeed;
-            if (self.y < ylimit) {
+            if self.y < ylimit {
                 self.y = ylimit;
                 self.land();
             }
             self.yspeed -= GRAVITY;
         } else {
             self.land();
+        }
+    }
+
+    pub fn float(&mut self, ylimit: Fixed) {
+        //todo: replace 192 with the actual player height, when that starts varying
+        let y = self.y + Fixed::from_raw(192);
+        if y < ylimit {
+            self.y += self.yspeed;
+            if self.y + Fixed::from_raw(192) > ylimit {
+                self.y = ylimit - Fixed::from_raw(192);
+                self.land();
+            }
+            self.yspeed -= GRAVITY;
         }
     }
 }

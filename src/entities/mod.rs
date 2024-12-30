@@ -1,5 +1,4 @@
 pub mod entity;
-use agb::println;
 use entity::*;
 
 pub mod cube;
@@ -179,53 +178,71 @@ pub fn quick_sort(
     }
 }
 
-//return top level of rectangle, if there is a collision
-fn peak_rect_overlap(top: &BoundingRect, rect: &BoundingRect) -> Fixed {
-
-    if (top.z > rect.z) {
-        return Fixed::const_new(-999);
+fn rect_overlap(first: &BoundingRect, second: &BoundingRect, limit: Fixed) -> Fixed {
+    if (limit < Fixed::const_new(0) &&  first.z > second.z)
+        || (limit > Fixed::const_new(0) && first.z < second.z) {
+        return limit;
     }
 
     for i in 0..4 {
-        let cross1 = cross_product(rect.data[0], rect.data[1], top.data[i]);
-        let cross2 = cross_product(rect.data[1], rect.data[2], top.data[i]);
-        let cross3 = cross_product(rect.data[2], rect.data[3], top.data[i]);
-        let cross4 = cross_product(rect.data[3], rect.data[0], top.data[i]);
-        const z: Fixed = Fixed::const_new(0);
-        if (cross1 >= z && cross2 >= z && cross3 >= z && cross4 >= z)
-            || (cross1 <= z && cross2 <= z && cross3 <= z && cross4 <= z)
+        let cross1 = cross_product(second.data[0], second.data[1], first.data[i]);
+        let cross2 = cross_product(second.data[1], second.data[2], first.data[i]);
+        let cross3 = cross_product(second.data[2], second.data[3], first.data[i]);
+        let cross4 = cross_product(second.data[3], second.data[0], first.data[i]);
+        const Z: Fixed = Fixed::const_new(0);
+        if (cross1 >= Z && cross2 >= Z && cross3 >= Z && cross4 >= Z)
+            || (cross1 <= Z && cross2 <= Z && cross3 <= Z && cross4 <= Z)
         {
-            return top.z;
+            return first.z;
         }
     }
     for i in 0..4 {
-        let cross1 = cross_product(top.data[0], top.data[1], rect.data[i]);
-        let cross2 = cross_product(top.data[1], top.data[2], rect.data[i]);
-        let cross3 = cross_product(top.data[2], top.data[3], rect.data[i]);
-        let cross4 = cross_product(top.data[3], top.data[0], rect.data[i]);
+        let cross1 = cross_product(first.data[0], first.data[1], second.data[i]);
+        let cross2 = cross_product(first.data[1], first.data[2], second.data[i]);
+        let cross3 = cross_product(first.data[2], first.data[3], second.data[i]);
+        let cross4 = cross_product(first.data[3], first.data[0], second.data[i]);
 
-        const z: Fixed = Fixed::const_new(0);
-        if (cross1 >= z && cross2 >= z && cross3 >= z && cross4 >= z)
-            || (cross1 <= z && cross2 <= z && cross3 <= z && cross4 <= z)
+        const Z: Fixed = Fixed::const_new(0);
+        if (cross1 >= Z && cross2 >= Z && cross3 >= Z && cross4 >= Z)
+            || (cross1 <= Z && cross2 <= Z && cross3 <= Z && cross4 <= Z)
         {
-            return top.z;
+            return first.z;
         }
     }
-    return Fixed::const_new(-999);
+    return limit;
 }
 
-//determine if the element in the entiry array has an object below it
+//determine if the element in the entiry array is below us and how far
 pub fn check_support_below(entity_array: &[EntityEnum], element: usize) -> Fixed {
     let rect: BoundingRect = entity_array[element].bottom_bounding_rect();
-    let mut distance = Fixed::const_new(-999);
+    let mut distance: Fixed = Fixed::const_new(-999);
     for (i, e) in entity_array.iter().enumerate() {
         if i != 0 && i != 1 {
             let top = e.top_bounding_rect();
-            let d: Fixed = peak_rect_overlap(&top, &rect);
+            let d: Fixed = rect_overlap(&top, &rect, Fixed::const_new(-999));
             if d > distance {
                 distance = d;
             }
         }
     }
     return distance;
+}
+
+
+//todo also check for the top of the "head" of the player.
+//can run checks as a duplicate rect_overlap call, but for the head instead
+//if that - head height > max_height -> override
+pub fn check_block_above(entity_array: &[EntityEnum], element: usize) -> Fixed {
+    let top: BoundingRect = entity_array[element].top_bounding_rect();
+    let mut max_height: Fixed = Fixed::const_new(999);
+    for (i, e) in entity_array.iter().enumerate() {
+        if i != 0 && i != 1 {
+            let bottom = e.bottom_bounding_rect();
+            let overlap_height: Fixed = rect_overlap(&bottom, &top, Fixed::const_new(999));
+            if overlap_height < max_height {
+                max_height = overlap_height;
+            }
+        }
+    }
+    return max_height;
 }

@@ -126,7 +126,7 @@ fn main(mut gba: agb::Gba) -> ! {
     player.camera.set_z_rotation(Fixed::from_raw(0));
     player.camera.local_y = new_num(3);
 
-    player.y = new_num(5);//new_num(5);
+    player.y = new_num(3);//new_num(5);
     player.z = new_num(0);
     player.camera_left(0);
 
@@ -143,8 +143,16 @@ fn main(mut gba: agb::Gba) -> ! {
             angle = Fixed::const_new(0);
         }
 
-        let groundlevel: Fixed = check_support_below(&entity_array, 0);
-        player.fall(groundlevel);
+        if player.yspeed <= Fixed::const_new(0) {
+            let groundlevel: Fixed = check_support_below(&entity_array, 0);
+            player.fall(groundlevel);
+        }
+        else if player.yspeed > Fixed::const_new(0) {
+            let rooflevel: Fixed = check_block_above(&entity_array, 0);
+            player.float(rooflevel);    
+        }
+
+
 
         player.update_camera_position();
 

@@ -74,6 +74,7 @@ pub fn vector_sub(vec1: [Fixed; 3], vec2: [Fixed; 3]) -> [Fixed; 3] {
     return result;
 }
 
+#[allow(dead_code)]
 pub fn vector_sub_2d(p1: [Fixed; 2], p2: [Fixed; 2]) -> [Fixed; 2] {
     return [p1[0] - p2[0], p1[1] - p2[1]];
 }

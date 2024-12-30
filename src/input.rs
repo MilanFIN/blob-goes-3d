@@ -29,7 +29,7 @@ pub fn handle_input(player: &mut Player, input: &ButtonController) {
     }
 
     if input.is_just_pressed(Button::A) {
-        if (player.yspeed == Fixed::const_new(0)) {
+        if player.yspeed == Fixed::const_new(0) {
             player.yspeed = JUMPPOWER;
         }
     }
