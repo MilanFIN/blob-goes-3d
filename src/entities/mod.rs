@@ -1,4 +1,5 @@
 pub mod entity;
+use agb::println;
 use entity::*;
 
 pub mod cube;
@@ -226,6 +227,5 @@ pub fn check_support_below(entity_array: &[EntityEnum], element: usize) -> Fixed
             }
         }
     }
-    //distance = Fixed::const_new(10);
     return distance;
 }

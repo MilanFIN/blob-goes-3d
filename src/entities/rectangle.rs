@@ -231,8 +231,14 @@ impl Entity for Rectangle {
                 Fixed::const_new(1),
             ];
 
-            translated_point = matmul_4(camera.x_rotation_matrix, translated_point);
+            self.world_points[i] = [
+                self.model_rotated_points[i][0] + self.x,
+                self.model_rotated_points[i][1] + self.y,
+                self.model_rotated_points[i][2] + self.z,
+            ];
+
             translated_point = matmul_4(camera.y_rotation_matrix, translated_point);
+            translated_point = matmul_4(camera.x_rotation_matrix, translated_point);
             translated_point = matmul_4(camera.z_rotation_matrix, translated_point);
 
             // Apply projection matrix
@@ -258,11 +264,7 @@ impl Entity for Rectangle {
                 translated_point[1],
                 translated_point[2],
             ];
-            self.world_points[i] = [
-                translated_point[0],
-                translated_point[1],
-                translated_point[2],
-            ];
+
         }
         
         if back_face_culling(&translated_points, 0, 1, 2) {

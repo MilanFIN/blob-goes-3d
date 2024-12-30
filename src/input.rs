@@ -22,10 +22,10 @@ pub fn handle_input(player: &mut Player, input: &ButtonController) {
     }
 
     if input.is_pressed(Button::L) {
-        player.camera_left(1);
+        player.camera_left(2);
     }
     if input.is_pressed(Button::R) {
-        player.camera_right(1);
+        player.camera_right(2);
     }
 
     if input.is_just_pressed(Button::A) {

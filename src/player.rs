@@ -110,22 +110,31 @@ impl Player {
         self.camera_angle -= amount;
         self.camera
             .set_y_rotation(CAMERALOCATIONS[self.camera_angle][2]);
+        self.camera
+            .set_x_rotation(CAMERALOCATIONS[self.camera_angle][3]);
+        self.camera
+            .set_z_rotation(CAMERALOCATIONS[self.camera_angle][4]);
+
         self.camera.local_x = CAMERALOCATIONS[self.camera_angle][0];
         self.camera.local_z = CAMERALOCATIONS[self.camera_angle][1];
+
+
+
     }
     pub fn camera_right(&mut self, mut amount: usize) {
-
         self.camera_angle += amount;
         if self.camera_angle >= 256 {
             self.camera_angle -= 256;
         }
         self.camera
             .set_y_rotation(CAMERALOCATIONS[self.camera_angle][2]);
+        self.camera
+            .set_x_rotation(CAMERALOCATIONS[self.camera_angle][3]);
+        self.camera
+            .set_z_rotation(CAMERALOCATIONS[self.camera_angle][4]);
+
         self.camera.local_x = CAMERALOCATIONS[self.camera_angle][0];
         self.camera.local_z = CAMERALOCATIONS[self.camera_angle][1];
-
-
-
     }
 
     pub fn update_camera_position(&mut self) {
@@ -136,26 +145,21 @@ impl Player {
 
     pub fn land(&mut self) {
         self.yspeed = Fixed::const_new(0);
-        
     }
 
     pub fn fall(&mut self, ylimit: Fixed) {
         if (self.yspeed > Fixed::const_new(0)) {
             self.y += self.yspeed;
             self.yspeed -= GRAVITY;
-        }
-        else if (self.y > ylimit) {
+        } else if (self.y > ylimit) {
             self.y += self.yspeed;
             if (self.y < ylimit) {
                 self.y = ylimit;
                 self.land();
             }
             self.yspeed -= GRAVITY;
-        }
-        else {
+        } else {
             self.land();
         }
-
     }
-
 }
