@@ -53,8 +53,6 @@ and interrupt handlers correctly. It will also handle creating the `Gba` struct 
 */
 #[agb::entry]
 fn main(mut gba: agb::Gba) -> ! {
-    use rectangle::Rectangle;
-
 
     let mut input = ButtonController::new();
 

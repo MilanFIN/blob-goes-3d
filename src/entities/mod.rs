@@ -253,8 +253,8 @@ pub fn rect_overlap(first: &BoundingBox, second: &BoundingBox) -> bool{
 }
 
 pub fn vertical_room_check(first: &BoundingBox, second: &BoundingBox, limit: Fixed) -> Fixed {
-    if (limit < Fixed::const_new(0) && first.yTop > second.yBottom)
-        || (limit > Fixed::const_new(0) && first.yBottom < second.yTop)
+    if (limit < Fixed::const_new(0) && first.y_top > second.y_bottom)
+        || (limit > Fixed::const_new(0) && first.y_bottom < second.y_top)
     {
         return limit;
     }
@@ -265,10 +265,10 @@ pub fn vertical_room_check(first: &BoundingBox, second: &BoundingBox, limit: Fix
 
     if rect_overlap(first, second) {
         if limit < Fixed::const_new(0) {
-            return first.yTop;
+            return first.y_top;
         }
         else {
-            return first.yBottom;
+            return first.y_bottom;
         }
     }
 
@@ -313,7 +313,7 @@ pub fn check_block_above(entity_array: &[EntityEnum], element: usize) -> Fixed {
 pub fn overlap_3d(box1: &BoundingBox, box2: &BoundingBox) -> bool {
     
     //can't overlap, if not sharing y coordinates (z here)
-    if box1.yTop <= box2.yBottom || box2.yTop <= box1.yBottom {
+    if box1.y_top <= box2.y_bottom || box2.y_top <= box1.y_bottom {
         return false
     }
     

@@ -397,8 +397,8 @@ impl Entity for Cube {
                 [self.world_points[5][0], self.world_points[5][2]],
                 [self.world_points[4][0], self.world_points[4][2]],
             ],
-            yTop: self.world_points[0][1],
-            yBottom: self.world_points[2][1],
+            y_top: self.world_points[0][1],
+            y_bottom: self.world_points[2][1],
         }
     }
 

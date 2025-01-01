@@ -23,17 +23,43 @@ pub fn handle_input(
     entities: &[EntityEnum],
     body: &BoundingBox,
 ) {
+
+    if input.is_pressed(Button::L) {
+        player.camera_left(2);
+    }
+    if input.is_pressed(Button::R) {
+        player.camera_right(2);
+    }
+
+    if input.is_just_pressed(Button::A) {
+        if player.yspeed == Fixed::const_new(0) {
+            player.yspeed = JUMPPOWER;
+        }
+    }
+
     if input.is_pressed(Button::UP) && input.is_pressed(Button::LEFT) {
-        player.forward_left();
+        let (x, z) = player.forward_left();
+        if attempt_move(player, x, z, entities, body) {
+            return;
+        }
     }
     if input.is_pressed(Button::DOWN) && input.is_pressed(Button::LEFT) {
-        player.back_left();
+        let (x, z) = player.back_left();
+        if attempt_move(player, x, z, entities, body) {
+            return;
+        }
     }
     if input.is_pressed(Button::UP) && input.is_pressed(Button::RIGHT) {
-        player.forward_right();
+        let (x, z) = player.forward_right();
+        if attempt_move(player, x, z, entities, body) {
+            return;
+        }
     }
     if input.is_pressed(Button::DOWN) && input.is_pressed(Button::RIGHT) {
-        player.back_right();
+        let (x, z) = player.back_right();
+        if attempt_move(player, x, z, entities, body) {
+            return;
+        }
     }
     if input.is_pressed(Button::UP) {
         let (x, z) = player.forward();
@@ -60,16 +86,4 @@ pub fn handle_input(
         }
     }
 
-    if input.is_pressed(Button::L) {
-        player.camera_left(2);
-    }
-    if input.is_pressed(Button::R) {
-        player.camera_right(2);
-    }
-
-    if input.is_just_pressed(Button::A) {
-        if player.yspeed == Fixed::const_new(0) {
-            player.yspeed = JUMPPOWER;
-        }
-    }
 }

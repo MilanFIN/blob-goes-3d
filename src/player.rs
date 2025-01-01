@@ -10,7 +10,6 @@ const GRAVITY: Fixed = Fixed::from_raw(32);
 const MOVEAMOUNT: Fixed = Fixed::from_raw(64);
 pub const JUMPPOWER: Fixed = Fixed::from_raw(512);
 
-
 pub struct Player {
     pub x: Fixed,
     pub y: Fixed,
@@ -51,24 +50,26 @@ impl Player {
         return (x, z);
     }
 
-    pub fn forward_left(&mut self) {
+    pub fn forward_left(&mut self) -> (Fixed, Fixed) {
         let mut view_dir: usize = self.camera_angle + 32;
         if view_dir > 255 {
             view_dir -= 255;
         }
         self.angle = CAMERALOCATIONS[view_dir][2];
-        self.x += self.angle.cos() * MOVEAMOUNT;
-        self.z += self.angle.sin() * MOVEAMOUNT;
+        let x = self.angle.cos() * MOVEAMOUNT;
+        let z = self.angle.sin() * MOVEAMOUNT;
+        return (x, z);
     }
 
-    pub fn forward_right(&mut self) {
+    pub fn forward_right(&mut self) -> (Fixed, Fixed) {
         let mut view_dir: usize = self.camera_angle + 96;
         if view_dir > 255 {
             view_dir -= 255;
         }
         self.angle = CAMERALOCATIONS[view_dir][2];
-        self.x += self.angle.cos() * MOVEAMOUNT;
-        self.z += self.angle.sin() * MOVEAMOUNT;
+        let x = self.angle.cos() * MOVEAMOUNT;
+        let z = self.angle.sin() * MOVEAMOUNT;
+        return (x, z);
     }
 
     pub fn back(&mut self) -> (Fixed, Fixed) {
@@ -82,24 +83,26 @@ impl Player {
         return (x, z);
     }
 
-    pub fn back_left(&mut self) {
+    pub fn back_left(&mut self) -> (Fixed, Fixed) {
         let mut view_dir: usize = self.camera_angle + 224;
         if view_dir > 255 {
             view_dir -= 255;
         }
         self.angle = CAMERALOCATIONS[view_dir][2];
-        self.x += self.angle.cos() * MOVEAMOUNT;
-        self.z += self.angle.sin() * MOVEAMOUNT;
+        let x = self.angle.cos() * MOVEAMOUNT;
+        let z = self.angle.sin() * MOVEAMOUNT;
+        return (x, z);
     }
 
-    pub fn back_right(&mut self) {
+    pub fn back_right(&mut self) -> (Fixed, Fixed) {
         let mut view_dir: usize = self.camera_angle + 160;
         if view_dir > 255 {
             view_dir -= 255;
         }
         self.angle = CAMERALOCATIONS[view_dir][2];
-        self.x += self.angle.cos() * MOVEAMOUNT;
-        self.z += self.angle.sin() * MOVEAMOUNT;
+        let x = self.angle.cos() * MOVEAMOUNT;
+        let z = self.angle.sin() * MOVEAMOUNT;
+        return (x, z);
     }
 
     pub fn left(&mut self) -> (Fixed, Fixed) {
