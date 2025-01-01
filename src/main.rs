@@ -53,6 +53,8 @@ and interrupt handlers correctly. It will also handle creating the `Gba` struct 
 */
 #[agb::entry]
 fn main(mut gba: agb::Gba) -> ! {
+    use rectangle::Rectangle;
+
 
     let mut input = ButtonController::new();
 
@@ -66,31 +68,34 @@ fn main(mut gba: agb::Gba) -> ! {
     let mut angle: Fixed = Fixed::const_new(0);
     let increment: Fixed = Fixed::const_new(1) / 256;
 
-    //todo: use these
-    let mut entity_array: [EntityEnum; 4] = [EntityEnum::Empty(Empty::default()); 4];
-    let mut entity_render_order: [usize; 4] = [0; 4];
+    const LEVELSIZE: usize = 3;
+    let mut entity_array: [EntityEnum; LEVELSIZE +2] = [EntityEnum::Empty(Empty::default()); LEVELSIZE +2];
+    let mut entity_render_order: [usize; LEVELSIZE+2] = [0; LEVELSIZE+2];
 
 
     let message_bytes = levels::LEVELS[1].trim().as_bytes();
-    let (cubes, _): ([EntityEnum; 2], _) = from_slice(message_bytes).unwrap();
+    let (parsedentities, _): ([EntityEnum; LEVELSIZE], _) = from_slice(message_bytes).unwrap();
 
 
     for i in 0..2 {
+        //entity_array[i] = EntityEnum::Cube(Cube::default());
         entity_array[i] = EntityEnum::Cube(Cube::default());
+
         entity_array[i].set_z_offset(new_num(0));
         entity_array[i].set_x_rotation(new_num(0));
         entity_array[i].set_y_rotation(new_num(0));
         entity_array[i].set_z_rotation(new_num(0));
         //always call after modifying rotation
 
-        entity_array[i].set_size(new_num(2));
-        entity_array[i].refresh_model_matrix();
+        //entity_array[i].set_size(new_num(2));
+        //entity_array[i].recalculate_points();
+        //entity_array[i].refresh_model_matrix();
 
         entity_render_order[i] = i;
     }
 
-    for i in 2..4 {
-        entity_array[i] = cubes[i-2];
+    for i in 2..LEVELSIZE+2 {
+        entity_array[i] = parsedentities[i-2];
         entity_array[i].set_x_rotation(new_num(0));
         entity_array[i].set_y_rotation(new_num(0));
         entity_array[i].set_z_rotation(new_num(0));
@@ -107,13 +112,13 @@ fn main(mut gba: agb::Gba) -> ! {
     entity_array[0].set_size(new_num(1));
     entity_array[0].set_y_offset(new_num(0));
     entity_array[0].set_y_rotation(Fixed::from_raw(64));
-
+    entity_array[0].recalculate_points();
     entity_array[0].refresh_model_matrix();
 
-    entity_array[1].set_size(Fixed::from_f32(0.5));
+    entity_array[1].set_size(Fixed::from_raw(128));
     entity_array[1].set_y_offset(Fixed::from_raw(-192));
     entity_array[1].set_y_rotation(Fixed::from_raw(64));
-
+    entity_array[1].recalculate_points();
     entity_array[1].refresh_model_matrix();
 
     //rest of the blocks
@@ -135,7 +140,7 @@ fn main(mut gba: agb::Gba) -> ! {
     loop {
         input.update();
 
-        input::handle_input(&mut player, &input);
+        input::handle_input(&mut player, &input, &entity_array, &entity_array[0].bounding_box());
 
         bitmap4.clear(0);
         angle += increment;
@@ -173,7 +178,7 @@ fn main(mut gba: agb::Gba) -> ! {
             3,
             &player.camera,
         );
-        for i in 0..4 {
+        for i in 0..LEVELSIZE+2 {
             entity_array[entity_render_order[i]].render(&mut bitmap4, &player.camera);
         }
 

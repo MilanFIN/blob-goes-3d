@@ -124,18 +124,11 @@ impl EntityEnum {
             EntityEnum::Empty(_e) => Fixed::const_new(999),
         }
     }
-    pub fn bottom_bounding_rect(&self) -> BoundingRect {
+    pub fn bounding_box(&self) -> BoundingBox {
         match self {
-            EntityEnum::Cube(c) => c.bottom_bounding_rect(),
-            EntityEnum::Rectangle(r) => r.bottom_bounding_rect(),
-            EntityEnum::Empty(_e) => BoundingRect::default(),
-        }
-    }
-    pub fn top_bounding_rect(&self) -> BoundingRect {
-        match self {
-            EntityEnum::Cube(c) => c.top_bounding_rect(),
-            EntityEnum::Rectangle(r) => r.top_bounding_rect(),
-            EntityEnum::Empty(_e) => BoundingRect::default(),
+            EntityEnum::Cube(c) => c.bounding_box(),
+            EntityEnum::Rectangle(r) => r.bounding_box(),
+            EntityEnum::Empty(_e) => BoundingBox::default(),
         }
     }
 }
@@ -178,7 +171,7 @@ pub fn quick_sort(
     }
 }
 
-fn rect_simple_overlap_check(first: &BoundingRect, second: &BoundingRect) -> bool{
+fn rect_simple_overlap_check(first: &BoundingBox, second: &BoundingBox) -> bool{
     let mut first_smallest_x = first.data[0][0];
     let mut first_largest_x = first.data[0][0];
     let mut first_smallest_y = first.data[0][1];
@@ -220,17 +213,17 @@ fn rect_simple_overlap_check(first: &BoundingRect, second: &BoundingRect) -> boo
     }
 
     if (first_largest_x < second_smallest_x || first_smallest_x > second_largest_x)
-        && (first_largest_y < second_smallest_y || first_smallest_y > second_largest_y)
+        || (first_largest_y < second_smallest_y || first_smallest_y > second_largest_y)
     {
-        return true;
+        return false;
     }
     else {
-        return false;
+        return true;
     }
 }
 
 
-pub fn rect_overlap(first: &BoundingRect, second: &BoundingRect) -> bool{
+pub fn rect_overlap(first: &BoundingBox, second: &BoundingBox) -> bool{
     for i in 0..4 {
         let cross1 = cross_product(second.data[0], second.data[1], first.data[i]);
         let cross2 = cross_product(second.data[1], second.data[2], first.data[i]);
@@ -259,19 +252,24 @@ pub fn rect_overlap(first: &BoundingRect, second: &BoundingRect) -> bool{
     return false;
 }
 
-pub fn vertical_room_check(first: &BoundingRect, second: &BoundingRect, limit: Fixed) -> Fixed {
-    if (limit < Fixed::const_new(0) && first.y > second.y)
-        || (limit > Fixed::const_new(0) && first.y < second.y)
+pub fn vertical_room_check(first: &BoundingBox, second: &BoundingBox, limit: Fixed) -> Fixed {
+    if (limit < Fixed::const_new(0) && first.yTop > second.yBottom)
+        || (limit > Fixed::const_new(0) && first.yBottom < second.yTop)
     {
         return limit;
     }
 
-    if rect_simple_overlap_check(first, second) {
+    if !rect_simple_overlap_check(first, second) {
         return limit;
     }
 
     if rect_overlap(first, second) {
-        return first.y;
+        if limit < Fixed::const_new(0) {
+            return first.yTop;
+        }
+        else {
+            return first.yBottom;
+        }
     }
 
     return limit;
@@ -279,12 +277,12 @@ pub fn vertical_room_check(first: &BoundingRect, second: &BoundingRect, limit: F
 
 //determine if the element in the entiry array is below us and how far
 pub fn check_support_below(entity_array: &[EntityEnum], element: usize) -> Fixed {
-    let rect: BoundingRect = entity_array[element].bottom_bounding_rect();
+    let bottom: BoundingBox = entity_array[element].bounding_box();
     let mut distance: Fixed = Fixed::const_new(-999);
     for (i, e) in entity_array.iter().enumerate() {
         if i != 0 && i != 1 {
-            let top = e.top_bounding_rect();
-            let d: Fixed = vertical_room_check(&top, &rect, Fixed::const_new(-999));
+            let top: BoundingBox = e.bounding_box();
+            let d: Fixed = vertical_room_check(&top, &bottom, Fixed::const_new(-999));
             if d > distance {
                 distance = d;
             }
@@ -297,11 +295,11 @@ pub fn check_support_below(entity_array: &[EntityEnum], element: usize) -> Fixed
 //can run checks as a duplicate rect_overlap call, but for the head instead
 //if that - head height > max_height -> override
 pub fn check_block_above(entity_array: &[EntityEnum], element: usize) -> Fixed {
-    let top: BoundingRect = entity_array[element].top_bounding_rect();
+    let top: BoundingBox = entity_array[element].bounding_box();
     let mut max_height: Fixed = Fixed::const_new(999);
     for (i, e) in entity_array.iter().enumerate() {
         if i != 0 && i != 1 {
-            let bottom = e.bottom_bounding_rect();
+            let bottom = e.bounding_box();
             let overlap_height: Fixed = vertical_room_check(&bottom, &top, Fixed::const_new(999));
             if overlap_height < max_height {
                 max_height = overlap_height;
@@ -312,32 +310,33 @@ pub fn check_block_above(entity_array: &[EntityEnum], element: usize) -> Fixed {
 }
 
 
-pub fn overlap_3d(top1: &BoundingRect, bottom1: &BoundingRect, top2: &BoundingRect, bottom2: &BoundingRect) -> bool {
+pub fn overlap_3d(box1: &BoundingBox, box2: &BoundingBox) -> bool {
     
     //can't overlap, if not sharing y coordinates (z here)
-    if top1.y <= bottom2.y || top2.y <= bottom1.y {
+    if box1.yTop <= box2.yBottom || box2.yTop <= box1.yBottom {
         return false
     }
-
-    if rect_overlap(top1, top2) {
+    
+    if rect_simple_overlap_check(box1, box2) {
         return true;
     }
-
+/*
+    if rect_overlap(box1, box2) {
+        return true;
+    }
+*/
     return false;
 }
 
 //todo: call this when we've figured out ow to get the new position of the player in the world
 //might get top_bounding with an x & y offset
-pub fn horizontal_collision_check(entity_array: &[EntityEnum], element: usize) -> bool {
-    let top1: BoundingRect = entity_array[element].top_bounding_rect();
-    let bottom1: BoundingRect = entity_array[element].bottom_bounding_rect();
+pub fn horizontal_collision_check(entity_array: &[EntityEnum], box1: BoundingBox) -> bool {
 
     for (i, e) in entity_array.iter().enumerate() {
         if i != 0 && i != 1 {
-            let top2 = e.top_bounding_rect();
-            let bottom2 = e.bottom_bounding_rect();
+            let box2 = e.bounding_box();
 
-            if overlap_3d(&top1, &bottom1, &top2, &bottom2) {
+            if overlap_3d(&box1, &box2) {
                 return true;
             }
         }

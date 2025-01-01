@@ -7,7 +7,9 @@ use crate::fixed;
 use fixed::*;
 
 const GRAVITY: Fixed = Fixed::from_raw(32);
+const MOVEAMOUNT: Fixed = Fixed::from_raw(64);
 pub const JUMPPOWER: Fixed = Fixed::from_raw(512);
+
 
 pub struct Player {
     pub x: Fixed,
@@ -32,14 +34,21 @@ impl Player {
             camera: Camera::default(),
         }
     }
-    pub fn forward(&mut self) {
+
+    pub fn move_to(&mut self, x: Fixed, z: Fixed) {
+        self.x = self.x + x;
+        self.z = self.z + z;
+    }
+
+    pub fn forward(&mut self) -> (Fixed, Fixed) {
         let mut view_dir: usize = self.camera_angle + 64;
         if view_dir > 255 {
             view_dir -= 255;
         }
         self.angle = CAMERALOCATIONS[view_dir][2];
-        self.x += self.angle.cos();
-        self.z += self.angle.sin();
+        let x: Fixed = self.angle.cos() * MOVEAMOUNT;
+        let z: Fixed = self.angle.sin() * MOVEAMOUNT;
+        return (x, z);
     }
 
     pub fn forward_left(&mut self) {
@@ -48,8 +57,8 @@ impl Player {
             view_dir -= 255;
         }
         self.angle = CAMERALOCATIONS[view_dir][2];
-        self.x += self.angle.cos();
-        self.z += self.angle.sin();
+        self.x += self.angle.cos() * MOVEAMOUNT;
+        self.z += self.angle.sin() * MOVEAMOUNT;
     }
 
     pub fn forward_right(&mut self) {
@@ -58,18 +67,19 @@ impl Player {
             view_dir -= 255;
         }
         self.angle = CAMERALOCATIONS[view_dir][2];
-        self.x += self.angle.cos();
-        self.z += self.angle.sin();
+        self.x += self.angle.cos() * MOVEAMOUNT;
+        self.z += self.angle.sin() * MOVEAMOUNT;
     }
 
-    pub fn back(&mut self) {
+    pub fn back(&mut self) -> (Fixed, Fixed) {
         let mut view_dir: usize = self.camera_angle + 192;
         if view_dir > 255 {
             view_dir -= 255;
         }
         self.angle = CAMERALOCATIONS[view_dir][2];
-        self.x += self.angle.cos();
-        self.z += self.angle.sin();
+        let x = self.angle.cos() * MOVEAMOUNT;
+        let z = self.angle.sin() * MOVEAMOUNT;
+        return (x, z);
     }
 
     pub fn back_left(&mut self) {
@@ -78,8 +88,8 @@ impl Player {
             view_dir -= 255;
         }
         self.angle = CAMERALOCATIONS[view_dir][2];
-        self.x += self.angle.cos();
-        self.z += self.angle.sin();
+        self.x += self.angle.cos() * MOVEAMOUNT;
+        self.z += self.angle.sin() * MOVEAMOUNT;
     }
 
     pub fn back_right(&mut self) {
@@ -88,19 +98,21 @@ impl Player {
             view_dir -= 255;
         }
         self.angle = CAMERALOCATIONS[view_dir][2];
-        self.x += self.angle.cos();
-        self.z += self.angle.sin();
+        self.x += self.angle.cos() * MOVEAMOUNT;
+        self.z += self.angle.sin() * MOVEAMOUNT;
     }
 
-    pub fn left(&mut self) {
+    pub fn left(&mut self) -> (Fixed, Fixed) {
         self.angle = CAMERALOCATIONS[self.camera_angle][2];
-        self.x += self.angle.cos();
-        self.z += self.angle.sin();
+        let x = self.angle.cos() * MOVEAMOUNT;
+        let z = self.angle.sin() * MOVEAMOUNT;
+        return (x, z);
     }
-    pub fn right(&mut self) {
+    pub fn right(&mut self) -> (Fixed, Fixed) {
         self.angle = CAMERALOCATIONS[self.camera_angle][2];
-        self.x -= self.angle.cos();
-        self.z -= self.angle.sin();
+        let x = -self.angle.cos() * MOVEAMOUNT;
+        let z = -self.angle.sin() * MOVEAMOUNT;
+        return (x, z);
     }
     pub fn camera_left(&mut self, mut amount: usize) {
         if self.camera_angle < amount {

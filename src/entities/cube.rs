@@ -2,7 +2,7 @@ use serde::Deserialize;
 
 use super::math;
 use super::render;
-use super::BoundingRect;
+use super::BoundingBox;
 use super::Camera;
 use super::Entity;
 use math::*;
@@ -104,20 +104,19 @@ impl Entity for Cube {
     }
 
     fn set_size(&mut self, size: Fixed) {
-        self.size = size / 2;
-        self.recalculate_points();
+        self.size = size;
     }
 
     fn recalculate_points(&mut self) {
         self.points = [
-            [(self.size), (self.size), (self.size)],
-            [(-self.size), (self.size), (self.size)],
-            [(-self.size), (-self.size), (self.size)],
-            [(self.size), (-self.size), (self.size)],
-            [(self.size), (self.size), (-self.size)],
-            [(-self.size), (self.size), (-self.size)],
-            [(-self.size), (-self.size), (-self.size)],
-            [(self.size), (-self.size), (-self.size)],
+            [(self.size / 2), (self.size / 2), (self.size / 2)],
+            [(-self.size / 2), (self.size / 2), (self.size / 2)],
+            [(-self.size / 2), (-self.size / 2), (self.size / 2)],
+            [(self.size / 2), (-self.size / 2), (self.size / 2)],
+            [(self.size / 2), (self.size / 2), (-self.size / 2)],
+            [(-self.size / 2), (self.size / 2), (-self.size / 2)],
+            [(-self.size / 2), (-self.size / 2), (-self.size / 2)],
+            [(self.size / 2), (-self.size / 2), (-self.size / 2)],
         ];
     }
 
@@ -390,27 +389,16 @@ impl Entity for Cube {
         return (self.x - camera.x).abs() + (self.y - camera.y).abs() + (self.z - camera.z).abs();
     }
 
-    fn bottom_bounding_rect(&self) -> BoundingRect {
-        BoundingRect {
+    fn bounding_box(&self) -> BoundingBox {
+        BoundingBox {
             data: [
                 [self.world_points[0][0], self.world_points[0][2]],
                 [self.world_points[1][0], self.world_points[1][2]],
                 [self.world_points[5][0], self.world_points[5][2]],
                 [self.world_points[4][0], self.world_points[4][2]],
             ],
-            y: self.world_points[2][1],
-        }
-    }
-
-    fn top_bounding_rect(&self) -> BoundingRect {
-        BoundingRect {
-            data: [
-                [self.world_points[3][0], self.world_points[3][2]],
-                [self.world_points[2][0], self.world_points[2][2]],
-                [self.world_points[6][0], self.world_points[6][2]],
-                [self.world_points[7][0], self.world_points[7][2]],
-            ],
-            y: self.world_points[0][1],
+            yTop: self.world_points[0][1],
+            yBottom: self.world_points[2][1],
         }
     }
 

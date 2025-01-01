@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-use super::{entity, BoundingRect};
+use super::{entity, BoundingBox};
 use entity::*;
 
 use super::Camera;
@@ -25,13 +25,9 @@ impl Entity for Empty {
     fn distance_from_camera(&self, _camera: &Camera) -> Fixed {
         return Fixed::const_new(999);
     }
-    fn bottom_bounding_rect(&self) -> BoundingRect {
-        BoundingRect::default()
+    fn bounding_box(&self) -> BoundingBox {
+        BoundingBox::default()
     }
-    fn top_bounding_rect(&self) -> BoundingRect {
-        BoundingRect::default()
-    }
-
 }
 
 impl Empty {

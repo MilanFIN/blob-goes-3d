@@ -1,24 +1,63 @@
-use crate::{player, Fixed};
+use crate::{boundingrect::BoundingBox, horizontal_collision_check, player, EntityEnum, Fixed};
 use agb::input::{Button, ButtonController};
 use player::*;
 
-pub fn handle_input(player: &mut Player, input: &ButtonController) {
+fn attempt_move(
+    player: &mut Player,
+    x: Fixed,
+    z: Fixed,
+    entities: &[EntityEnum],
+    body: &BoundingBox,
+) -> bool {
+    let potential_position: BoundingBox = BoundingBox::new_with_offset(body, x, z);
+    if !horizontal_collision_check(entities, potential_position) {
+        player.move_to(x, z);
+        return true;
+    }
+    return false;
+}
+
+pub fn handle_input(
+    player: &mut Player,
+    input: &ButtonController,
+    entities: &[EntityEnum],
+    body: &BoundingBox,
+) {
     if input.is_pressed(Button::UP) && input.is_pressed(Button::LEFT) {
         player.forward_left();
-    } else if input.is_pressed(Button::DOWN) && input.is_pressed(Button::LEFT) {
+    }
+    if input.is_pressed(Button::DOWN) && input.is_pressed(Button::LEFT) {
         player.back_left();
-    } else if input.is_pressed(Button::UP) && input.is_pressed(Button::RIGHT) {
+    }
+    if input.is_pressed(Button::UP) && input.is_pressed(Button::RIGHT) {
         player.forward_right();
-    } else if input.is_pressed(Button::DOWN) && input.is_pressed(Button::RIGHT) {
+    }
+    if input.is_pressed(Button::DOWN) && input.is_pressed(Button::RIGHT) {
         player.back_right();
-    } else if input.is_pressed(Button::UP) {
-        player.forward();
-    } else if input.is_pressed(Button::DOWN) {
-        player.back();
-    } else if input.is_pressed(Button::LEFT) {
-        player.left();
-    } else if input.is_pressed(Button::RIGHT) {
-        player.right();
+    }
+    if input.is_pressed(Button::UP) {
+        let (x, z) = player.forward();
+        if attempt_move(player, x, z, entities, body) {
+            return;
+        }
+    }
+    if input.is_pressed(Button::DOWN) {
+        let (x, z) = player.back();
+        if attempt_move(player, x, z, entities, body) {
+            return;
+        }
+    }
+    if input.is_pressed(Button::LEFT) {
+        let (x, z) = player.left();
+        if attempt_move(player, x, z, entities, body) {
+            return;
+        }
+    }
+    if input.is_pressed(Button::RIGHT) {
+        let (x, z) = player.right();
+        if attempt_move(player, x, z, entities, body) {
+            return;
+        }
     }
 
     if input.is_pressed(Button::L) {
