@@ -172,7 +172,7 @@ fn main(mut gba: agb::Gba) -> ! {
             &mut entity_render_order,
             &entity_array,
             0,
-            3,
+            LEVELSIZE+1,
             &player.camera,
         );
         for i in 0..LEVELSIZE+2 {

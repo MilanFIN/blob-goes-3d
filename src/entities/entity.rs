@@ -1,7 +1,7 @@
 use crate::{camera, Fixed};
 use camera::*;
 
-use super::BoundingBox;
+use super::{BoundingBox, BoundingCylinder};
 
 pub trait Entity {
     fn render(&mut self, bitmap4: &mut agb::display::bitmap4::Bitmap4, camera: &Camera);
@@ -20,4 +20,6 @@ pub trait Entity {
     fn set_vertex(&mut self, point: [Fixed; 3], index: i32);
     fn distance_from_camera(&self, camera: &Camera) -> Fixed;
     fn bounding_box(&self) -> BoundingBox;
+    fn bounding_cylinder(&self) -> BoundingCylinder;
+
 }

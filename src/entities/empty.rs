@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-use super::{entity, BoundingBox};
+use super::{entity, BoundingBox, BoundingCylinder};
 use entity::*;
 
 use super::Camera;
@@ -27,6 +27,9 @@ impl Entity for Empty {
     }
     fn bounding_box(&self) -> BoundingBox {
         BoundingBox::default()
+    }
+    fn bounding_cylinder(&self) -> BoundingCylinder {
+        BoundingCylinder::default()
     }
 }
 

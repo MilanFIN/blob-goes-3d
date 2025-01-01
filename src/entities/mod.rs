@@ -10,8 +10,8 @@ use rectangle::*;
 pub mod empty;
 use empty::*;
 
-pub mod boundingrect;
-use boundingrect::*;
+pub mod boundingshapes;
+use boundingshapes::*;
 
 use serde::Deserialize;
 
@@ -131,6 +131,14 @@ impl EntityEnum {
             EntityEnum::Empty(_e) => BoundingBox::default(),
         }
     }
+    pub fn bounding_cylinder(&self) -> BoundingCylinder {
+        match self {
+            EntityEnum::Cube(c) => c.bounding_cylinder(),
+            EntityEnum::Rectangle(r) => r.bounding_cylinder(),
+            EntityEnum::Empty(_e) => BoundingCylinder::default(),
+        }
+    }
+
 }
 
 fn partition(

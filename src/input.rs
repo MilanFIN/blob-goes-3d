@@ -1,4 +1,4 @@
-use crate::{boundingrect::BoundingBox, horizontal_collision_check, player, EntityEnum, Fixed};
+use crate::{boundingshapes::BoundingBox, horizontal_collision_check, player, EntityEnum, Fixed};
 use agb::input::{Button, ButtonController};
 use player::*;
 

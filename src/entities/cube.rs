@@ -3,6 +3,7 @@ use serde::Deserialize;
 use super::math;
 use super::render;
 use super::BoundingBox;
+use super::BoundingCylinder;
 use super::Camera;
 use super::Entity;
 use math::*;
@@ -397,6 +398,16 @@ impl Entity for Cube {
                 [self.world_points[5][0], self.world_points[5][2]],
                 [self.world_points[4][0], self.world_points[4][2]],
             ],
+            y_top: self.world_points[0][1],
+            y_bottom: self.world_points[2][1],
+        }
+    }
+
+    fn bounding_cylinder(&self) -> BoundingCylinder {
+        BoundingCylinder {
+            x: self.x,
+            z: self.z,
+            radius: self.size / 2,
             y_top: self.world_points[0][1],
             y_bottom: self.world_points[2][1],
         }
