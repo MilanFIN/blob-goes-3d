@@ -45,7 +45,6 @@ use fixed::*;
 mod levels;
 use serde_json_core::from_slice;
 
-
 /*
 The main function must take 1 arguments and never return. The agb::entry decorator
 ensures that everything is in order. `agb` will call this after setting up the stack

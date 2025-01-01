@@ -10,10 +10,24 @@ fn attempt_move(
     body: &BoundingBox,
 ) -> bool {
     let potential_position: BoundingBox = BoundingBox::new_with_offset(body, x, z);
+    //check if we can move in both x and z dirs
     if !horizontal_collision_check(entities, potential_position) {
         player.move_to(x, z);
         return true;
     }
+    //if not, check x and z separately
+    let potential_position: BoundingBox = BoundingBox::new_with_offset(body, x, Fixed::const_new(0));
+    if !horizontal_collision_check(entities, potential_position) {
+        player.move_to(x, Fixed::const_new(0));
+        return true;
+    }
+    let potential_position: BoundingBox = BoundingBox::new_with_offset(body, Fixed::const_new(0), z);
+    if !horizontal_collision_check(entities, potential_position) {
+        player.move_to(Fixed::const_new(0), z);
+        return true;
+    }
+
+
     return false;
 }
 
