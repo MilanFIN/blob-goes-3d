@@ -1,4 +1,4 @@
-use crate::{boundingshapes::BoundingBox, horizontal_collision_check, player, EntityEnum, Fixed};
+use crate::{boundingshapes::{BoundingCylinder}, horizontal_collision_check, player, EntityEnum, Fixed};
 use agb::input::{Button, ButtonController};
 use player::*;
 
@@ -7,21 +7,21 @@ fn attempt_move(
     x: Fixed,
     z: Fixed,
     entities: &[EntityEnum],
-    body: &BoundingBox,
+    body: &BoundingCylinder,
 ) -> bool {
-    let potential_position: BoundingBox = BoundingBox::new_with_offset(body, x, z);
+    let potential_position: BoundingCylinder = BoundingCylinder::new_with_offset(body, x, z);
     //check if we can move in both x and z dirs
     if !horizontal_collision_check(entities, potential_position) {
         player.move_to(x, z);
         return true;
     }
     //if not, check x and z separately
-    let potential_position: BoundingBox = BoundingBox::new_with_offset(body, x, Fixed::const_new(0));
+    let potential_position: BoundingCylinder = BoundingCylinder::new_with_offset(body, x, Fixed::const_new(0));
     if !horizontal_collision_check(entities, potential_position) {
         player.move_to(x, Fixed::const_new(0));
         return true;
     }
-    let potential_position: BoundingBox = BoundingBox::new_with_offset(body, Fixed::const_new(0), z);
+    let potential_position: BoundingCylinder = BoundingCylinder::new_with_offset(body, Fixed::const_new(0), z);
     if !horizontal_collision_check(entities, potential_position) {
         player.move_to(Fixed::const_new(0), z);
         return true;
@@ -35,7 +35,7 @@ pub fn handle_input(
     player: &mut Player,
     input: &ButtonController,
     entities: &[EntityEnum],
-    body: &BoundingBox,
+    body: &BoundingCylinder,
 ) {
 
     if input.is_pressed(Button::L) {

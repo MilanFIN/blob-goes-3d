@@ -138,7 +138,6 @@ impl EntityEnum {
             EntityEnum::Empty(_e) => BoundingCylinder::default(),
         }
     }
-
 }
 
 fn partition(
@@ -179,7 +178,7 @@ pub fn quick_sort(
     }
 }
 
-fn rect_simple_overlap_check(first: &BoundingBox, second: &BoundingBox) -> bool{
+fn rect_simple_overlap_check(first: &BoundingBox, second: &BoundingBox) -> bool {
     let mut first_smallest_x = first.data[0][0];
     let mut first_largest_x = first.data[0][0];
     let mut first_smallest_y = first.data[0][1];
@@ -224,14 +223,12 @@ fn rect_simple_overlap_check(first: &BoundingBox, second: &BoundingBox) -> bool{
         || (first_largest_y < second_smallest_y || first_smallest_y > second_largest_y)
     {
         return false;
-    }
-    else {
+    } else {
         return true;
     }
 }
 
-
-pub fn rect_overlap(first: &BoundingBox, second: &BoundingBox) -> bool{
+pub fn rect_overlap(first: &BoundingBox, second: &BoundingBox) -> bool {
     for i in 0..4 {
         let cross1 = cross_product(second.data[0], second.data[1], first.data[i]);
         let cross2 = cross_product(second.data[1], second.data[2], first.data[i]);
@@ -274,8 +271,7 @@ pub fn vertical_room_check(first: &BoundingBox, second: &BoundingBox, limit: Fix
     if rect_overlap(first, second) {
         if limit < Fixed::const_new(0) {
             return first.y_top;
-        }
-        else {
+        } else {
             return first.y_bottom;
         }
     }
@@ -317,38 +313,68 @@ pub fn check_block_above(entity_array: &[EntityEnum], element: usize) -> Fixed {
     return max_height;
 }
 
-
-pub fn overlap_3d(box1: &BoundingBox, box2: &BoundingBox) -> bool {
-    
+pub fn cylinder_and_rect_collision(cyl1: &BoundingCylinder, box2: &BoundingBox) -> bool {
     //can't overlap, if not sharing y coordinates (z here)
-    if box1.y_top <= box2.y_bottom || box2.y_top <= box1.y_bottom {
-        return false
+    if cyl1.y_top <= box2.y_bottom || box2.y_top <= cyl1.y_bottom {
+        return false;
     }
-    
-    if rect_simple_overlap_check(box1, box2) {
-        return true;
+    // Step 1: Deduce rectangle bounds
+    let mut min_x: Fixed = box2.data[0][0];
+    let mut max_x: Fixed = box2.data[0][0];
+    let mut min_z: Fixed = box2.data[0][1];
+    let mut max_z: Fixed = box2.data[0][1];
+
+    for point in box2.data.iter() {
+        let x: Fixed = point[0];
+        let z: Fixed = point[1];
+        if x < min_x {
+            min_x = x;
+        }
+        if x > max_x {
+            max_x = x;
+        }
+        if z < min_z {
+            min_z = z;
+        }
+        if z > max_z {
+            max_z = z;
+        }
     }
-/*
-    if rect_overlap(box1, box2) {
-        return true;
-    }
-*/
-    return false;
+
+    let clamped_x: Fixed = if cyl1.x < min_x {
+        min_x
+    } else if cyl1.x > max_x {
+        max_x
+    } else {
+        cyl1.x
+    };
+    let clamped_y: Fixed = if cyl1.z < min_z {
+        min_z
+    } else if cyl1.z > max_z {
+        max_z
+    } else {
+        cyl1.z
+    };
+
+    let dx: Fixed = clamped_x - cyl1.x;
+    let dy: Fixed = clamped_y - cyl1.z;
+    let distance_squared: Fixed = dx * dx + dy * dy;
+
+    //true if there is a collision
+    distance_squared <= cyl1.radius * cyl1.radius
 }
 
 //todo: call this when we've figured out ow to get the new position of the player in the world
 //might get top_bounding with an x & y offset
-pub fn horizontal_collision_check(entity_array: &[EntityEnum], box1: BoundingBox) -> bool {
-
+pub fn horizontal_collision_check(entity_array: &[EntityEnum], cyl1: BoundingCylinder) -> bool {
     for (i, e) in entity_array.iter().enumerate() {
         if i != 0 && i != 1 {
             let box2 = e.bounding_box();
 
-            if overlap_3d(&box1, &box2) {
+            if cylinder_and_rect_collision(&cyl1, &box2) {
                 return true;
             }
         }
     }
     return false;
-
 }

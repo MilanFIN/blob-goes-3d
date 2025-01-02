@@ -137,7 +137,7 @@ fn main(mut gba: agb::Gba) -> ! {
     loop {
         input.update();
 
-        input::handle_input(&mut player, &input, &entity_array, &entity_array[0].bounding_box());
+        input::handle_input(&mut player, &input, &entity_array, &entity_array[0].bounding_cylinder());
 
         bitmap4.clear(0);
         angle += increment;

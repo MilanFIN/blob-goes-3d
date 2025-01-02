@@ -21,6 +21,7 @@ impl BoundingBox {
     pub fn new(data: [[Fixed; 2]; 4], y_top: Fixed, y_bottom: Fixed) -> Self {
         BoundingBox { data, y_top, y_bottom }
     }
+    #[allow(dead_code)]
     pub fn new_with_offset(old_box: &BoundingBox, x_offset: Fixed, z_offset: Fixed) -> Self {
         let new_data = old_box
             .data
