@@ -1,31 +1,3 @@
-"""
-import math
-
-# Parameters
-num_points = 256
-radius = 5  # Radius of the circle
-center_x, center_y = 0, 0  # Center of the circle
-
-# Compute and print results
-for i in range(num_points):
-    # Calculate the current angle in degrees
-    angle_degrees = i * (360 / num_points)
-    angle_radians = math.radians(angle_degrees)
-
-    # Calculate x and y coordinates on the edge of the circle
-    # Starting at (0, -5) at angle 0
-    x = radius * math.sin(angle_radians)
-    y = -radius * math.cos(angle_radians)
-
-    formatted_x = int(x * 256)
-    formatted_y = int(y * 256)
-    formatted_angle = int(i)
-
-
-    formatted_string = f"[Fixed::from_raw({formatted_x}), Fixed::from_raw({formatted_y}), Fixed::from_raw({formatted_angle})],"
-    print (formatted_string)
-"""
-
 import math
 
 # Parameters
