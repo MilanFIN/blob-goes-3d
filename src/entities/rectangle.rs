@@ -10,6 +10,7 @@ use math::*;
 use render::*;
 
 use crate::fixed;
+use crate::utils;
 use fixed::*;
 
 #[derive(Copy, Clone, Deserialize, Debug)]
@@ -30,7 +31,7 @@ pub struct Rectangle {
 
     #[serde(default = "default_fixed")]
     x_rotation: Fixed,
-    #[serde(default = "default_fixed")]
+    #[serde(rename = "rotation", default = "default_fixed")]
     y_rotation: Fixed,
     #[serde(default = "default_fixed")]
     z_rotation: Fixed,
@@ -172,6 +173,11 @@ impl Entity for Rectangle {
         ];
     }
 
+    fn reload_rotation_matrices(&mut self) {
+        self.set_x_rotation(self.x_rotation);
+        self.set_y_rotation(self.y_rotation);
+        self.set_z_rotation(self.z_rotation);
+    }
     fn refresh_model_matrix(&mut self) {
         for i in 0..self.points.len() {
             let point: &[Fixed; 3] = &self.points[i];
@@ -266,9 +272,8 @@ impl Entity for Rectangle {
                 translated_point[1],
                 translated_point[2],
             ];
-
         }
-        
+
         if back_face_culling(&translated_points, 0, 1, 2) {
             //draw_face_outline(&mut bitmap4, screenPoints, 0, 1, 2, 3);
             draw_triangle(
@@ -379,17 +384,21 @@ impl Entity for Rectangle {
         return (self.x - camera.x).abs() + (self.y - camera.y).abs() + (self.z - camera.z).abs();
     }
 
-
     fn bounding_box(&self) -> BoundingBox {
+        let points: [[Fixed; 2]; 4] = [
+            [self.world_points[0][0], self.world_points[0][2]],
+            [self.world_points[1][0], self.world_points[1][2]],
+            [self.world_points[5][0], self.world_points[5][2]],
+            [self.world_points[4][0], self.world_points[4][2]],
+        ];
         BoundingBox {
-            data: [
-                [self.world_points[0][0], self.world_points[0][2]],
-                [self.world_points[1][0], self.world_points[1][2]],
-                [self.world_points[5][0], self.world_points[5][2]],
-                [self.world_points[4][0], self.world_points[4][2]],
-            ],
+            data: points,
+            center: utils::calculate_center(&points),
+            width: (self.world_points[0][0] - self.world_points[1][0]).abs(),
+            height: (self.world_points[1][2] - self.world_points[5][2]).abs(),
             y_top: self.world_points[0][1],
             y_bottom: self.world_points[2][1],
+            rotation: -self.y_rotation,
         }
     }
 
@@ -402,5 +411,7 @@ impl Entity for Rectangle {
             y_bottom: self.world_points[2][1],
         }
     }
-
+    fn get_y(&self) -> Fixed {
+        return self.y;
+    }
 }

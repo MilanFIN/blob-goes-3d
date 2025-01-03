@@ -12,6 +12,9 @@ use render::*;
 use crate::fixed;
 use fixed::*;
 
+use crate::utils;
+
+
 /*
 const fov: Fixed = Fixed::const_new(90); // FOV in degrees
 const aspect_ratio: Fixed = Fixed::from_raw(384);
@@ -183,6 +186,13 @@ impl Entity for Cube {
             ],
         ];
     }
+
+    fn reload_rotation_matrices(&mut self) {
+        self.set_x_rotation(self.x_rotation);
+        self.set_y_rotation(self.y_rotation);
+        self.set_z_rotation(self.z_rotation);
+    }
+
 
     fn refresh_model_matrix(&mut self) {
         for i in 0..self.points.len() {
@@ -391,15 +401,20 @@ impl Entity for Cube {
     }
 
     fn bounding_box(&self) -> BoundingBox {
+        let points: [[Fixed; 2]; 4] =  [
+            [self.world_points[0][0], self.world_points[0][2]],
+            [self.world_points[1][0], self.world_points[1][2]],
+            [self.world_points[5][0], self.world_points[5][2]],
+            [self.world_points[4][0], self.world_points[4][2]],
+        ];
         BoundingBox {
-            data: [
-                [self.world_points[0][0], self.world_points[0][2]],
-                [self.world_points[1][0], self.world_points[1][2]],
-                [self.world_points[5][0], self.world_points[5][2]],
-                [self.world_points[4][0], self.world_points[4][2]],
-            ],
+            data: points,
+            center: utils::calculate_center(&points),
+            width: (self.world_points[0][0] - self.world_points[1][0]).abs(),
+            height: (self.world_points[1][2] - self.world_points[5][2]).abs(),
             y_top: self.world_points[0][1],
             y_bottom: self.world_points[2][1],
+            rotation: self.y_rotation
         }
     }
 
@@ -412,5 +427,7 @@ impl Entity for Cube {
             y_bottom: self.world_points[2][1],
         }
     }
-
+    fn get_y(&self) -> Fixed {
+        return self.y;
+    }
 }

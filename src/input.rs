@@ -1,4 +1,4 @@
-use crate::{boundingshapes::{BoundingCylinder}, horizontal_collision_check, player, EntityEnum, Fixed};
+use crate::{boundingshapes::BoundingCylinder, horizontal_collision_check, player, EntityEnum, Fixed};
 use agb::input::{Button, ButtonController};
 use player::*;
 
@@ -11,10 +11,21 @@ fn attempt_move(
 ) -> bool {
     let potential_position: BoundingCylinder = BoundingCylinder::new_with_offset(body, x, z);
     //check if we can move in both x and z dirs
-    if !horizontal_collision_check(entities, potential_position) {
+    let (_wallangle, ok) = horizontal_collision_check(entities, potential_position);
+    if !ok {
         player.move_to(x, z);
         return true;
     }
+    
+    //todo: from the wall angle, calculate two vectors for movement, then we can check if those are available as well
+    /*
+    let potential_position: BoundingCylinder = BoundingCylinder::new_with_offset(body, x, z);
+    if !horizontal_collision_check(entities, potential_position, dir).1 {
+        player.move_to(x, Fixed::const_new(0));
+        return true;
+    }*/
+
+    /*
     //if not, check x and z separately
     let potential_position: BoundingCylinder = BoundingCylinder::new_with_offset(body, x, Fixed::const_new(0));
     if !horizontal_collision_check(entities, potential_position) {
@@ -26,6 +37,7 @@ fn attempt_move(
         player.move_to(Fixed::const_new(0), z);
         return true;
     }
+    */
 
 
     return false;

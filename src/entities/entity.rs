@@ -13,6 +13,8 @@ pub trait Entity {
     fn set_x_rotation(&mut self, x_rotation: Fixed);
     fn set_y_rotation(&mut self, y_rotation: Fixed);
     fn set_z_rotation(&mut self, z_rotation: Fixed);
+    fn reload_rotation_matrices(&mut self);
+
     fn recalculate_points(&mut self);
     fn refresh_model_matrix(&mut self);
 
@@ -21,5 +23,5 @@ pub trait Entity {
     fn distance_from_camera(&self, camera: &Camera) -> Fixed;
     fn bounding_box(&self) -> BoundingBox;
     fn bounding_cylinder(&self) -> BoundingCylinder;
-
+    fn get_y(&self) -> Fixed;
 }

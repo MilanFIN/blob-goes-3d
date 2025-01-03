@@ -1,15 +1,11 @@
-
-
 use agb::fixnum::Num;
+use core::ops::Neg;
+use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 use serde::Deserialize;
 use serde::Deserializer;
-use core::ops::Neg;
-use core::ops::{Add, AddAssign, Sub, SubAssign, Mul, MulAssign, Div, DivAssign};
-
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Fixed(Num<i32, 8>);
-
 
 pub fn default_fixed() -> Fixed {
     Fixed::new(0)
@@ -23,7 +19,7 @@ pub fn default_fixed_3_3() -> [[Fixed; 3]; 3] {
     [[Fixed::const_new(0); 3]; 3]
 }
 
-pub const fn i32_to_fixed(m:i32) -> Fixed {
+pub const fn i32_to_fixed(m: i32) -> Fixed {
     return Fixed(Num::from_raw(m << 8));
 }
 
@@ -33,9 +29,9 @@ impl Fixed {
     pub fn new(arg: i32) -> Self {
         Fixed(Num::new(arg)) // Precision is always 8
     }
-	pub const fn const_new(arg: i32) -> Self {
-		i32_to_fixed(arg)
-	}
+    pub const fn const_new(arg: i32) -> Self {
+        i32_to_fixed(arg)
+    }
     pub const fn from_raw(arg: i32) -> Self {
         Fixed(Num::from_raw(arg))
     }
@@ -48,10 +44,13 @@ impl Fixed {
     pub fn abs(self) -> Self {
         if self.0 >= Num::from_raw(0) {
             self
-        } 
-        else {
+        } else {
             -self
         }
+    }
+    #[allow(dead_code)]
+    pub fn sqrt(self) -> Self {
+        Fixed(self.0.sqrt())
     }
 }
 
@@ -72,7 +71,7 @@ impl<'de> Deserialize<'de> for Fixed {
 
 ///
 /// BASIC OPERATIONS
-/// 
+///
 
 impl Neg for Fixed {
     type Output = Self;
@@ -138,7 +137,6 @@ impl DivAssign for Fixed {
     }
 }
 
-
 // Implement `Mul` for Fixed * i32
 impl Mul<i32> for Fixed {
     type Output = Self;
@@ -154,7 +152,6 @@ impl Mul<usize> for Fixed {
         Fixed(self.0 * other as i32)
     }
 }
-
 
 // Implement MulAssign
 impl MulAssign<i32> for Fixed {
@@ -177,8 +174,8 @@ impl DivAssign<i32> for Fixed {
 }
 
 ///
-/// Num traits 
-/// 
+/// Num traits
+///
 
 impl Fixed {
     pub fn cos(self) -> Self {

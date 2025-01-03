@@ -93,9 +93,10 @@ fn main(mut gba: agb::Gba) -> ! {
 
     for i in 2..LEVELSIZE+2 {
         entity_array[i] = parsedentities[i-2];
-        entity_array[i].set_x_rotation(new_num(0));
-        entity_array[i].set_y_rotation(new_num(0));
-        entity_array[i].set_z_rotation(new_num(0));
+        //entity_array[i].set_x_rotation(new_num(0));
+        //entity_array[i].set_y_rotation(new_num(0));
+        //entity_array[i].set_z_rotation(new_num(0));
+        entity_array[i].reload_rotation_matrices();
         //always call after modifying rotation
 
         entity_array[i].recalculate_points();

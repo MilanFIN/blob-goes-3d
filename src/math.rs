@@ -79,6 +79,14 @@ pub fn vector_sub_2d(p1: [Fixed; 2], p2: [Fixed; 2]) -> [Fixed; 2] {
     return [p1[0] - p2[0], p1[1] - p2[1]];
 }
 
+#[allow(dead_code)]
+pub fn normalize_2(v: [Fixed; 2]) -> [Fixed; 2] {
+    let length: Fixed = (v[0] * v[0] + v[1] * v[1] ).sqrt();
+    //let length: Fixed = (v[0] * v[0] + v[1] * v[1] + v[2] * v[2]).sqrt();
+    [v[0] / length, v[1] / length]
+}
+
+
 pub fn normalize(v: [Fixed; 3]) -> [Fixed; 3] {
     let length: Fixed = fast_sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
     //let length: Fixed = (v[0] * v[0] + v[1] * v[1] + v[2] * v[2]).sqrt();

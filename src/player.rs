@@ -8,7 +8,7 @@ use fixed::*;
 
 const GRAVITY: Fixed = Fixed::from_raw(32);
 const MOVEAMOUNT: Fixed = Fixed::from_raw(64);
-pub const JUMPPOWER: Fixed = Fixed::from_raw(512);
+pub const JUMPPOWER: Fixed = Fixed::from_raw(256);
 
 pub struct Player {
     pub x: Fixed,

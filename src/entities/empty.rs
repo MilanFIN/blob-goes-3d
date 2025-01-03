@@ -20,6 +20,7 @@ impl Entity for Empty {
     fn set_x_rotation(&mut self, _x_rotation: Fixed) {}
     fn set_y_rotation(&mut self, _y_rotation: Fixed) {}
     fn set_z_rotation(&mut self, _z_rotation: Fixed) {}
+    fn reload_rotation_matrices(&mut self) {}
     fn refresh_model_matrix(&mut self) {}
     fn set_vertex(&mut self, _point: [Fixed; 3], _index: i32) {}
     fn distance_from_camera(&self, _camera: &Camera) -> Fixed {
@@ -30,6 +31,9 @@ impl Entity for Empty {
     }
     fn bounding_cylinder(&self) -> BoundingCylinder {
         BoundingCylinder::default()
+    }
+    fn get_y(&self) -> Fixed {
+        return Fixed::const_new(-999);
     }
 }
 
