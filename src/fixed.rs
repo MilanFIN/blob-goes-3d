@@ -52,6 +52,11 @@ impl Fixed {
     pub fn sqrt(self) -> Self {
         Fixed(self.0.sqrt())
     }
+
+    pub fn modulo(self, other: Self) -> Self {
+        let remainder: Num<i32, 8> = self.0 % other.0;
+        Fixed(remainder)
+    }
 }
 
 impl<'de> Deserialize<'de> for Fixed {

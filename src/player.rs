@@ -106,15 +106,23 @@ impl Player {
     }
 
     pub fn left(&mut self) -> (Fixed, Fixed) {
-        self.angle = CAMERALOCATIONS[self.camera_angle][2];
+        let mut view_dir: usize = self.camera_angle + 0;
+        if view_dir > 255 {
+            view_dir -= 255;
+        }
+        self.angle = CAMERALOCATIONS[view_dir][2];
         let x = self.angle.cos() * MOVEAMOUNT;
         let z = self.angle.sin() * MOVEAMOUNT;
         return (x, z);
     }
     pub fn right(&mut self) -> (Fixed, Fixed) {
-        self.angle = CAMERALOCATIONS[self.camera_angle][2];
-        let x = -self.angle.cos() * MOVEAMOUNT;
-        let z = -self.angle.sin() * MOVEAMOUNT;
+        let mut view_dir: usize = self.camera_angle + 128;
+        if view_dir > 255 {
+            view_dir -= 255;
+        }
+        self.angle = CAMERALOCATIONS[view_dir][2];
+        let x = self.angle.cos() * MOVEAMOUNT;
+        let z = self.angle.sin() * MOVEAMOUNT;
         return (x, z);
     }
     pub fn camera_left(&mut self, mut amount: usize) {
