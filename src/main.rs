@@ -30,7 +30,8 @@ use entities::*;
 mod camera;
 
 mod math;
-mod render;
+mod renderer;
+
 mod utils;
 use utils::*;
 
@@ -57,10 +58,7 @@ fn main(mut gba: agb::Gba) -> ! {
 
     let mut bitmap4: agb::display::bitmap4::Bitmap4 = gba.display.video.bitmap4();
 
-    // Set a palette entries
-    bitmap4.set_palette_entry(1, 0x001F);
-    bitmap4.set_palette_entry(2, 0x3E0);
-    bitmap4.set_palette_entry(3, 0x7C00);
+    renderer::utils::init_palette(&mut bitmap4);
 
     let mut angle: Fixed = Fixed::const_new(0);
     let increment: Fixed = Fixed::const_new(1) / 256;
@@ -73,6 +71,17 @@ fn main(mut gba: agb::Gba) -> ! {
     let message_bytes = levels::LEVELS[1].trim().as_bytes();
     let (parsedentities, _): ([EntityEnum; LEVELSIZE], _) = from_slice(message_bytes).unwrap();
 
+    let mut player1 = Player::default();
+
+    player1.camera.set_x_rotation(Fixed::from_raw(0));
+    player1.camera.set_y_rotation(Fixed::from_raw(0));
+    player1.camera.set_z_rotation(Fixed::from_raw(0));
+    player1.camera.local_y = new_num(3);
+
+    player1.y = new_num(3);
+    player1.z = new_num(0);
+    player1.camera_left(0);
+
 
     for i in 0..2 {
         //entity_array[i] = EntityEnum::Cube(Cube::default());
@@ -82,6 +91,8 @@ fn main(mut gba: agb::Gba) -> ! {
         entity_array[i].set_x_rotation(new_num(0));
         entity_array[i].set_y_rotation(new_num(0));
         entity_array[i].set_z_rotation(new_num(0));
+        entity_array[i].set_color(1);
+
         //always call after modifying rotation
 
         //entity_array[i].set_size(new_num(2));
@@ -122,50 +133,40 @@ fn main(mut gba: agb::Gba) -> ! {
     //rest of the blocks
     //entity_array[2].set_x_offset(new_num(5));
     //entity_array[3].set_x_offset(new_num(-5));
-    let mut player = Player::default();
-
-    player.camera.set_x_rotation(Fixed::from_raw(0));
-    player.camera.set_y_rotation(Fixed::from_raw(0));
-    player.camera.set_z_rotation(Fixed::from_raw(0));
-    player.camera.local_y = new_num(3);
-
-    player.y = new_num(3);//new_num(5);
-    player.z = new_num(0);
-    player.camera_left(0);
 
 
 
     loop {
         input.update();
 
-        input::handle_input(&mut player, &input, &entity_array, &entity_array[0].bounding_cylinder());
+        input::handle_input(&mut player1, &input, &entity_array, &entity_array[0].bounding_cylinder());
 
-        bitmap4.clear(0);
+        bitmap4.clear(128);
         angle += increment;
         if angle > Fixed::const_new(1) {
             angle = Fixed::const_new(0);
         }
 
-        if player.yspeed <= Fixed::const_new(0) {
+        if player1.yspeed <= Fixed::const_new(0) {
             let groundlevel: Fixed = check_support_below(&entity_array, 0);
-            player.fall(groundlevel);
+            player1.fall(groundlevel);
         }
-        else if player.yspeed > Fixed::const_new(0) {
+        else if player1.yspeed > Fixed::const_new(0) {
             let rooflevel: Fixed = check_block_above(&entity_array, 0);
-            player.float(rooflevel);    
+            player1.float(rooflevel);    
         }
 
 
 
-        player.update_camera_position();
+        player1.update_camera_position();
 
         //rotate player body blocks and move them where the player is
         for i in 0..2 {
-            entity_array[i].set_x_offset(player.x);
-            entity_array[i].set_y_offset(player.y + Fixed::from_raw(128) + Fixed::from_raw(192) * i);
-            entity_array[i].set_z_offset(player.z);
+            entity_array[i].set_x_offset(player1.x);
+            entity_array[i].set_y_offset(player1.y + Fixed::from_raw(128) + Fixed::from_raw(192) * i);
+            entity_array[i].set_z_offset(player1.z);
 
-            entity_array[i].set_y_rotation(-player.angle);
+            entity_array[i].set_y_rotation(-player1.angle);
             entity_array[i].refresh_model_matrix();
         }
 
@@ -174,10 +175,10 @@ fn main(mut gba: agb::Gba) -> ! {
             &entity_array,
             0,
             LEVELSIZE+1,
-            &player.camera,
+            &player1.camera,
         );
         for i in 0..LEVELSIZE+2 {
-            entity_array[entity_render_order[i]].render(&mut bitmap4, &player.camera);
+            entity_array[entity_render_order[i]].render(&mut bitmap4, &player1.camera);
         }
 
         bitmap4.flip_page();

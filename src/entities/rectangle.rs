@@ -1,13 +1,13 @@
 use serde::Deserialize;
 
 use super::math;
-use super::render;
 use super::BoundingBox;
 use super::BoundingCylinder;
 use super::Camera;
 use super::Entity;
+use crate::renderer;
 use math::*;
-use render::*;
+use renderer::*;
 
 use crate::fixed;
 use crate::utils;
@@ -50,6 +50,9 @@ pub struct Rectangle {
 
     #[serde(default = "default_fixed_3_8")]
     world_points: [[Fixed; 3]; 8],
+
+    #[serde(default = "default_u8")]
+    color: u8,
 }
 
 impl Rectangle {
@@ -71,6 +74,7 @@ impl Rectangle {
             y_rotation_matrix: [[Fixed::const_new(0); 3]; 3],
             z_rotation_matrix: [[Fixed::const_new(0); 3]; 3],
             world_points: [[Fixed::const_new(0); 3]; 8],
+            color: 0,
         }
     }
 }
@@ -274,108 +278,127 @@ impl Entity for Rectangle {
             ];
         }
 
-        if back_face_culling(&translated_points, 0, 1, 2) {
+        let visible = back_face_culling(&translated_points, 0, 1, 2);
+        if visible {
             //draw_face_outline(&mut bitmap4, screenPoints, 0, 1, 2, 3);
+            let color =
+                renderer::utils::get_color(self.color, self.y_rotation + Fixed::from_raw(0));
             draw_triangle(
                 bitmap4,
                 screen_points[0],
                 screen_points[1],
                 screen_points[2],
-                1,
+                color,
             );
             draw_triangle(
                 bitmap4,
                 screen_points[0],
                 screen_points[2],
                 screen_points[3],
-                1,
+                color,
             );
         }
-        if back_face_culling(&translated_points, 7, 6, 5) {
+        let visible = back_face_culling(&translated_points, 7, 6, 5);
+        if visible {
             //draw_face_outline(&mut bitmap4, screenPoints, 7, 6, 5, 4);
+            let color =
+                renderer::utils::get_color(self.color, self.y_rotation + Fixed::from_raw(128));
             draw_triangle(
                 bitmap4,
                 screen_points[7],
                 screen_points[6],
                 screen_points[5],
-                1,
+                color,
             );
             draw_triangle(
                 bitmap4,
                 screen_points[7],
                 screen_points[5],
                 screen_points[4],
-                1,
+                color,
             );
         }
+        let visible = back_face_culling(&translated_points, 0, 3, 7);
 
-        if back_face_culling(&translated_points, 0, 3, 7) {
+        if visible {
             //draw_face_outline(&mut bitmap4, screenPoints, 0, 3, 7, 4);
-            draw_triangle(
-                bitmap4,
-                screen_points[0],
-                screen_points[3],
-                screen_points[7],
-                2,
-            );
-            draw_triangle(
-                bitmap4,
-                screen_points[0],
-                screen_points[7],
-                screen_points[4],
-                2,
-            );
-        }
-        if back_face_culling(&translated_points, 1, 5, 6) {
-            //draw_face_outline(&mut bitmap4, screenPoints, 1, 5, 6, 2);
-            draw_triangle(
-                bitmap4,
-                screen_points[1],
-                screen_points[5],
-                screen_points[6],
-                2,
-            );
-            draw_triangle(
-                bitmap4,
-                screen_points[1],
-                screen_points[6],
-                screen_points[2],
-                2,
-            );
-        }
+            let color =
+                renderer::utils::get_color(self.color, self.y_rotation + Fixed::from_raw(64));
 
-        if back_face_culling(&translated_points, 7, 3, 2) {
+            draw_triangle(
+                bitmap4,
+                screen_points[0],
+                screen_points[3],
+                screen_points[7],
+                color,
+            );
+            draw_triangle(
+                bitmap4,
+                screen_points[0],
+                screen_points[7],
+                screen_points[4],
+                color,
+            );
+        }
+        let visible = back_face_culling(&translated_points, 1, 5, 6);
+        if visible {
+            //draw_face_outline(&mut bitmap4, screenPoints, 1, 5, 6, 2);
+            let color =
+                renderer::utils::get_color(self.color, self.y_rotation + Fixed::from_raw(192));
+
+            draw_triangle(
+                bitmap4,
+                screen_points[1],
+                screen_points[5],
+                screen_points[6],
+                color,
+            );
+            draw_triangle(
+                bitmap4,
+                screen_points[1],
+                screen_points[6],
+                screen_points[2],
+                color,
+            );
+        }
+        let visible= back_face_culling(&translated_points, 7, 3, 2);
+        if visible {
             //draw_face_outline(&mut bitmap4, screenPoints, 7, 3, 2, 6);
+            let color = renderer::utils::get_color(self.color, Fixed::from_raw(0));
+
             draw_triangle(
                 bitmap4,
                 screen_points[7],
                 screen_points[3],
                 screen_points[2],
-                3,
+                color,
             );
             draw_triangle(
                 bitmap4,
                 screen_points[7],
                 screen_points[2],
                 screen_points[6],
-                3,
+                color,
             );
         }
-        if back_face_culling(&translated_points, 0, 4, 5) {
+        let visible = back_face_culling(&translated_points, 0, 4, 5);
+        if visible {
             //draw_face_outline(&mut bitmap4, screenPoints, 0, 4, 5, 1);
+            let color = renderer::utils::get_color(self.color, Fixed::from_raw(0));
+
             draw_triangle(
                 bitmap4,
                 screen_points[0],
                 screen_points[4],
                 screen_points[5],
-                3,
+                color,
             );
             draw_triangle(
                 bitmap4,
                 screen_points[0],
                 screen_points[5],
                 screen_points[1],
-                3,
+                color,
             );
         }
     }
@@ -413,5 +436,8 @@ impl Entity for Rectangle {
     }
     fn get_y(&self) -> Fixed {
         return self.y;
+    }
+    fn set_color(&mut self, color: u8) {
+        self.color = color;
     }
 }

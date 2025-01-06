@@ -35,6 +35,8 @@ impl Entity for Empty {
     fn get_y(&self) -> Fixed {
         return Fixed::const_new(-999);
     }
+
+    fn set_color(&mut self, _color: u8) {}
 }
 
 impl Empty {

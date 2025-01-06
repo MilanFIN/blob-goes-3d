@@ -7,6 +7,10 @@ use serde::Deserializer;
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Fixed(Num<i32, 8>);
 
+pub fn default_u8() -> u8 {
+    0
+}
+
 pub fn default_fixed() -> Fixed {
     Fixed::new(0)
 }
@@ -34,6 +38,10 @@ impl Fixed {
     }
     pub const fn from_raw(arg: i32) -> Self {
         Fixed(Num::from_raw(arg))
+    }
+    #[allow(dead_code)]
+    pub fn to_raw(self) -> i32 {
+        Num::to_raw(self.0)
     }
     pub fn from_f32(arg: f32) -> Self {
         Fixed(Num::from_f32(arg))

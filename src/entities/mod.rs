@@ -16,7 +16,6 @@ use boundingshapes::*;
 use serde::Deserialize;
 
 use super::math;
-use super::render;
 
 use super::camera;
 use camera::*;
@@ -152,6 +151,13 @@ impl EntityEnum {
             EntityEnum::Empty(_e) => Fixed::const_new(-999),
         }
     }
+    pub fn set_color(&mut self, color: u8) {
+        match self {
+            EntityEnum::Cube(c) => c.set_color(color),
+            EntityEnum::Rectangle(r) => r.set_color(color),
+            EntityEnum::Empty(_e) => {}
+        }
+    }
 }
 
 fn partition(
@@ -166,7 +172,7 @@ fn partition(
 
     let mut i = low as isize - 1; // Use `isize` to allow `-1` for initialization
 
-    //very jank method to avoid having to do actual per polygon zindexing 
+    //very jank method to avoid having to do actual per polygon zindexing
     //basically objects with largest y are drawn last, use distance to camera as fallback
     //this needs to be kept in mind when creating levels eventually
     for j in low..high {
@@ -174,11 +180,11 @@ fn partition(
         if y < pivot_y {
             i += 1;
             entity_render_order.swap(i as usize, j);
-        }
-        else if y > pivot_y {
+        } else if y > pivot_y {
             //already when we want it
-        }
-        else if entity_array[entity_render_order[j]].distance_from_camera(camera) >= pivot_distance {
+        } else if entity_array[entity_render_order[j]].distance_from_camera(camera)
+            >= pivot_distance
+        {
             i += 1;
             entity_render_order.swap(i as usize, j);
         }
@@ -392,7 +398,10 @@ pub fn cylinder_and_rect_collision(cyl1: &BoundingCylinder, box2: &BoundingBox) 
     distance_squared <= cyl1.radius * cyl1.radius
 }
 
-pub fn cylinder_and_rotated_rect_collision(cyl1: &BoundingCylinder, box2: &BoundingBox) -> (Fixed, bool) {
+pub fn cylinder_and_rotated_rect_collision(
+    cyl1: &BoundingCylinder,
+    box2: &BoundingBox,
+) -> (Fixed, bool) {
     // Can't overlap if not sharing y coordinates (z here)
     if cyl1.y_top <= box2.y_bottom || box2.y_top <= cyl1.y_bottom {
         return (Fixed::default(), false);
@@ -439,11 +448,12 @@ pub fn cylinder_and_rotated_rect_collision(cyl1: &BoundingCylinder, box2: &Bound
         return (box2.rotation, true);
     }
     return (Fixed::default(), false);
-    
 }
 
-
-pub fn horizontal_collision_check(entity_array: &[EntityEnum], cyl1: BoundingCylinder) -> (Fixed, bool) {
+pub fn horizontal_collision_check(
+    entity_array: &[EntityEnum],
+    cyl1: BoundingCylinder,
+) -> (Fixed, bool) {
     for (i, e) in entity_array.iter().enumerate() {
         if i != 0 && i != 1 {
             let box2: BoundingBox = e.bounding_box();
@@ -452,12 +462,11 @@ pub fn horizontal_collision_check(entity_array: &[EntityEnum], cyl1: BoundingCyl
                 if cylinder_and_rect_collision(&cyl1, &box2) {
                     return (Fixed::const_new(0), true);
                 }
-            }
-            else {
+            } else {
                 let (wallangle, ok) = cylinder_and_rotated_rect_collision(&cyl1, &box2);
                 if ok {
                     return (wallangle, true);
-                }    
+                }
             }
         }
     }

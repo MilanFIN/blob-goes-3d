@@ -1,9 +1,8 @@
-
-
-use crate::math;
-use math::*;
+pub mod utils;
 use crate::fixed;
+use crate::math;
 use fixed::*;
+use math::*;
 
 #[allow(dead_code)]
 pub fn draw_line(
@@ -95,13 +94,7 @@ pub fn draw_face_outline(
 }
 
 //return true if visible, presume points to be defined in counter clockwise direction
-pub fn back_face_culling(
-    &points: &[[Fixed; 3]; 8],
-    p1: usize,
-    p2: usize,
-    p3: usize,
-) -> bool {
-
+pub fn back_face_culling(&points: &[[Fixed; 3]; 8], p1: usize, p2: usize, p3: usize) -> bool {
     let v12: [Fixed; 3] = vector_sub(points[p2], points[p1]);
     let v23: [Fixed; 3] = vector_sub(points[p3], points[p2]);
 
@@ -116,7 +109,8 @@ pub fn back_face_culling(
 
     //doing this for all points instead
     //behind camera, so not visible
-    if polygon_center[2] < Fixed::const_new(1) {
+
+    if polygon_center[2] < Fixed::const_new(0) {
         return false;
     }
 
@@ -235,11 +229,7 @@ pub fn draw_flat_top_triangle(
     }
 }
 
-pub fn sort_points(
-    p1: &mut [Fixed; 2],
-    p2: &mut [Fixed; 2],
-    p3: &mut [Fixed; 2],
-) {
+pub fn sort_points(p1: &mut [Fixed; 2], p2: &mut [Fixed; 2], p3: &mut [Fixed; 2]) {
     // Swap points to ensure p1 has the smallest y, then x
     if (p2[1] < p1[1]) || (p2[1] == p1[1] && p2[0] < p1[0]) {
         for i in 0..2 {
@@ -265,7 +255,6 @@ pub fn sort_points(
     }
 }
 
-
 pub fn draw_triangle(
     bitmap4: &mut agb::display::bitmap4::Bitmap4,
     mut p1: [Fixed; 2],
@@ -276,24 +265,25 @@ pub fn draw_triangle(
     let zero: Fixed = Fixed::const_new(0);
     let x_max: Fixed = Fixed::const_new(240);
     let y_max: Fixed = Fixed::const_new(160);
-    
+
     //jank way to avoid giant polygons near zero plane
     if p1[0] > Fixed::const_new(1000) || p1[0] < Fixed::const_new(-100) {
-        return
+        return;
     }
     if p2[0] > Fixed::const_new(1000) || p2[0] < Fixed::const_new(-100) {
-        return
-    }   
+        return;
+    }
     if p3[0] > Fixed::const_new(1000) || p3[0] < Fixed::const_new(-100) {
-        return
-    }    
+        return;
+    }
     if p1[1] > Fixed::const_new(1000) || p1[1] < Fixed::const_new(-100) {
-        return
+        return;
     }
     if p2[1] > Fixed::const_new(1000) || p2[1] < Fixed::const_new(-100) {
-        return
-    }   if p3[1] > Fixed::const_new(1000) || p3[1] < Fixed::const_new(-100) {
-        return
+        return;
+    }
+    if p3[1] > Fixed::const_new(1000) || p3[1] < Fixed::const_new(-100) {
+        return;
     }
 
     //first check out if the triangle is completely out of view
