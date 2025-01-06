@@ -69,9 +69,6 @@ pub struct Cube {
     #[serde(default = "default_fixed_3_3")]
     z_rotation_matrix: [[Fixed; 3]; 3],
 
-    #[serde(default = "default_fixed_3_8")]
-    world_points: [[Fixed; 3]; 8],
-
     #[serde(default = "default_u8")]
     color: u8,
 }
@@ -91,7 +88,6 @@ impl Cube {
             x_rotation_matrix: [[Fixed::const_new(0); 3]; 3],
             y_rotation_matrix: [[Fixed::const_new(0); 3]; 3],
             z_rotation_matrix: [[Fixed::const_new(0); 3]; 3],
-            world_points: [[Fixed::const_new(0); 3]; 8],
             color: 0,
         }
     }
@@ -259,12 +255,6 @@ impl Entity for Cube {
                 Fixed::const_new(1),
             ];
 
-            self.world_points[i] = [
-                self.model_rotated_points[i][0] + self.x,
-                self.model_rotated_points[i][1] + self.y,
-                self.model_rotated_points[i][2] + self.z,
-            ];
-
             translated_point = matmul_4(camera.y_rotation_matrix, translated_point);
             translated_point = matmul_4(camera.x_rotation_matrix, translated_point);
             translated_point = matmul_4(camera.z_rotation_matrix, translated_point);
@@ -422,18 +412,34 @@ impl Entity for Cube {
 
     fn bounding_box(&self) -> BoundingBox {
         let points: [[Fixed; 2]; 4] = [
-            [self.world_points[0][0], self.world_points[0][2]],
-            [self.world_points[1][0], self.world_points[1][2]],
-            [self.world_points[5][0], self.world_points[5][2]],
-            [self.world_points[4][0], self.world_points[4][2]],
+            [
+                self.model_rotated_points[0][0] + self.x,
+                self.model_rotated_points[0][2] + self.z,
+            ],
+            [
+                self.model_rotated_points[1][0] + self.x,
+                self.model_rotated_points[1][2] + self.z,
+            ],
+            [
+                self.model_rotated_points[5][0] + self.x,
+                self.model_rotated_points[5][2] + self.z,
+            ],
+            [
+                self.model_rotated_points[4][0] + self.x,
+                self.model_rotated_points[4][2] + self.z,
+            ],
         ];
         BoundingBox {
             data: points,
             center: utils::calculate_center(&points),
-            width: (self.world_points[0][0] - self.world_points[1][0]).abs(),
-            height: (self.world_points[1][2] - self.world_points[5][2]).abs(),
-            y_top: self.world_points[0][1],
-            y_bottom: self.world_points[2][1],
+            width: (self.model_rotated_points[0][0] + self.x
+                - (self.model_rotated_points[1][0] + self.x))
+                .abs(),
+            height: (self.model_rotated_points[1][2] + self.z
+                - (self.model_rotated_points[5][2] + self.z))
+                .abs(),
+            y_top: self.model_rotated_points[0][1] + self.y,
+            y_bottom: self.model_rotated_points[2][1] + self.y,
             rotation: self.y_rotation,
         }
     }
@@ -443,14 +449,15 @@ impl Entity for Cube {
             x: self.x,
             z: self.z,
             radius: self.size / 2,
-            y_top: self.world_points[0][1],
-            y_bottom: self.world_points[2][1],
+            y_top: self.model_rotated_points[0][1] + self.y,
+            y_bottom: self.model_rotated_points[2][1] + self.y,
         }
     }
+
     fn get_y(&self) -> Fixed {
         return self.y;
     }
-    
+
     fn set_color(&mut self, color: u8) {
         self.color = color;
     }
