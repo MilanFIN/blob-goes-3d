@@ -57,6 +57,7 @@ fn main(mut gba: agb::Gba) -> ! {
     let mut input = ButtonController::new();
 
     let mut bitmap4: agb::display::bitmap4::Bitmap4 = gba.display.video.bitmap4();
+    let mut page: u32 = 0;
 
     renderer::utils::init_palette(&mut bitmap4);
 
@@ -141,7 +142,8 @@ fn main(mut gba: agb::Gba) -> ! {
 
         input::handle_input(&mut player1, &input, &entity_array, &entity_array[0].bounding_cylinder());
 
-        bitmap4.clear(128);
+        //bitmap4.clear(128);
+        renderer::hw::fill(page, 128);
         angle += increment;
         if angle > Fixed::const_new(1) {
             angle = Fixed::const_new(0);
@@ -178,9 +180,10 @@ fn main(mut gba: agb::Gba) -> ! {
             &player1.camera,
         );
         for i in 0..LEVELSIZE+2 {
-            entity_array[entity_render_order[i]].render(&mut bitmap4, &player1.camera);
+            entity_array[entity_render_order[i]].render(&player1.camera, page);
         }
 
-        bitmap4.flip_page();
+        renderer::hw::flip(&mut page);
+        //bitmap4.flip_page();
     }
 }

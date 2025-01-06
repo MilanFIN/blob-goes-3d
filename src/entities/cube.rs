@@ -208,7 +208,7 @@ impl Entity for Cube {
         //not implemented
     }
 
-    fn render(&mut self, bitmap4: &mut agb::display::bitmap4::Bitmap4, camera: &Camera) {
+    fn render(&mut self, camera: &Camera, page: u32) {
         let projection_matrix: [[Fixed; 4]; 4] = [
             [
                 Fixed::from_f32(0.66666667),
@@ -287,18 +287,18 @@ impl Entity for Cube {
             let color =
                 renderer::utils::get_color(self.color, self.y_rotation + Fixed::from_raw(0));
             draw_triangle(
-                bitmap4,
                 screen_points[0],
                 screen_points[1],
                 screen_points[2],
                 color,
+                page,
             );
             draw_triangle(
-                bitmap4,
                 screen_points[0],
                 screen_points[2],
                 screen_points[3],
                 color,
+                page,
             );
         }
         let visible = back_face_culling(&translated_points, 7, 6, 5);
@@ -307,18 +307,18 @@ impl Entity for Cube {
             let color =
                 renderer::utils::get_color(self.color, self.y_rotation + Fixed::from_raw(128));
             draw_triangle(
-                bitmap4,
                 screen_points[7],
                 screen_points[6],
                 screen_points[5],
                 color,
+                page,
             );
             draw_triangle(
-                bitmap4,
                 screen_points[7],
                 screen_points[5],
                 screen_points[4],
                 color,
+                page,
             );
         }
         let visible = back_face_culling(&translated_points, 0, 3, 7);
@@ -329,18 +329,18 @@ impl Entity for Cube {
                 renderer::utils::get_color(self.color, self.y_rotation + Fixed::from_raw(64));
 
             draw_triangle(
-                bitmap4,
                 screen_points[0],
                 screen_points[3],
                 screen_points[7],
                 color,
+                page,
             );
             draw_triangle(
-                bitmap4,
                 screen_points[0],
                 screen_points[7],
                 screen_points[4],
                 color,
+                page,
             );
         }
         let visible = back_face_culling(&translated_points, 1, 5, 6);
@@ -350,18 +350,18 @@ impl Entity for Cube {
                 renderer::utils::get_color(self.color, self.y_rotation + Fixed::from_raw(192));
 
             draw_triangle(
-                bitmap4,
                 screen_points[1],
                 screen_points[5],
                 screen_points[6],
                 color,
+                page,
             );
             draw_triangle(
-                bitmap4,
                 screen_points[1],
                 screen_points[6],
                 screen_points[2],
                 color,
+                page,
             );
         }
         let visible = back_face_culling(&translated_points, 7, 3, 2);
@@ -370,18 +370,18 @@ impl Entity for Cube {
             let color = renderer::utils::get_color(self.color, Fixed::from_raw(0));
 
             draw_triangle(
-                bitmap4,
                 screen_points[7],
                 screen_points[3],
                 screen_points[2],
                 color,
+                page,
             );
             draw_triangle(
-                bitmap4,
                 screen_points[7],
                 screen_points[2],
                 screen_points[6],
                 color,
+                page,
             );
         }
         let visible = back_face_culling(&translated_points, 0, 4, 5);
@@ -390,18 +390,18 @@ impl Entity for Cube {
             let color = renderer::utils::get_color(self.color, Fixed::from_raw(0));
 
             draw_triangle(
-                bitmap4,
                 screen_points[0],
                 screen_points[4],
                 screen_points[5],
                 color,
+                page,
             );
             draw_triangle(
-                bitmap4,
                 screen_points[0],
                 screen_points[5],
                 screen_points[1],
                 color,
+                page,
             );
         }
     }

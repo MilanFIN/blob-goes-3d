@@ -1,18 +1,12 @@
 pub mod utils;
+pub mod hw;
 use crate::fixed;
 use crate::math;
 use fixed::*;
 use math::*;
 
 #[allow(dead_code)]
-pub fn draw_line(
-    bitmap: &mut agb::display::bitmap4::Bitmap4,
-    mut x1: i32,
-    mut y1: i32,
-    x2: i32,
-    y2: i32,
-    color: u8,
-) {
+pub fn draw_line(mut x1: i32, mut y1: i32, x2: i32, y2: i32, color: u8, page: u32) {
     let dx: i32 = (x2 - x1).abs();
     let dy: i32 = (y2 - y1).abs();
 
@@ -33,7 +27,8 @@ pub fn draw_line(
     let mut err: i32 = dx - dy;
 
     loop {
-        bitmap.draw_point(x1, y1, color);
+        //bitmap.draw_point(x1, y1, color);
+        hw::draw_wide_point(x1, y1, color, page);
         if x1 == x2 && y1 == y2 {
             break;
         }
@@ -52,44 +47,44 @@ pub fn draw_line(
 
 #[allow(dead_code)]
 pub fn draw_face_outline(
-    bitmap4: &mut agb::display::bitmap4::Bitmap4,
     screen_points: [[i32; 2]; 8],
     p1: usize,
     p2: usize,
     p3: usize,
     p4: usize,
+    page: u32,
 ) {
     draw_line(
-        bitmap4,
         screen_points[p1][0],
         screen_points[p1][1],
         screen_points[p2][0],
         screen_points[p2][1],
         1,
+        page,
     );
     draw_line(
-        bitmap4,
         screen_points[p2][0],
         screen_points[p2][1],
         screen_points[p3][0],
         screen_points[p3][1],
         1,
+        page,
     );
     draw_line(
-        bitmap4,
         screen_points[p3][0],
         screen_points[p3][1],
         screen_points[p4][0],
         screen_points[p4][1],
         1,
+        page,
     );
     draw_line(
-        bitmap4,
         screen_points[p4][0],
         screen_points[p4][1],
         screen_points[p1][0],
         screen_points[p1][1],
         1,
+        page,
     );
 }
 
@@ -97,9 +92,9 @@ pub fn draw_face_outline(
 pub fn back_face_culling(&points: &[[Fixed; 3]; 8], p1: usize, p2: usize, p3: usize) -> bool {
     //checking if some of the points are behind the camera?
     //then dont draw
-    if (points[p1][2] < Fixed::const_new(0)
+    if points[p1][2] < Fixed::const_new(0)
         || points[p2][2] < Fixed::const_new(0)
-        || points[p3][2] < Fixed::const_new(0))
+        || points[p3][2] < Fixed::const_new(0)
     {
         return false;
     }
@@ -128,13 +123,7 @@ pub fn back_face_culling(&points: &[[Fixed; 3]; 8], p1: usize, p2: usize, p3: us
     return dot_prod < Fixed::const_new(0);
 }
 
-pub fn draw_h_line(
-    bitmap4: &mut agb::display::bitmap4::Bitmap4,
-    x1: i32,
-    x2: i32,
-    y: i32,
-    color: u8,
-) {
+pub fn draw_h_line(x1: i32, x2: i32, y: i32, color: u8, page: u32) {
     // Ensure x1 is less than or equal to x2 for proper iteration
     let (mut start, mut end) = if x1 <= x2 { (x1, x2) } else { (x2, x1) };
 
@@ -147,16 +136,16 @@ pub fn draw_h_line(
     // Iterate over even numbers using step_by(2)
     for x in (start..=end).step_by(2) {
         // Draw each point on the horizontal line
-        bitmap4.draw_wide_point(x, y, color);
+        hw::draw_wide_point(x, y, color, page);
     }
 }
 
 pub fn draw_flat_bottom_triangle(
-    bitmap4: &mut agb::display::bitmap4::Bitmap4,
     p1: [Fixed; 2],
     p2: [Fixed; 2],
     p3: [Fixed; 2],
     color: u8,
+    page: u32,
 ) {
     let mut div1 = p2[1] - p1[1];
     let mut div2 = p3[1] - p1[1];
@@ -187,19 +176,13 @@ pub fn draw_flat_bottom_triangle(
         if scanline_y > 159 {
             break;
         }
-        draw_h_line(bitmap4, curx1.trunc(), curx2.trunc(), scanline_y, color);
+        draw_h_line(curx1.trunc(), curx2.trunc(), scanline_y, color, page);
         curx1 += invslope1;
         curx2 += invslope2;
     }
 }
 
-pub fn draw_flat_top_triangle(
-    bitmap4: &mut agb::display::bitmap4::Bitmap4,
-    p1: [Fixed; 2],
-    p2: [Fixed; 2],
-    p3: [Fixed; 2],
-    color: u8,
-) {
+pub fn draw_flat_top_triangle(p1: [Fixed; 2], p2: [Fixed; 2], p3: [Fixed; 2], color: u8, page: u32) {
     let mut div1 = p3[1] - p1[1];
     let mut div2 = p3[1] - p2[1];
     if div1 < Fixed::const_new(3) {
@@ -230,7 +213,7 @@ pub fn draw_flat_top_triangle(
         if scanline_y > 159 {
             break;
         }
-        draw_h_line(bitmap4, curx1.trunc(), curx2.trunc(), scanline_y, color);
+        draw_h_line(curx1.trunc(), curx2.trunc(), scanline_y, color, page);
         curx1 += invslope1;
         curx2 += invslope2;
     }
@@ -263,11 +246,11 @@ pub fn sort_points(p1: &mut [Fixed; 2], p2: &mut [Fixed; 2], p3: &mut [Fixed; 2]
 }
 
 pub fn draw_triangle(
-    bitmap4: &mut agb::display::bitmap4::Bitmap4,
     mut p1: [Fixed; 2],
     mut p2: [Fixed; 2],
     mut p3: [Fixed; 2],
     color: u8,
+    page: u32,
 ) {
     let zero: Fixed = Fixed::const_new(0);
     let x_max: Fixed = Fixed::const_new(240);
@@ -305,14 +288,14 @@ pub fn draw_triangle(
     sort_points(&mut p1, &mut p2, &mut p3);
     //flat top triangle
     if p1[1] == p2[1] {
-        draw_flat_top_triangle(bitmap4, p1, p2, p3, color);
+        draw_flat_top_triangle(p1, p2, p3, color, page);
     }
     //flat bottom triangle
     else if p2[1] == p3[1] {
-        draw_flat_bottom_triangle(bitmap4, p1, p2, p3, color);
+        draw_flat_bottom_triangle(p1, p2, p3, color, page);
     } else {
         let p4x: Fixed = p1[0] + (p2[1] - p1[1]) / (p3[1] - p1[1]) * (p3[0] - p1[0]);
-        draw_flat_bottom_triangle(bitmap4, p1, p2, [p4x, p2[1]], color);
-        draw_flat_top_triangle(bitmap4, p2, [p4x, p2[1]], p3, color);
+        draw_flat_bottom_triangle(p1, p2, [p4x, p2[1]], color, page);
+        draw_flat_top_triangle(p2, [p4x, p2[1]], p3, color, page);
     }
 }

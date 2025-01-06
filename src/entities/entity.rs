@@ -4,7 +4,7 @@ use camera::*;
 use super::{BoundingBox, BoundingCylinder};
 
 pub trait Entity {
-    fn render(&mut self, bitmap4: &mut agb::display::bitmap4::Bitmap4, camera: &Camera);
+    fn render(&mut self, camera: &Camera, page: u32);
 
     fn set_x_offset(&mut self, x_offset: Fixed);
     fn set_y_offset(&mut self, y_offset: Fixed);

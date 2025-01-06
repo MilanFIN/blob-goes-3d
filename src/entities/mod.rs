@@ -116,10 +116,10 @@ impl EntityEnum {
             EntityEnum::Empty(_e) => {}
         }
     }
-    pub fn render(&mut self, bitmap4: &mut agb::display::bitmap4::Bitmap4, camera: &Camera) {
+    pub fn render(&mut self, camera: &Camera, page: u32) {
         match self {
-            EntityEnum::Cube(c) => c.render(bitmap4, camera),
-            EntityEnum::Rectangle(r) => r.render(bitmap4, camera),
+            EntityEnum::Cube(c) => c.render(camera, page),
+            EntityEnum::Rectangle(r) => r.render(camera, page),
             EntityEnum::Empty(_e) => {}
         }
     }
