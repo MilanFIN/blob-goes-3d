@@ -142,7 +142,6 @@ fn main(mut gba: agb::Gba) -> ! {
 
         input::handle_input(&mut player1, &input, &entity_array, &entity_array[0].bounding_cylinder());
 
-        //bitmap4.clear(128);
         renderer::hw::fill(page, 128);
         angle += increment;
         if angle > Fixed::const_new(1) {
@@ -184,6 +183,5 @@ fn main(mut gba: agb::Gba) -> ! {
         }
 
         renderer::hw::flip(&mut page);
-        //bitmap4.flip_page();
     }
 }
