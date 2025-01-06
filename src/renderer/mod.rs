@@ -95,6 +95,15 @@ pub fn draw_face_outline(
 
 //return true if visible, presume points to be defined in counter clockwise direction
 pub fn back_face_culling(&points: &[[Fixed; 3]; 8], p1: usize, p2: usize, p3: usize) -> bool {
+    //checking if some of the points are behind the camera?
+    //then dont draw
+    if (points[p1][2] < Fixed::const_new(0)
+        || points[p2][2] < Fixed::const_new(0)
+        || points[p3][2] < Fixed::const_new(0))
+    {
+        return false;
+    }
+
     let v12: [Fixed; 3] = vector_sub(points[p2], points[p1]);
     let v23: [Fixed; 3] = vector_sub(points[p3], points[p2]);
 
@@ -107,12 +116,10 @@ pub fn back_face_culling(&points: &[[Fixed; 3]; 8], p1: usize, p2: usize, p3: us
         (points[p1][2] + points[p2][2] + points[p3][2]) / 3,
     ];
 
-    //doing this for all points instead
-    //behind camera, so not visible
-
+    /*
     if polygon_center[2] < Fixed::const_new(0) {
         return false;
-    }
+    }*/
 
     //calculate view direction towards the center of the polygon
     let view_dir: [Fixed; 3] = normalize(polygon_center);
@@ -267,22 +274,22 @@ pub fn draw_triangle(
     let y_max: Fixed = Fixed::const_new(160);
 
     //jank way to avoid giant polygons near zero plane
-    if p1[0] > Fixed::const_new(1000) || p1[0] < Fixed::const_new(-100) {
+    if p1[0] > Fixed::const_new(400) || p1[0] < Fixed::const_new(-100) {
         return;
     }
-    if p2[0] > Fixed::const_new(1000) || p2[0] < Fixed::const_new(-100) {
+    if p2[0] > Fixed::const_new(400) || p2[0] < Fixed::const_new(-100) {
         return;
     }
-    if p3[0] > Fixed::const_new(1000) || p3[0] < Fixed::const_new(-100) {
+    if p3[0] > Fixed::const_new(400) || p3[0] < Fixed::const_new(-100) {
         return;
     }
-    if p1[1] > Fixed::const_new(1000) || p1[1] < Fixed::const_new(-100) {
+    if p1[1] > Fixed::const_new(400) || p1[1] < Fixed::const_new(-100) {
         return;
     }
-    if p2[1] > Fixed::const_new(1000) || p2[1] < Fixed::const_new(-100) {
+    if p2[1] > Fixed::const_new(400) || p2[1] < Fixed::const_new(-100) {
         return;
     }
-    if p3[1] > Fixed::const_new(1000) || p3[1] < Fixed::const_new(-100) {
+    if p3[1] > Fixed::const_new(400) || p3[1] < Fixed::const_new(-100) {
         return;
     }
 
