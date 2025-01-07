@@ -64,7 +64,7 @@ fn main(mut gba: agb::Gba) -> ! {
     let mut angle: Fixed = Fixed::const_new(0);
     let increment: Fixed = Fixed::const_new(1) / 256;
 
-    const LEVELSIZE: usize = 3;
+    const LEVELSIZE: usize = 4;
     let mut entity_array: [EntityEnum; LEVELSIZE +2] = [EntityEnum::Empty(Empty::default()); LEVELSIZE +2];
     let mut entity_render_order: [usize; LEVELSIZE+2] = [0; LEVELSIZE+2];
 

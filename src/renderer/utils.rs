@@ -1,5 +1,32 @@
 use super::Fixed;
 
+pub const PROJECTION_MATRIX: [[Fixed; 4]; 4] = [
+    [
+        Fixed::from_raw(171),//(0.66666667),
+        Fixed::from_raw(0),
+        Fixed::from_raw(0),
+        Fixed::from_raw(0),
+    ],
+    [
+        Fixed::from_raw(0),
+        Fixed::from_raw(256),//(1.0),
+        Fixed::from_raw(0),
+        Fixed::from_raw(0),
+    ],
+    [
+        Fixed::from_raw(0),
+        Fixed::from_raw(0),
+        Fixed::from_raw(-256),//(-1.00020002),
+        Fixed::from_raw(-51)//(-0.20002),
+    ],
+    [
+        Fixed::from_raw(0),
+        Fixed::from_raw(0),
+        Fixed::from_raw(-256),//(-1.0),
+        Fixed::from_raw(0),
+    ],
+];
+
 pub fn init_palette(bitmap4: &mut agb::display::bitmap4::Bitmap4) {
     // Set  palette entries
 
@@ -14,20 +41,19 @@ pub fn init_palette(bitmap4: &mut agb::display::bitmap4::Bitmap4) {
     let green: u16 = 31;
     for i in 0..8 {
         let shade: u16 = green - (14 - 2 * i) << 5;
-        bitmap4.set_palette_entry((8+i).into(), shade);
+        bitmap4.set_palette_entry((8 + i).into(), shade);
     }
     let blue: u16 = 31;
     for i in 0..8 {
         let shade: u16 = blue - (14 - 2 * i) << 10;
-        bitmap4.set_palette_entry((16+i).into(), shade);
+        bitmap4.set_palette_entry((16 + i).into(), shade);
     }
-
 
     //bitmap4.set_palette_entry(2, 0x3E0);
     //bitmap4.set_palette_entry(3, 0x7C00);
 }
 
-pub fn get_color(index: u8, angle: Fixed) -> u8 {
+pub fn get_color(index: u32, angle: Fixed) -> u32 {
     const SUN_ANGLE: Fixed = Fixed::from_raw(32);
     const BASE_COLOR: Fixed = Fixed::const_new(7);
     const QUARTER: Fixed = Fixed::from_raw(64);
@@ -43,5 +69,5 @@ pub fn get_color(index: u8, angle: Fixed) -> u8 {
     let offset = BASE_COLOR * (Fixed::const_new(1) - clamped_diff / QUARTER);
 
     // Convert to integer index
-    return (offset.trunc()) as u8 + index*8;
+    return ((offset.trunc()) as u32) + index * 8;
 }

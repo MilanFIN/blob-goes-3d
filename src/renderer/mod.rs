@@ -1,12 +1,13 @@
-pub mod utils;
 pub mod hw;
+pub mod utils;
+use crate::camera::Camera;
 use crate::fixed;
 use crate::math;
 use fixed::*;
 use math::*;
 
 #[allow(dead_code)]
-pub fn draw_line(mut x1: i32, mut y1: i32, x2: i32, y2: i32, color: u8, page: u32) {
+pub fn draw_line(mut x1: i32, mut y1: i32, x2: i32, y2: i32, color: u32, page: u32) {
     let dx: i32 = (x2 - x1).abs();
     let dy: i32 = (y2 - y1).abs();
 
@@ -123,7 +124,7 @@ pub fn back_face_culling(&points: &[[Fixed; 3]; 8], p1: usize, p2: usize, p3: us
     return dot_prod < Fixed::const_new(0);
 }
 
-pub fn draw_h_line(x1: i32, x2: i32, y: i32, color: u8, page: u32) {
+pub fn draw_h_line(x1: i32, x2: i32, y: i32, color: u32, page: u32) {
     // Ensure x1 is less than or equal to x2 for proper iteration
     let (mut start, mut end) = if x1 <= x2 { (x1, x2) } else { (x2, x1) };
 
@@ -144,7 +145,7 @@ pub fn draw_flat_bottom_triangle(
     p1: [Fixed; 2],
     p2: [Fixed; 2],
     p3: [Fixed; 2],
-    color: u8,
+    color: u32,
     page: u32,
 ) {
     let mut div1 = p2[1] - p1[1];
@@ -182,7 +183,13 @@ pub fn draw_flat_bottom_triangle(
     }
 }
 
-pub fn draw_flat_top_triangle(p1: [Fixed; 2], p2: [Fixed; 2], p3: [Fixed; 2], color: u8, page: u32) {
+pub fn draw_flat_top_triangle(
+    p1: [Fixed; 2],
+    p2: [Fixed; 2],
+    p3: [Fixed; 2],
+    color: u32,
+    page: u32,
+) {
     let mut div1 = p3[1] - p1[1];
     let mut div2 = p3[1] - p2[1];
     if div1 < Fixed::const_new(3) {
@@ -249,7 +256,7 @@ pub fn draw_triangle(
     mut p1: [Fixed; 2],
     mut p2: [Fixed; 2],
     mut p3: [Fixed; 2],
-    color: u8,
+    color: u32,
     page: u32,
 ) {
     let zero: Fixed = Fixed::const_new(0);
@@ -297,5 +304,186 @@ pub fn draw_triangle(
         let p4x: Fixed = p1[0] + (p2[1] - p1[1]) / (p3[1] - p1[1]) * (p3[0] - p1[0]);
         draw_flat_bottom_triangle(p1, p2, [p4x, p2[1]], color, page);
         draw_flat_top_triangle(p2, [p4x, p2[1]], p3, color, page);
+    }
+}
+
+//passing as a pointer instead of as a reference speeds up rendering a lot for some reason
+//same with color being u32 instead of u8, but that has something to do with the gba memory
+pub fn draw_rect(
+    model_rotated_points: *const [[Fixed; 3]; 8],
+    x: Fixed,
+    y: Fixed,
+    z: Fixed,
+    y_rotation: Fixed,
+    camera_ptr: *const Camera,
+    color: u32,
+    page: u32,
+) {
+    let width: i32 = 240;
+    let height: i32 = 160;
+    let middle: [Fixed; 2] = [Fixed::const_new(width / 2), Fixed::const_new(height / 2)]; // x, y
+
+    let mut screen_points: [[Fixed; 2]; 8] = [[Fixed::const_new(0), Fixed::const_new(0)]; 8];
+    let mut translated_points: [[Fixed; 3]; 8] = [[
+        Fixed::const_new(0),
+        Fixed::const_new(0),
+        Fixed::const_new(0),
+    ]; 8];
+
+    unsafe {
+        for i in 0..(*model_rotated_points).len() {
+            let mut translated_point: [Fixed; 4] = [
+                (*model_rotated_points)[i][0] + (x - (*camera_ptr).x),
+                (*model_rotated_points)[i][1] + (y - (*camera_ptr).y),
+                (*model_rotated_points)[i][2] + (z - (*camera_ptr).z),
+                Fixed::const_new(1),
+            ];
+
+            translated_point = matmul_4((*camera_ptr).y_rotation_matrix, translated_point);
+            translated_point = matmul_4((*camera_ptr).x_rotation_matrix, translated_point);
+            translated_point = matmul_4((*camera_ptr).z_rotation_matrix, translated_point);
+
+            // Apply projection matrix
+            let projected_point = matmul_4(utils::PROJECTION_MATRIX, translated_point);
+
+            // Perform perspective divide (convert to 2D)
+            if projected_point[3] != Fixed::const_new(0) {
+                let x: Fixed = projected_point[0] / projected_point[3];
+                let y: Fixed = projected_point[1] / projected_point[3];
+                // Convert to screen space
+                screen_points[i] = [
+                    (x * Fixed::const_new(width) / Fixed::const_new(2)) + middle[0],
+                    (y * Fixed::const_new(height) / Fixed::const_new(2)) + middle[1],
+                ];
+            } else {
+                screen_points[i] = [middle[0], middle[1]];
+            }
+
+            translated_points[i] = [
+                translated_point[0],
+                translated_point[1],
+                translated_point[2],
+            ];
+        }
+    }
+
+    let visible = back_face_culling(&translated_points, 0, 1, 2);
+    if visible {
+        //draw_face_outline(&mut bitmap4, screenPoints, 0, 1, 2, 3);
+        let color = utils::get_color(color, y_rotation + Fixed::from_raw(0));
+        draw_triangle(
+            screen_points[0],
+            screen_points[1],
+            screen_points[2],
+            color,
+            page,
+        );
+        draw_triangle(
+            screen_points[0],
+            screen_points[2],
+            screen_points[3],
+            color,
+            page,
+        );
+    }
+    let visible = back_face_culling(&translated_points, 7, 6, 5);
+    if visible {
+        //draw_face_outline(&mut bitmap4, screenPoints, 7, 6, 5, 4);
+        let color = utils::get_color(color, y_rotation + Fixed::from_raw(128));
+        draw_triangle(
+            screen_points[7],
+            screen_points[6],
+            screen_points[5],
+            color,
+            page,
+        );
+        draw_triangle(
+            screen_points[7],
+            screen_points[5],
+            screen_points[4],
+            color,
+            page,
+        );
+    }
+    let visible = back_face_culling(&translated_points, 0, 3, 7);
+
+    if visible {
+        //draw_face_outline(&mut bitmap4, screenPoints, 0, 3, 7, 4);
+        let color = utils::get_color(color, y_rotation + Fixed::from_raw(64));
+
+        draw_triangle(
+            screen_points[0],
+            screen_points[3],
+            screen_points[7],
+            color,
+            page,
+        );
+        draw_triangle(
+            screen_points[0],
+            screen_points[7],
+            screen_points[4],
+            color,
+            page,
+        );
+    }
+    let visible = back_face_culling(&translated_points, 1, 5, 6);
+    if visible {
+        //draw_face_outline(&mut bitmap4, screenPoints, 1, 5, 6, 2);
+        let color = utils::get_color(color, y_rotation + Fixed::from_raw(192));
+
+        draw_triangle(
+            screen_points[1],
+            screen_points[5],
+            screen_points[6],
+            color,
+            page,
+        );
+        draw_triangle(
+            screen_points[1],
+            screen_points[6],
+            screen_points[2],
+            color,
+            page,
+        );
+    }
+    let visible = back_face_culling(&translated_points, 7, 3, 2);
+    if visible {
+        //draw_face_outline(&mut bitmap4, screenPoints, 7, 3, 2, 6);
+        let color = utils::get_color(color, Fixed::from_raw(0));
+
+        draw_triangle(
+            screen_points[7],
+            screen_points[3],
+            screen_points[2],
+            color,
+            page,
+        );
+        draw_triangle(
+            screen_points[7],
+            screen_points[2],
+            screen_points[6],
+            color,
+            page,
+        );
+    }
+    let visible = back_face_culling(&translated_points, 0, 4, 5);
+    if visible {
+        //draw_face_outline(&mut bitmap4, screenPoints, 0, 4, 5, 1);
+        let color = utils::get_color(color, Fixed::from_raw(0));
+
+        draw_triangle(
+            screen_points[0],
+            screen_points[4],
+            screen_points[5],
+            color,
+            page,
+        );
+        draw_triangle(
+            screen_points[0],
+            screen_points[5],
+            screen_points[1],
+            color,
+            page,
+        );
     }
 }

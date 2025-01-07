@@ -195,34 +195,19 @@ impl Entity for Rectangle {
     }
 
     fn render(&mut self, camera: &Camera, page: u32) {
-        let projection_matrix: [[Fixed; 4]; 4] = [
-            [
-                Fixed::from_f32(0.66666667),
-                Fixed::from_f32(0.0),
-                Fixed::from_f32(0.0),
-                Fixed::from_f32(0.0),
-            ],
-            [
-                Fixed::from_f32(0.0),
-                Fixed::from_f32(1.0),
-                Fixed::from_f32(0.0),
-                Fixed::from_f32(0.0),
-            ],
-            [
-                Fixed::from_f32(0.0),
-                Fixed::from_f32(0.0),
-                Fixed::from_f32(-1.00020002),
-                Fixed::from_f32(-0.20002),
-            ],
-            [
-                Fixed::from_f32(0.0),
-                Fixed::from_f32(0.0),
-                Fixed::from_f32(-1.0),
-                Fixed::from_f32(0.0),
-            ],
-        ];
 
-        let width: i32 = 240;
+
+        renderer::draw_rect(
+            &self.model_rotated_points as *const _,
+            self.x,
+            self.y,
+            self.z,
+            self.y_rotation,
+            camera as *const Camera,
+            self.color as u32,
+            page,
+        );
+        /*let width: i32 = 240;
         let height: i32 = 160;
         let middle: [Fixed; 2] = [Fixed::const_new(width / 2), Fixed::const_new(height / 2)]; // x, y
 
@@ -246,7 +231,7 @@ impl Entity for Rectangle {
             translated_point = matmul_4(camera.z_rotation_matrix, translated_point);
 
             // Apply projection matrix
-            let projected_point = matmul_4(projection_matrix, translated_point);
+            let projected_point = matmul_4(renderer::utils::PROJECTION_MATRIX, translated_point);
 
             // Perform perspective divide (convert to 2D)
             if projected_point[3] != Fixed::const_new(0) {
@@ -390,7 +375,7 @@ impl Entity for Rectangle {
                 color,
                 page,
             );
-        }
+        }*/
     }
 
     fn distance_from_camera(&self, camera: &Camera) -> Fixed {

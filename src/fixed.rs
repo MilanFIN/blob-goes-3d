@@ -11,6 +11,11 @@ pub fn default_u8() -> u8 {
     0
 }
 
+pub fn default_u32() -> u32 {
+    0
+}
+
+
 pub fn default_fixed() -> Fixed {
     Fixed::new(0)
 }
@@ -43,6 +48,7 @@ impl Fixed {
     pub fn to_raw(self) -> i32 {
         Num::to_raw(self.0)
     }
+    #[allow(dead_code)]
     pub fn from_f32(arg: f32) -> Self {
         Fixed(Num::from_f32(arg))
     }
