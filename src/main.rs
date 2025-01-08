@@ -33,6 +33,7 @@ mod math;
 mod renderer;
 
 mod utils;
+use levels::LEVELSIZE;
 use utils::*;
 
 mod player;
@@ -53,7 +54,6 @@ and interrupt handlers correctly. It will also handle creating the `Gba` struct 
 */
 #[agb::entry]
 fn main(mut gba: agb::Gba) -> ! {
-    use levels::LEVELSIZE;
 
 
     let mut input = ButtonController::new();
@@ -179,6 +179,11 @@ fn main(mut gba: agb::Gba) -> ! {
             LEVELSIZE+1,
             &player1.camera,
         );
+
+        for i in 2..LEVELSIZE+2 {
+            entity_array[i].tick();
+        }
+
         for i in 0..LEVELSIZE+2 {
             entity_array[entity_render_order[i]].render(&player1.camera, page);
         }

@@ -1,3 +1,4 @@
+use agb::fixnum::Num;
 use serde::Deserialize;
 
 use super::math;
@@ -13,7 +14,7 @@ use crate::utils;
 use fixed::*;
 
 #[derive(Copy, Clone, Deserialize, Debug)]
-pub struct Rectangle {
+pub struct Mover {
     #[serde(default = "default_fixed")]
     x: Fixed,
     #[serde(default = "default_fixed")]
@@ -49,9 +50,22 @@ pub struct Rectangle {
 
     #[serde(default = "default_u16")]
     color: u16,
+
+	#[serde(default = "default_fixed")]
+    startx: Fixed,
+	#[serde(default = "default_fixed")]
+    starty: Fixed,
+	#[serde(default = "default_fixed")]
+    startz: Fixed,
+	#[serde(default = "default_fixed")]
+    endx: Fixed,
+	#[serde(default = "default_fixed")]
+    endy: Fixed,
+	#[serde(default = "default_fixed")]
+    endz: Fixed,
 }
 
-impl Rectangle {
+impl Mover {
     #[allow(dead_code)]
     pub fn default() -> Self {
         Self {
@@ -70,13 +84,17 @@ impl Rectangle {
             y_rotation_matrix: [[Fixed::const_new(0); 3]; 3],
             z_rotation_matrix: [[Fixed::const_new(0); 3]; 3],
             color: 0,
+            startx: Fixed::const_new(0),
+            starty: Fixed::const_new(0),
+            startz: Fixed::const_new(0),
+            endx: Fixed::const_new(0),
+            endy: Fixed::const_new(0),
+            endz: Fixed::const_new(0),
         }
     }
-    
-
 }
 
-impl Entity for Rectangle {
+impl Entity for Mover {
     fn set_x_offset(&mut self, x_offset: Fixed) {
         self.x = x_offset;
     }
@@ -263,7 +281,8 @@ impl Entity for Rectangle {
     fn set_color(&mut self, color: u16) {
         self.color = color;
     }
-    fn tick(&mut self) {
-        
-    }
+	
+	fn tick(&mut self) {
+		todo!()
+	}
 }

@@ -25,4 +25,5 @@ pub trait Entity {
     fn bounding_cylinder(&self) -> BoundingCylinder;
     fn get_y(&self) -> Fixed;
     fn set_color(&mut self, color: u16);
+    fn tick(&mut self);
 }

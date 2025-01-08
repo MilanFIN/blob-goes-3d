@@ -10,6 +10,9 @@ use rectangle::*;
 pub mod empty;
 use empty::*;
 
+pub mod mover;
+use mover::*;
+
 pub mod boundingshapes;
 use boundingshapes::*;
 
@@ -31,6 +34,8 @@ pub enum EntityEnum {
     Cube(Cube),
     #[serde(rename = "rectangle")]
     Rectangle(Rectangle),
+    #[serde(rename = "mover")]
+    Mover(Mover),
     #[serde(rename = "empty")]
     Empty(Empty),
 }
@@ -38,127 +43,151 @@ pub enum EntityEnum {
 impl EntityEnum {
     pub fn set_x_offset(&mut self, offset: Fixed) {
         match self {
-            EntityEnum::Cube(c) => c.set_x_offset(offset),
-            EntityEnum::Rectangle(r) => r.set_x_offset(offset),
-            EntityEnum::Empty(_e) => {}
+            EntityEnum::Cube(a) => a.set_x_offset(offset),
+            EntityEnum::Rectangle(a) => a.set_x_offset(offset),
+            EntityEnum::Mover(a) => a.set_x_offset(offset),
+            EntityEnum::Empty(_a) => {}
         }
     }
     pub fn set_y_offset(&mut self, offset: Fixed) {
         match self {
-            EntityEnum::Cube(c) => c.set_y_offset(offset),
-            EntityEnum::Rectangle(r) => r.set_y_offset(offset),
-            EntityEnum::Empty(_e) => {}
+            EntityEnum::Cube(a) => a.set_y_offset(offset),
+            EntityEnum::Rectangle(a) => a.set_y_offset(offset),
+            EntityEnum::Mover(a) => a.set_y_offset(offset),
+            EntityEnum::Empty(_a) => {}
         }
     }
     pub fn set_z_offset(&mut self, offset: Fixed) {
         match self {
-            EntityEnum::Cube(c) => c.set_z_offset(offset),
-            EntityEnum::Rectangle(r) => r.set_z_offset(offset),
-            EntityEnum::Empty(_e) => {}
+            EntityEnum::Cube(a) => a.set_z_offset(offset),
+            EntityEnum::Rectangle(a) => a.set_z_offset(offset),
+            EntityEnum::Mover(a) => a.set_z_offset(offset),
+            EntityEnum::Empty(_a) => {}
         }
     }
     pub fn set_x_rotation(&mut self, rot: Fixed) {
         match self {
-            EntityEnum::Cube(c) => c.set_x_rotation(rot),
-            EntityEnum::Rectangle(r) => r.set_x_rotation(rot),
-            EntityEnum::Empty(_e) => {}
+            EntityEnum::Cube(a) => a.set_x_rotation(rot),
+            EntityEnum::Rectangle(a) => a.set_x_rotation(rot),
+            EntityEnum::Mover(a) => a.set_x_rotation(rot),
+            EntityEnum::Empty(_a) => {}
         }
     }
     pub fn set_y_rotation(&mut self, rot: Fixed) {
         match self {
-            EntityEnum::Cube(c) => c.set_y_rotation(rot),
-            EntityEnum::Rectangle(r) => r.set_y_rotation(rot),
-            EntityEnum::Empty(_e) => {}
+            EntityEnum::Cube(a) => a.set_y_rotation(rot),
+            EntityEnum::Rectangle(a) => a.set_y_rotation(rot),
+            EntityEnum::Mover(a) => a.set_y_rotation(rot),
+            EntityEnum::Empty(_a) => {}
         }
     }
     pub fn set_z_rotation(&mut self, rot: Fixed) {
         match self {
-            EntityEnum::Cube(c) => c.set_z_rotation(rot),
-            EntityEnum::Rectangle(r) => r.set_z_rotation(rot),
-            EntityEnum::Empty(_e) => {}
+            EntityEnum::Cube(a) => a.set_z_rotation(rot),
+            EntityEnum::Rectangle(a) => a.set_z_rotation(rot),
+            EntityEnum::Mover(a) => a.set_z_rotation(rot),
+            EntityEnum::Empty(_a) => {}
         }
     }
     pub fn reload_rotation_matrices(&mut self) {
         match self {
-            EntityEnum::Cube(c) => c.reload_rotation_matrices(),
-            EntityEnum::Rectangle(r) => r.reload_rotation_matrices(),
-            EntityEnum::Empty(_e) => {}
+            EntityEnum::Cube(a) => a.reload_rotation_matrices(),
+            EntityEnum::Rectangle(a) => a.reload_rotation_matrices(),
+            EntityEnum::Mover(a) => a.reload_rotation_matrices(),
+            EntityEnum::Empty(_a) => {}
         }
     }
     pub fn refresh_model_matrix(&mut self) {
         match self {
-            EntityEnum::Cube(c) => c.refresh_model_matrix(),
-            EntityEnum::Rectangle(r) => r.refresh_model_matrix(),
-            EntityEnum::Empty(_e) => {}
+            EntityEnum::Cube(a) => a.refresh_model_matrix(),
+            EntityEnum::Rectangle(a) => a.refresh_model_matrix(),
+            EntityEnum::Mover(a) => a.refresh_model_matrix(),
+            EntityEnum::Empty(_a) => {}
         }
     }
     //todo: rename to set_scale at some point to recalculate points at a different scale from original size
     pub fn set_size(&mut self, size: Fixed) {
         match self {
-            EntityEnum::Cube(c) => c.set_size(size),
+            EntityEnum::Cube(a) => a.set_size(size),
             //not implemented
-            EntityEnum::Rectangle(_r) => {}
-            EntityEnum::Empty(_e) => {}
+            EntityEnum::Rectangle(_a) => {}
+            EntityEnum::Mover(_a) => {}
+            EntityEnum::Empty(_a) => {}
         }
     }
     pub fn recalculate_points(&mut self) {
         match self {
-            EntityEnum::Cube(c) => c.recalculate_points(),
-            EntityEnum::Rectangle(r) => r.recalculate_points(),
-            EntityEnum::Empty(_e) => {}
+            EntityEnum::Cube(a) => a.recalculate_points(),
+            EntityEnum::Rectangle(a) => a.recalculate_points(),
+            EntityEnum::Mover(a) => a.recalculate_points(),
+            EntityEnum::Empty(_a) => {}
         }
     }
     #[allow(dead_code)]
     pub fn set_vertex(&mut self, point: [Fixed; 3], index: i32) {
         match self {
-            EntityEnum::Cube(c) => c.set_vertex(point, index),
-            EntityEnum::Rectangle(r) => r.set_vertex(point, index),
-            EntityEnum::Empty(_e) => {}
+            EntityEnum::Cube(a) => a.set_vertex(point, index),
+            EntityEnum::Rectangle(a) => a.set_vertex(point, index),
+            EntityEnum::Mover(a) => a.set_vertex(point, index),
+            EntityEnum::Empty(_a) => {}
         }
     }
     pub fn render(&mut self, camera: &Camera, page: u32) {
         match self {
-            EntityEnum::Cube(c) => c.render(camera, page),
-            EntityEnum::Rectangle(r) => r.render(camera, page),
-            EntityEnum::Empty(_e) => {}
+            EntityEnum::Cube(a) => a.render(camera, page),
+            EntityEnum::Rectangle(a) => a.render(camera, page),
+            EntityEnum::Mover(a) => a.render(camera, page),
+            EntityEnum::Empty(_a) => {}
         }
     }
     pub fn distance_from_camera(&self, camera: &Camera) -> Fixed {
         match self {
-            EntityEnum::Cube(c) => c.distance_from_camera(camera),
-            EntityEnum::Rectangle(r) => r.distance_from_camera(camera),
-            EntityEnum::Empty(_e) => Fixed::const_new(999),
+            EntityEnum::Cube(a) => a.distance_from_camera(camera),
+            EntityEnum::Rectangle(a) => a.distance_from_camera(camera),
+            EntityEnum::Mover(a) => a.distance_from_camera(camera),
+            EntityEnum::Empty(_a) => Fixed::const_new(999),
         }
     }
     pub fn bounding_box(&self) -> BoundingBox {
         match self {
-            EntityEnum::Cube(c) => c.bounding_box(),
-            EntityEnum::Rectangle(r) => r.bounding_box(),
-            EntityEnum::Empty(_e) => BoundingBox::default(),
+            EntityEnum::Cube(a) => a.bounding_box(),
+            EntityEnum::Rectangle(a) => a.bounding_box(),
+            EntityEnum::Mover(a) => a.bounding_box(),
+            EntityEnum::Empty(_a) => BoundingBox::default(),
         }
     }
     pub fn bounding_cylinder(&self) -> BoundingCylinder {
         match self {
-            EntityEnum::Cube(c) => c.bounding_cylinder(),
-            EntityEnum::Rectangle(r) => r.bounding_cylinder(),
-            EntityEnum::Empty(_e) => BoundingCylinder::default(),
+            EntityEnum::Cube(a) => a.bounding_cylinder(),
+            EntityEnum::Rectangle(a) => a.bounding_cylinder(),
+            EntityEnum::Mover(a) => a.bounding_cylinder(),
+            EntityEnum::Empty(_a) => BoundingCylinder::default(),
         }
     }
     pub fn get_y(&self) -> Fixed {
         match self {
-            EntityEnum::Cube(c) => c.get_y(),
-            EntityEnum::Rectangle(r) => r.get_y(),
-            EntityEnum::Empty(_e) => Fixed::const_new(-999),
+            EntityEnum::Cube(a) => a.get_y(),
+            EntityEnum::Rectangle(a) => a.get_y(),
+            EntityEnum::Mover(a) => a.get_y(),
+            EntityEnum::Empty(_a) => Fixed::const_new(-999),
         }
     }
     pub fn set_color(&mut self, color: u16) {
         match self {
-            EntityEnum::Cube(c) => c.set_color(color),
-            EntityEnum::Rectangle(r) => r.set_color(color),
-            EntityEnum::Empty(_e) => {}
+            EntityEnum::Cube(a) => a.set_color(color),
+            EntityEnum::Rectangle(a) => a.set_color(color),
+            EntityEnum::Mover(a) => a.set_color(color),
+            EntityEnum::Empty(_a) => {}
         }
     }
-}
+    pub fn tick(&mut self) {
+        match self {
+            EntityEnum::Cube(a) => a.tick(),
+            EntityEnum::Rectangle(a) => a.tick(),
+            EntityEnum::Mover(a) => a.tick(),
+            EntityEnum::Empty(_a) => {}
+        }
+    }}
 
 fn partition(
     entity_render_order: &mut [usize],

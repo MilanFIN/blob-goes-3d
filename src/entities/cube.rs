@@ -13,29 +13,7 @@ use fixed::*;
 
 use crate::utils;
 
-/*
-const fov: Fixed = Fixed::const_new(90); // FOV in degrees
-const aspect_ratio: Fixed = Fixed::from_raw(384);
-const near: Fixed = Fixed::from_raw(25);
-const far: Fixed = Fixed::const_new(1000);
 
-
-// Calculate constants for projection matrix
-const fov_rad:Fixed = Fixed::from_raw(201) ;
-//fov.to_radians() / Fixed::const_new(2);
-
-const scale:Fixed = Fixed::from_raw(-1);
-//Fixed::const_new(1) / fov_rad.tan();
-const depth_range: Fixed = Fixed::const_new(975);
-//far - near;
-
-const projection_matrix: [[Fixed; 4]; 4] = [
-    [Fixed::from_raw(-1), Fixed::const_new(0), Fixed::const_new(0), Fixed::const_new(0)],
-    [Fixed::const_new(0), scale, Fixed::const_new(0), Fixed::const_new(0)],
-    [Fixed::const_new(0), Fixed::const_new(0), -(far + near) / depth_range, -(Fixed::const_new(2) * far * near) / depth_range],
-    [Fixed::const_new(0), Fixed::const_new(0), Fixed::const_new(-1), Fixed::const_new(0)],
-];
-*/
 
 #[derive(Copy, Clone, Deserialize, Debug)]
 pub struct Cube {
@@ -90,6 +68,8 @@ impl Cube {
             color: 0,
         }
     }
+    
+
 }
 
 impl Entity for Cube {
@@ -275,5 +255,8 @@ impl Entity for Cube {
 
     fn set_color(&mut self, color: u16) {
         self.color = color;
+    }
+    
+    fn tick(&mut self) {
     }
 }

@@ -37,6 +37,8 @@ impl Entity for Empty {
     }
 
     fn set_color(&mut self, _color: u16) {}
+
+    fn tick(&mut self) {}
 }
 
 impl Empty {
