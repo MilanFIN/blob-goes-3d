@@ -53,7 +53,7 @@ pub fn init_palette(bitmap4: &mut agb::display::bitmap4::Bitmap4) {
     //bitmap4.set_palette_entry(3, 0x7C00);
 }
 
-pub fn get_color(index: u32, angle: Fixed) -> u32 {
+pub fn get_color(index: u16, angle: Fixed) -> u16 {
     const SUN_ANGLE: Fixed = Fixed::from_raw(32);
     const BASE_COLOR: Fixed = Fixed::const_new(7);
     const QUARTER: Fixed = Fixed::from_raw(64);
@@ -69,5 +69,5 @@ pub fn get_color(index: u32, angle: Fixed) -> u32 {
     let offset = BASE_COLOR * (Fixed::const_new(1) - clamped_diff / QUARTER);
 
     // Convert to integer index
-    return ((offset.trunc()) as u32) + index * 8;
+    return ((offset.trunc()) as u16) + index * 8;
 }

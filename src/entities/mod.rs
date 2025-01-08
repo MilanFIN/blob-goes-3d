@@ -151,7 +151,7 @@ impl EntityEnum {
             EntityEnum::Empty(_e) => Fixed::const_new(-999),
         }
     }
-    pub fn set_color(&mut self, color: u8) {
+    pub fn set_color(&mut self, color: u16) {
         match self {
             EntityEnum::Cube(c) => c.set_color(color),
             EntityEnum::Rectangle(r) => r.set_color(color),

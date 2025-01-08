@@ -7,7 +7,7 @@ use fixed::*;
 use math::*;
 
 #[allow(dead_code)]
-pub fn draw_line(mut x1: i32, mut y1: i32, x2: i32, y2: i32, color: u32, page: u32) {
+pub fn draw_line(mut x1: i32, mut y1: i32, x2: i32, y2: i32, color: u16, page: u32) {
     let dx: i32 = (x2 - x1).abs();
     let dy: i32 = (y2 - y1).abs();
 
@@ -124,7 +124,7 @@ pub fn back_face_culling(&points: &[[Fixed; 3]; 8], p1: usize, p2: usize, p3: us
     return dot_prod < Fixed::const_new(0);
 }
 
-pub fn draw_h_line(x1: i32, x2: i32, y: i32, color: u32, page: u32) {
+pub fn draw_h_line(x1: i32, x2: i32, y: i32, color: u16, page: u32) {
     // Ensure x1 is less than or equal to x2 for proper iteration
     let (mut start, mut end) = if x1 <= x2 { (x1, x2) } else { (x2, x1) };
 
@@ -145,7 +145,7 @@ pub fn draw_flat_bottom_triangle(
     p1: [Fixed; 2],
     p2: [Fixed; 2],
     p3: [Fixed; 2],
-    color: u32,
+    color: u16,
     page: u32,
 ) {
     let mut div1 = p2[1] - p1[1];
@@ -187,7 +187,7 @@ pub fn draw_flat_top_triangle(
     p1: [Fixed; 2],
     p2: [Fixed; 2],
     p3: [Fixed; 2],
-    color: u32,
+    color: u16,
     page: u32,
 ) {
     let mut div1 = p3[1] - p1[1];
@@ -256,7 +256,7 @@ pub fn draw_triangle(
     mut p1: [Fixed; 2],
     mut p2: [Fixed; 2],
     mut p3: [Fixed; 2],
-    color: u32,
+    color: u16,
     page: u32,
 ) {
     let zero: Fixed = Fixed::const_new(0);
@@ -308,7 +308,7 @@ pub fn draw_triangle(
 }
 
 //passing as a pointer instead of as a reference speeds up rendering a lot for some reason
-//same with color being u32 instead of u8, but that has something to do with the gba memory
+//same with color being u32 instead of u16, but that has something to do with the gba memory
 pub fn draw_rect(
     model_rotated_points: *const [[Fixed; 3]; 8],
     x: Fixed,
@@ -316,7 +316,7 @@ pub fn draw_rect(
     z: Fixed,
     y_rotation: Fixed,
     camera_ptr: *const Camera,
-    color: u32,
+    color: u16,
     page: u32,
 ) {
     let width: i32 = 240;

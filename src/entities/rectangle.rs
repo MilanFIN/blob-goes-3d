@@ -7,7 +7,6 @@ use super::Camera;
 use super::Entity;
 use crate::renderer;
 use math::*;
-use renderer::*;
 
 use crate::fixed;
 use crate::utils;
@@ -48,8 +47,8 @@ pub struct Rectangle {
     #[serde(default = "default_fixed_3_3")]
     z_rotation_matrix: [[Fixed; 3]; 3],
 
-    #[serde(default = "default_u8")]
-    color: u8,
+    #[serde(default = "default_u16")]
+    color: u16,
 }
 
 impl Rectangle {
@@ -204,7 +203,7 @@ impl Entity for Rectangle {
             self.z,
             self.y_rotation,
             camera as *const Camera,
-            self.color as u32,
+            self.color,
             page,
         );
         /*let width: i32 = 240;
@@ -429,7 +428,7 @@ impl Entity for Rectangle {
     fn get_y(&self) -> Fixed {
         return self.y;
     }
-    fn set_color(&mut self, color: u8) {
+    fn set_color(&mut self, color: u16) {
         self.color = color;
     }
 }
