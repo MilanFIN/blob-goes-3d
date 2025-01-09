@@ -1,4 +1,3 @@
-use agb::fixnum::Num;
 use serde::Deserialize;
 
 use super::math;
@@ -6,6 +5,7 @@ use super::BoundingBox;
 use super::BoundingCylinder;
 use super::Camera;
 use super::Entity;
+use crate::effects;
 use crate::renderer;
 use math::*;
 
@@ -15,6 +15,8 @@ use fixed::*;
 
 #[derive(Copy, Clone, Deserialize, Debug)]
 pub struct Mover {
+    #[serde(default = "default_i16")]
+    id: i16,
     #[serde(default = "default_fixed")]
     x: Fixed,
     #[serde(default = "default_fixed")]
@@ -51,18 +53,28 @@ pub struct Mover {
     #[serde(default = "default_u16")]
     color: u16,
 
-	#[serde(default = "default_fixed")]
-    startx: Fixed,
-	#[serde(default = "default_fixed")]
-    starty: Fixed,
-	#[serde(default = "default_fixed")]
-    startz: Fixed,
-	#[serde(default = "default_fixed")]
-    endx: Fixed,
-	#[serde(default = "default_fixed")]
-    endy: Fixed,
-	#[serde(default = "default_fixed")]
-    endz: Fixed,
+    //moving platform positions
+    #[serde(default = "default_fixed")]
+    pos_a_x: Fixed,
+    #[serde(default = "default_fixed")]
+    pos_a_y: Fixed,
+    #[serde(default = "default_fixed")]
+    pos_a_z: Fixed,
+    #[serde(default = "default_fixed")]
+    pos_b_x: Fixed,
+    #[serde(default = "default_fixed")]
+    pos_b_y: Fixed,
+    #[serde(default = "default_fixed")]
+    pos_b_z: Fixed,
+
+    #[serde(default = "default_fixed")]
+    speed: Fixed,
+    #[serde(default = "positive_i16")]
+    direction: i16,
+    #[serde(default = "default_u16")]
+    wait: u16,
+    #[serde(default = "default_u16")]
+    waitcounter: u16,
 }
 
 impl Mover {
@@ -84,12 +96,17 @@ impl Mover {
             y_rotation_matrix: [[Fixed::const_new(0); 3]; 3],
             z_rotation_matrix: [[Fixed::const_new(0); 3]; 3],
             color: 0,
-            startx: Fixed::const_new(0),
-            starty: Fixed::const_new(0),
-            startz: Fixed::const_new(0),
-            endx: Fixed::const_new(0),
-            endy: Fixed::const_new(0),
-            endz: Fixed::const_new(0),
+            pos_a_x: Fixed::const_new(0),
+            pos_a_y: Fixed::const_new(0),
+            pos_a_z: Fixed::const_new(0),
+            pos_b_x: Fixed::const_new(0),
+            pos_b_y: Fixed::const_new(0),
+            pos_b_z: Fixed::const_new(0),
+            speed: Fixed::const_new(0),
+            direction: 1,
+            wait: 0,
+            waitcounter: 0,
+            id: 0,
         }
     }
 }
@@ -214,14 +231,13 @@ impl Entity for Mover {
     }
 
     fn render(&mut self, camera: &Camera, page: u32) {
-
         renderer::draw_rect(
-            &self.model_rotated_points as *const _,
+            &self.model_rotated_points,
             self.x,
             self.y,
             self.z,
             self.y_rotation,
-            camera as *const Camera,
+            camera,
             self.color,
             page,
         );
@@ -281,8 +297,58 @@ impl Entity for Mover {
     fn set_color(&mut self, color: u16) {
         self.color = color;
     }
-	
-	fn tick(&mut self) {
-		todo!()
-	}
+
+    fn tick(&mut self, effects: &effects::InputPlayerEffects) -> Option<effects::OutputPlayerEffects> {
+        if self.wait != 0 {
+            if self.waitcounter != 0 {
+                self.waitcounter -= 1;
+                return None;
+            }
+        }
+
+        let target: [Fixed; 3];
+        if self.direction > 0 {
+            target = [self.pos_b_x, self.pos_b_y, self.pos_b_z];
+        } else {
+            target = [self.pos_a_x, self.pos_a_y, self.pos_a_z];
+        }
+
+        let xdiff: Fixed = target[0] - self.x;
+        let ydiff: Fixed = target[1] - self.y;
+        let zdiff: Fixed = target[2] - self.z;
+
+        let distance = vector_len([xdiff, ydiff, zdiff]);
+
+        if distance < self.speed {
+            self.x = target[0];
+            self.y = target[1];
+            self.z = target[2];
+            self.direction = 1 - self.direction;
+            self.waitcounter = self.wait
+        } else {
+            let dir: [Fixed; 3] = normalize([xdiff, ydiff, zdiff]);
+            let movement_vector = vector_mul(dir, self.speed);
+            self.x += movement_vector[0];
+            self.y += movement_vector[1];
+            self.z += movement_vector[2];
+        }
+
+        //player is standing on the moving block
+        if effects.support_below_id == self.id {
+            //TODO: return the amount of movement as an effect if there was movement
+            return None;
+        }
+        else {
+            return None;
+        }
+
+    }
+
+    fn get_id(&self) -> i16 {
+        return self.id;
+    }
+    
+    fn set_id(&mut self, id: i16) {
+        self.id = id;
+    }
 }

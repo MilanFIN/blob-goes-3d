@@ -5,7 +5,7 @@ use entity::*;
 
 use super::Camera;
 
-use crate::fixed;
+use crate::{effects, fixed};
 use fixed::*;
 
 #[derive(Copy, Clone, Deserialize, Debug)]
@@ -38,7 +38,11 @@ impl Entity for Empty {
 
     fn set_color(&mut self, _color: u16) {}
 
-    fn tick(&mut self) {}
+    fn tick(&mut self, _effects: &effects::InputPlayerEffects)-> Option<effects::OutputPlayerEffects> {None}
+
+    fn get_id(&self) -> i16 {-1}
+
+    fn set_id(&mut self, _id: i16) {}
 }
 
 impl Empty {

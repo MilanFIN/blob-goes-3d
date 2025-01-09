@@ -12,12 +12,22 @@ const LEVEL2: &str = r#"
 [
     { "type": "rectangle", "data": { "xsize": 5, "ysize": 1, "zsize": 5, "x": 0, "y": -5, "z": 0, "color": 2 } },
     { "type": "rectangle", "data": { "xsize": 5, "ysize": 1, "zsize": 5, "x": 0, "y": -3.5, "z": 3, "rotation": -0.1 } },
-    { "type": "rectangle", "data": { "xsize": 5, "ysize": 1, "zsize": 5, "x": 0, "y": -3.5, "z": -5 } }
+    {
+        "type": "mover",
+        "data": { "xsize": 5, "ysize": 1, "zsize": 5, "x": 0, "y": -3.5, "z": -5,
+                "pos_a_x": 0, "pos_a_y": -3.5, "pos_a_z": -5,
+                "pos_b_x": 10, "pos_b_y": -3.5, "pos_b_z": -5,
+                "speed": 1, "wait": 20
+                }
+    }
 ] 
 "#;
 
+
+
+
 /*
-,
+    { "type": "rectangle", "data": { "xsize": 5, "ysize": 1, "zsize": 5, "x": 0, "y": -3.5, "z": -5 } }
     { "type": "rectangle", "data": { "xsize": 5, "ysize": 1, "zsize": 5, "x": 0, "y": -3.5, "z": -10 } }
 */
 

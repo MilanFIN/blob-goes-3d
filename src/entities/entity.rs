@@ -1,4 +1,4 @@
-use crate::{camera, Fixed};
+use crate::{camera, effects, Fixed};
 use camera::*;
 
 use super::{BoundingBox, BoundingCylinder};
@@ -25,5 +25,9 @@ pub trait Entity {
     fn bounding_cylinder(&self) -> BoundingCylinder;
     fn get_y(&self) -> Fixed;
     fn set_color(&mut self, color: u16);
-    fn tick(&mut self);
+    fn tick(&mut self, _effects: &effects::InputPlayerEffects) -> Option<effects::OutputPlayerEffects>;
+    fn get_id(&self) -> i16;
+    fn set_id(&mut self, id: i16);
+
+
 }

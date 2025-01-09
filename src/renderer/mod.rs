@@ -307,15 +307,14 @@ pub fn draw_triangle(
     }
 }
 
-//passing as a pointer instead of as a reference speeds up rendering a lot for some reason
-//same with color being u32 instead of u16, but that has something to do with the gba memory
+#[inline(always)]
 pub fn draw_rect(
-    model_rotated_points: *const [[Fixed; 3]; 8],
+    model_rotated_points: &[[Fixed; 3]; 8],
     x: Fixed,
     y: Fixed,
     z: Fixed,
     y_rotation: Fixed,
-    camera_ptr: *const Camera,
+    camera_ptr: &Camera,
     color: u16,
     page: u32,
 ) {
@@ -330,41 +329,39 @@ pub fn draw_rect(
         Fixed::const_new(0),
     ]; 8];
 
-    unsafe {
-        for i in 0..(*model_rotated_points).len() {
-            let mut translated_point: [Fixed; 4] = [
-                (*model_rotated_points)[i][0] + (x - (*camera_ptr).x),
-                (*model_rotated_points)[i][1] + (y - (*camera_ptr).y),
-                (*model_rotated_points)[i][2] + (z - (*camera_ptr).z),
-                Fixed::const_new(1),
+    for i in 0..(*model_rotated_points).len() {
+        let mut translated_point: [Fixed; 4] = [
+            (*model_rotated_points)[i][0] + (x - (*camera_ptr).x),
+            (*model_rotated_points)[i][1] + (y - (*camera_ptr).y),
+            (*model_rotated_points)[i][2] + (z - (*camera_ptr).z),
+            Fixed::const_new(1),
+        ];
+
+        translated_point = matmul_4((*camera_ptr).y_rotation_matrix, translated_point);
+        translated_point = matmul_4((*camera_ptr).x_rotation_matrix, translated_point);
+        translated_point = matmul_4((*camera_ptr).z_rotation_matrix, translated_point);
+
+        // Apply projection matrix
+        let projected_point = matmul_4(utils::PROJECTION_MATRIX, translated_point);
+
+        // Perform perspective divide (convert to 2D)
+        if projected_point[3] != Fixed::const_new(0) {
+            let x: Fixed = projected_point[0] / projected_point[3];
+            let y: Fixed = projected_point[1] / projected_point[3];
+            // Convert to screen space
+            screen_points[i] = [
+                (x * Fixed::const_new(width) / Fixed::const_new(2)) + middle[0],
+                (y * Fixed::const_new(height) / Fixed::const_new(2)) + middle[1],
             ];
-
-            translated_point = matmul_4((*camera_ptr).y_rotation_matrix, translated_point);
-            translated_point = matmul_4((*camera_ptr).x_rotation_matrix, translated_point);
-            translated_point = matmul_4((*camera_ptr).z_rotation_matrix, translated_point);
-
-            // Apply projection matrix
-            let projected_point = matmul_4(utils::PROJECTION_MATRIX, translated_point);
-
-            // Perform perspective divide (convert to 2D)
-            if projected_point[3] != Fixed::const_new(0) {
-                let x: Fixed = projected_point[0] / projected_point[3];
-                let y: Fixed = projected_point[1] / projected_point[3];
-                // Convert to screen space
-                screen_points[i] = [
-                    (x * Fixed::const_new(width) / Fixed::const_new(2)) + middle[0],
-                    (y * Fixed::const_new(height) / Fixed::const_new(2)) + middle[1],
-                ];
-            } else {
-                screen_points[i] = [middle[0], middle[1]];
-            }
-
-            translated_points[i] = [
-                translated_point[0],
-                translated_point[1],
-                translated_point[2],
-            ];
+        } else {
+            screen_points[i] = [middle[0], middle[1]];
         }
+
+        translated_points[i] = [
+            translated_point[0],
+            translated_point[1],
+            translated_point[2],
+        ];
     }
 
     let visible = back_face_culling(&translated_points, 0, 1, 2);

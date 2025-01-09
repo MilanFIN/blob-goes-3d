@@ -23,6 +23,7 @@ use super::math;
 use super::camera;
 use camera::*;
 
+use crate::effects;
 use crate::fixed;
 use crate::math::cross_product;
 use fixed::*;
@@ -180,14 +181,31 @@ impl EntityEnum {
             EntityEnum::Empty(_a) => {}
         }
     }
-    pub fn tick(&mut self) {
+    pub fn tick(&mut self, effects: &effects::InputPlayerEffects) -> Option<effects::OutputPlayerEffects> {
         match self {
-            EntityEnum::Cube(a) => a.tick(),
-            EntityEnum::Rectangle(a) => a.tick(),
-            EntityEnum::Mover(a) => a.tick(),
+            EntityEnum::Cube(a) => a.tick(effects),
+            EntityEnum::Rectangle(a) => a.tick(effects),
+            EntityEnum::Mover(a) => a.tick(effects),
+            EntityEnum::Empty(_a) => {None}
+        }
+    }
+    pub fn get_id(&self) -> i16 {
+        match self {
+            EntityEnum::Cube(a) => a.get_id(),
+            EntityEnum::Rectangle(a) => a.get_id(),
+            EntityEnum::Mover(a) => a.get_id(),
+            EntityEnum::Empty(_a) => -1,
+        }
+    }
+    pub fn set_id(&mut self, id: i16) {
+        match self {
+            EntityEnum::Cube(a) => a.set_id(id),
+            EntityEnum::Rectangle(a) => a.set_id(id),
+            EntityEnum::Mover(a) => a.set_id(id),
             EntityEnum::Empty(_a) => {}
         }
-    }}
+    }
+}
 
 fn partition(
     entity_render_order: &mut [usize],
@@ -342,19 +360,23 @@ pub fn vertical_room_check(first: &BoundingBox, second: &BoundingBox, limit: Fix
 }
 
 //determine if the element in the entiry array is below us and how far
-pub fn check_support_below(entity_array: &[EntityEnum], element: usize) -> Fixed {
+pub fn check_support_below(entity_array: &[EntityEnum], element: usize) -> (Fixed, i16) {
     let bottom: BoundingBox = entity_array[element].bounding_box();
-    let mut distance: Fixed = Fixed::const_new(-999);
+    let mut height: Fixed = Fixed::const_new(-999);
+    let mut collider_id: i16 = -1;
     for (i, e) in entity_array.iter().enumerate() {
         if i != 0 && i != 1 {
             let top: BoundingBox = e.bounding_box();
             let d: Fixed = vertical_room_check(&top, &bottom, Fixed::const_new(-999));
-            if d > distance {
-                distance = d;
+            if d > height {
+                height = d;
+                if height == bottom.y_bottom {
+                    collider_id = e.get_id();
+                }
             }
         }
     }
-    return distance;
+    return (height, collider_id);
 }
 
 //todo also check for the top of the "head" of the player.

@@ -2,6 +2,10 @@
 
 use crate::Fixed;
 
+pub fn vector_mul(v: [Fixed; 3], m: Fixed) -> [Fixed; 3] {
+    return [v[0] * m, v[1] * m, v[2] * m];
+}
+
 pub fn matmul(matrix: [[Fixed; 3]; 3], vector: [Fixed; 3]) -> [Fixed; 3] {
     let mut result: [Fixed; 3] = [Fixed::const_new(0); 3];
 
@@ -104,7 +108,15 @@ pub fn directional_vector_2d(angle: Fixed) -> [Fixed; 2] {
     return [x, z];
 }
 
-pub fn vector_len_2d(v: [Fixed;2]) -> Fixed{
+pub fn vector_len_2d(v: [Fixed; 2]) -> Fixed {
     return (v[0] * v[0] + v[1] * v[1]).sqrt();
+}
 
+#[allow(dead_code)]
+pub fn fast_vector_len(v: [Fixed; 3]) -> Fixed {
+    return fast_sqrt(v[0] * v[0] + v[1] * v[1]);
+}
+
+pub fn vector_len(v: [Fixed; 3]) -> Fixed {
+    return (v[0] * v[0] + v[1] * v[1]).sqrt();
 }

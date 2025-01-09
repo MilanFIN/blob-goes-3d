@@ -5,6 +5,7 @@ use super::BoundingBox;
 use super::BoundingCylinder;
 use super::Camera;
 use super::Entity;
+use crate::effects;
 use crate::renderer;
 use math::*;
 
@@ -14,6 +15,8 @@ use fixed::*;
 
 #[derive(Copy, Clone, Deserialize, Debug)]
 pub struct Rectangle {
+    #[serde(default = "default_i16")]
+    id: i16,
     #[serde(default = "default_fixed")]
     x: Fixed,
     #[serde(default = "default_fixed")]
@@ -55,6 +58,7 @@ impl Rectangle {
     #[allow(dead_code)]
     pub fn default() -> Self {
         Self {
+            id: 0,
             x: Fixed::const_new(0),
             y: Fixed::const_new(0),
             z: Fixed::const_new(0),
@@ -198,12 +202,12 @@ impl Entity for Rectangle {
     fn render(&mut self, camera: &Camera, page: u32) {
 
         renderer::draw_rect(
-            &self.model_rotated_points as *const _,
+            &self.model_rotated_points,
             self.x,
             self.y,
             self.z,
             self.y_rotation,
-            camera as *const Camera,
+            camera,
             self.color,
             page,
         );
@@ -263,7 +267,15 @@ impl Entity for Rectangle {
     fn set_color(&mut self, color: u16) {
         self.color = color;
     }
-    fn tick(&mut self) {
-        
+    fn tick(&mut self, _effects: &effects::InputPlayerEffects) -> Option<effects::OutputPlayerEffects> {
+        return None
+    }
+    
+    fn get_id(&self) -> i16 {
+        return self.id
+    }
+    
+    fn set_id(&mut self, id: i16) {
+        self.id = id
     }
 }

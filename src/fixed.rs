@@ -11,6 +11,16 @@ pub fn default_u16() -> u16 {
     0
 }
 
+#[allow(dead_code)]
+pub fn default_i16() -> i16 {
+    0
+}
+
+pub fn positive_i16() -> i16 {
+    1
+}
+
+
 pub fn default_fixed() -> Fixed {
     Fixed::new(0)
 }

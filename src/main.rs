@@ -21,6 +21,7 @@ use serde_json_core;
 use serde_json_core::*;
 use serde::{Deserialize, Serialize};
 */
+use serde_json_core::from_slice;
 
 mod entities;
 use cube::Cube;
@@ -45,7 +46,8 @@ mod fixed;
 use fixed::*;
 
 mod levels;
-use serde_json_core::from_slice;
+
+mod effects;
 
 /*
 The main function must take 1 arguments and never return. The agb::entry decorator
@@ -54,8 +56,6 @@ and interrupt handlers correctly. It will also handle creating the `Gba` struct 
 */
 #[agb::entry]
 fn main(mut gba: agb::Gba) -> ! {
-
-
     let mut input = ButtonController::new();
 
     let mut bitmap4: agb::display::bitmap4::Bitmap4 = gba.display.video.bitmap4();
@@ -66,9 +66,9 @@ fn main(mut gba: agb::Gba) -> ! {
     let mut angle: Fixed = Fixed::const_new(0);
     let increment: Fixed = Fixed::const_new(1) / 256;
 
-    let mut entity_array: [EntityEnum; LEVELSIZE +2] = [EntityEnum::Empty(Empty::default()); LEVELSIZE +2];
-    let mut entity_render_order: [usize; LEVELSIZE+2] = [0; LEVELSIZE+2];
-
+    let mut entity_array: [EntityEnum; LEVELSIZE + 2] =
+        [EntityEnum::Empty(Empty::default()); LEVELSIZE + 2];
+    let mut entity_render_order: [usize; LEVELSIZE + 2] = [0; LEVELSIZE + 2];
 
     let message_bytes = levels::LEVELS[1].trim().as_bytes();
     let (parsedentities, _): ([EntityEnum; LEVELSIZE], _) = from_slice(message_bytes).unwrap();
@@ -83,7 +83,6 @@ fn main(mut gba: agb::Gba) -> ! {
     player1.y = new_num(3);
     player1.z = new_num(0);
     player1.camera_left(0);
-
 
     for i in 0..2 {
         //entity_array[i] = EntityEnum::Cube(Cube::default());
@@ -104,8 +103,8 @@ fn main(mut gba: agb::Gba) -> ! {
         entity_render_order[i] = i;
     }
 
-    for i in 2..LEVELSIZE+2 {
-        entity_array[i] = parsedentities[i-2];
+    for i in 2..LEVELSIZE + 2 {
+        entity_array[i] = parsedentities[i - 2];
         //entity_array[i].set_x_rotation(new_num(0));
         //entity_array[i].set_y_rotation(new_num(0));
         //entity_array[i].set_z_rotation(new_num(0));
@@ -116,7 +115,10 @@ fn main(mut gba: agb::Gba) -> ! {
         entity_array[i].refresh_model_matrix();
 
         entity_render_order[i] = i;
+    }
 
+    for i in 0..LEVELSIZE + 2 {
+        entity_array[i].set_id(i as i16);
     }
 
     //player entities
@@ -136,12 +138,15 @@ fn main(mut gba: agb::Gba) -> ! {
     //entity_array[2].set_x_offset(new_num(5));
     //entity_array[3].set_x_offset(new_num(-5));
 
-
-
     loop {
         input.update();
 
-        input::handle_input(&mut player1, &input, &entity_array, &entity_array[0].bounding_cylinder());
+        input::handle_input(
+            &mut player1,
+            &input,
+            &entity_array,
+            &entity_array[0].bounding_cylinder(),
+        );
 
         renderer::hw::fill(page, 128);
         angle += increment;
@@ -149,23 +154,23 @@ fn main(mut gba: agb::Gba) -> ! {
             angle = Fixed::const_new(0);
         }
 
+        let mut bottom_support_id: i16 = -1;
         if player1.yspeed <= Fixed::const_new(0) {
-            let groundlevel: Fixed = check_support_below(&entity_array, 0);
+            let (groundlevel, collider_entity) = check_support_below(&entity_array, 0);
+            bottom_support_id = collider_entity;
             player1.fall(groundlevel);
-        }
-        else if player1.yspeed > Fixed::const_new(0) {
+        } else if player1.yspeed > Fixed::const_new(0) {
             let rooflevel: Fixed = check_block_above(&entity_array, 0);
-            player1.float(rooflevel);    
+            player1.float(rooflevel);
         }
-
-
 
         player1.update_camera_position();
 
         //rotate player body blocks and move them where the player is
         for i in 0..2 {
             entity_array[i].set_x_offset(player1.x);
-            entity_array[i].set_y_offset(player1.y + Fixed::from_raw(128) + Fixed::from_raw(192) * i);
+            entity_array[i]
+                .set_y_offset(player1.y + Fixed::from_raw(128) + Fixed::from_raw(192) * i);
             entity_array[i].set_z_offset(player1.z);
 
             entity_array[i].set_y_rotation(-player1.angle);
@@ -176,15 +181,22 @@ fn main(mut gba: agb::Gba) -> ! {
             &mut entity_render_order,
             &entity_array,
             0,
-            LEVELSIZE+1,
+            LEVELSIZE + 1,
             &player1.camera,
         );
 
-        for i in 2..LEVELSIZE+2 {
-            entity_array[i].tick();
+        let player_input_effects: effects::InputPlayerEffects = effects::InputPlayerEffects {
+            support_below_id: bottom_support_id,
+        };
+
+        for i in 2..LEVELSIZE + 2 {
+            let player_effects: Option<effects::OutputPlayerEffects> = entity_array[i].tick(&player_input_effects);
+            if player_effects.is_some() {
+                //TODO, handle output effects, such as moving player
+            }
         }
 
-        for i in 0..LEVELSIZE+2 {
+        for i in 0..LEVELSIZE + 2 {
             entity_array[entity_render_order[i]].render(&player1.camera, page);
         }
 

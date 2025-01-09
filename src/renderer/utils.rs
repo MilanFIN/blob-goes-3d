@@ -71,3 +71,4 @@ pub fn get_color(index: u16, angle: Fixed) -> u16 {
     // Convert to integer index
     return ((offset.trunc()) as u16) + index * 8;
 }
+
