@@ -13,14 +13,18 @@
 #![cfg_attr(test, feature(custom_test_frameworks))]
 #![cfg_attr(test, reexport_test_harness_main = "test_main")]
 #![cfg_attr(test, test_runner(agb::test_runner::test_runner))]
+#![feature(allocator_api)]
 
 use agb::input::*;
 
-/*
-use serde_json_core;
-use serde_json_core::*;
-use serde::{Deserialize, Serialize};
-*/
+extern crate alloc;
+//use alloc::boxed::Box;
+use alloc::vec::Vec;
+
+// use serde_json_core;
+// use serde_json_core::*;
+// use serde::{Deserialize, Serialize};
+
 use serde_json_core::from_slice;
 
 mod entities;
@@ -71,9 +75,10 @@ fn main(mut gba: agb::Gba) -> ! {
     let mut entity_render_order: [usize; LEVELSIZE + 2] = [0; LEVELSIZE + 2];
 
     let message_bytes = levels::LEVELS[1].trim().as_bytes();
-    let (parsedentities, _): ([EntityEnum; LEVELSIZE], _) = from_slice(message_bytes).unwrap();
+    //let (parsedentities, _): ([EntityEnum; LEVELSIZE], _) = from_slice(message_bytes).unwrap();
+    let (parsed_entities, _): (Vec<EntityEnum>, usize) = from_slice(message_bytes).unwrap();
 
-    let mut player1 = Player::default();
+    let mut player1: Player = Player::default();
 
     player1.camera.set_x_rotation(Fixed::from_raw(0));
     player1.camera.set_y_rotation(Fixed::from_raw(0));
@@ -85,7 +90,6 @@ fn main(mut gba: agb::Gba) -> ! {
     player1.camera_left(0);
 
     for i in 0..2 {
-        //entity_array[i] = EntityEnum::Cube(Cube::default());
         entity_array[i] = EntityEnum::Cube(Cube::default());
 
         entity_array[i].set_z_offset(new_num(0));
@@ -95,7 +99,6 @@ fn main(mut gba: agb::Gba) -> ! {
         entity_array[i].set_color(1);
 
         //always call after modifying rotation
-
         //entity_array[i].set_size(new_num(2));
         //entity_array[i].recalculate_points();
         //entity_array[i].refresh_model_matrix();
@@ -103,18 +106,18 @@ fn main(mut gba: agb::Gba) -> ! {
         entity_render_order[i] = i;
     }
 
-    for i in 2..LEVELSIZE + 2 {
-        entity_array[i] = parsedentities[i - 2];
+    for i in 0..parsed_entities.len() {
+        entity_array[i + 2] = parsed_entities[i];
         //entity_array[i].set_x_rotation(new_num(0));
         //entity_array[i].set_y_rotation(new_num(0));
         //entity_array[i].set_z_rotation(new_num(0));
-        entity_array[i].reload_rotation_matrices();
+        entity_array[i + 2].reload_rotation_matrices();
         //always call after modifying rotation
 
-        entity_array[i].recalculate_points();
-        entity_array[i].refresh_model_matrix();
+        entity_array[i + 2].recalculate_points();
+        entity_array[i + 2].refresh_model_matrix();
 
-        entity_render_order[i] = i;
+        entity_render_order[i + 2] = i + 2;
     }
 
     for i in 0..LEVELSIZE + 2 {
@@ -133,10 +136,6 @@ fn main(mut gba: agb::Gba) -> ! {
     entity_array[1].set_y_rotation(Fixed::from_raw(64));
     entity_array[1].recalculate_points();
     entity_array[1].refresh_model_matrix();
-
-    //rest of the blocks
-    //entity_array[2].set_x_offset(new_num(5));
-    //entity_array[3].set_x_offset(new_num(-5));
 
     loop {
         input.update();
@@ -170,7 +169,7 @@ fn main(mut gba: agb::Gba) -> ! {
             &mut entity_render_order,
             &entity_array,
             0,
-            LEVELSIZE + 1,
+            parsed_entities.len() + 1,
             &player1.camera,
         );
 
@@ -179,6 +178,9 @@ fn main(mut gba: agb::Gba) -> ! {
         };
 
         for i in 2..LEVELSIZE + 2 {
+            if let EntityEnum::Empty(_) = entity_array[i] {
+                break;
+            }
             if let Some(player_effects) = entity_array[i].tick(&player_input_effects) {
                 player1.x += player_effects.move_x;
                 player1.y += player_effects.move_y;
@@ -198,6 +200,10 @@ fn main(mut gba: agb::Gba) -> ! {
         }
 
         for i in 0..LEVELSIZE + 2 {
+            if let EntityEnum::Empty(_) = entity_array[i] {
+                break;
+            }
+
             entity_array[entity_render_order[i]].render(&player1.camera, page);
         }
 

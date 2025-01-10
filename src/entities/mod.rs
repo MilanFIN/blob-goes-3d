@@ -13,6 +13,9 @@ use empty::*;
 pub mod mover;
 use mover::*;
 
+pub mod crumbling;
+use crumbling::*;
+
 pub mod boundingshapes;
 use boundingshapes::*;
 
@@ -37,6 +40,8 @@ pub enum EntityEnum {
     Rectangle(Rectangle),
     #[serde(rename = "mover")]
     Mover(Mover),
+    #[serde(rename = "crumbling")]
+    Crumbling(Crumbling),
     #[serde(rename = "empty")]
     Empty(Empty),
 }
@@ -47,6 +52,7 @@ impl EntityEnum {
             EntityEnum::Cube(a) => a.set_x_offset(offset),
             EntityEnum::Rectangle(a) => a.set_x_offset(offset),
             EntityEnum::Mover(a) => a.set_x_offset(offset),
+            EntityEnum::Crumbling(a) => a.set_x_offset(offset),
             EntityEnum::Empty(_a) => {}
         }
     }
@@ -55,6 +61,7 @@ impl EntityEnum {
             EntityEnum::Cube(a) => a.set_y_offset(offset),
             EntityEnum::Rectangle(a) => a.set_y_offset(offset),
             EntityEnum::Mover(a) => a.set_y_offset(offset),
+            EntityEnum::Crumbling(a) => a.set_y_offset(offset),
             EntityEnum::Empty(_a) => {}
         }
     }
@@ -63,6 +70,7 @@ impl EntityEnum {
             EntityEnum::Cube(a) => a.set_z_offset(offset),
             EntityEnum::Rectangle(a) => a.set_z_offset(offset),
             EntityEnum::Mover(a) => a.set_z_offset(offset),
+            EntityEnum::Crumbling(a) => a.set_z_offset(offset),
             EntityEnum::Empty(_a) => {}
         }
     }
@@ -71,6 +79,7 @@ impl EntityEnum {
             EntityEnum::Cube(a) => a.set_x_rotation(rot),
             EntityEnum::Rectangle(a) => a.set_x_rotation(rot),
             EntityEnum::Mover(a) => a.set_x_rotation(rot),
+            EntityEnum::Crumbling(a) => a.set_x_rotation(rot),
             EntityEnum::Empty(_a) => {}
         }
     }
@@ -79,6 +88,7 @@ impl EntityEnum {
             EntityEnum::Cube(a) => a.set_y_rotation(rot),
             EntityEnum::Rectangle(a) => a.set_y_rotation(rot),
             EntityEnum::Mover(a) => a.set_y_rotation(rot),
+            EntityEnum::Crumbling(a) => a.set_y_rotation(rot),
             EntityEnum::Empty(_a) => {}
         }
     }
@@ -87,6 +97,7 @@ impl EntityEnum {
             EntityEnum::Cube(a) => a.set_z_rotation(rot),
             EntityEnum::Rectangle(a) => a.set_z_rotation(rot),
             EntityEnum::Mover(a) => a.set_z_rotation(rot),
+            EntityEnum::Crumbling(a) => a.set_z_rotation(rot),
             EntityEnum::Empty(_a) => {}
         }
     }
@@ -95,6 +106,7 @@ impl EntityEnum {
             EntityEnum::Cube(a) => a.reload_rotation_matrices(),
             EntityEnum::Rectangle(a) => a.reload_rotation_matrices(),
             EntityEnum::Mover(a) => a.reload_rotation_matrices(),
+            EntityEnum::Crumbling(a) => a.reload_rotation_matrices(),
             EntityEnum::Empty(_a) => {}
         }
     }
@@ -103,6 +115,7 @@ impl EntityEnum {
             EntityEnum::Cube(a) => a.refresh_model_matrix(),
             EntityEnum::Rectangle(a) => a.refresh_model_matrix(),
             EntityEnum::Mover(a) => a.refresh_model_matrix(),
+            EntityEnum::Crumbling(a) => a.refresh_model_matrix(),
             EntityEnum::Empty(_a) => {}
         }
     }
@@ -113,6 +126,7 @@ impl EntityEnum {
             //not implemented
             EntityEnum::Rectangle(_a) => {}
             EntityEnum::Mover(_a) => {}
+            EntityEnum::Crumbling(_a) => {}
             EntityEnum::Empty(_a) => {}
         }
     }
@@ -121,6 +135,7 @@ impl EntityEnum {
             EntityEnum::Cube(a) => a.recalculate_points(),
             EntityEnum::Rectangle(a) => a.recalculate_points(),
             EntityEnum::Mover(a) => a.recalculate_points(),
+            EntityEnum::Crumbling(a) => a.recalculate_points(),
             EntityEnum::Empty(_a) => {}
         }
     }
@@ -130,6 +145,7 @@ impl EntityEnum {
             EntityEnum::Cube(a) => a.set_vertex(point, index),
             EntityEnum::Rectangle(a) => a.set_vertex(point, index),
             EntityEnum::Mover(a) => a.set_vertex(point, index),
+            EntityEnum::Crumbling(a) => a.set_vertex(point, index),
             EntityEnum::Empty(_a) => {}
         }
     }
@@ -138,6 +154,7 @@ impl EntityEnum {
             EntityEnum::Cube(a) => a.render(camera, page),
             EntityEnum::Rectangle(a) => a.render(camera, page),
             EntityEnum::Mover(a) => a.render(camera, page),
+            EntityEnum::Crumbling(a) => a.render(camera, page),
             EntityEnum::Empty(_a) => {}
         }
     }
@@ -146,6 +163,7 @@ impl EntityEnum {
             EntityEnum::Cube(a) => a.distance_from_camera(camera),
             EntityEnum::Rectangle(a) => a.distance_from_camera(camera),
             EntityEnum::Mover(a) => a.distance_from_camera(camera),
+            EntityEnum::Crumbling(a) => a.distance_from_camera(camera),
             EntityEnum::Empty(_a) => Fixed::const_new(999),
         }
     }
@@ -154,6 +172,7 @@ impl EntityEnum {
             EntityEnum::Cube(a) => a.bounding_box(),
             EntityEnum::Rectangle(a) => a.bounding_box(),
             EntityEnum::Mover(a) => a.bounding_box(),
+            EntityEnum::Crumbling(a) => a.bounding_box(),
             EntityEnum::Empty(_a) => BoundingBox::default(),
         }
     }
@@ -162,6 +181,7 @@ impl EntityEnum {
             EntityEnum::Cube(a) => a.bounding_cylinder(),
             EntityEnum::Rectangle(a) => a.bounding_cylinder(),
             EntityEnum::Mover(a) => a.bounding_cylinder(),
+            EntityEnum::Crumbling(a) => a.bounding_cylinder(),
             EntityEnum::Empty(_a) => BoundingCylinder::default(),
         }
     }
@@ -170,6 +190,7 @@ impl EntityEnum {
             EntityEnum::Cube(a) => a.get_y(),
             EntityEnum::Rectangle(a) => a.get_y(),
             EntityEnum::Mover(a) => a.get_y(),
+            EntityEnum::Crumbling(a) => a.get_y(),
             EntityEnum::Empty(_a) => Fixed::const_new(-999),
         }
     }
@@ -178,15 +199,21 @@ impl EntityEnum {
             EntityEnum::Cube(a) => a.set_color(color),
             EntityEnum::Rectangle(a) => a.set_color(color),
             EntityEnum::Mover(a) => a.set_color(color),
+            EntityEnum::Crumbling(a) => a.set_color(color),
             EntityEnum::Empty(_a) => {}
         }
     }
-    pub fn tick(&mut self, effects: &effects::InputPlayerEffects) -> Option<effects::OutputPlayerEffects> {
+
+    pub fn tick(
+        &mut self,
+        effects: &effects::InputPlayerEffects,
+    ) -> Option<effects::OutputPlayerEffects> {
         match self {
             EntityEnum::Cube(a) => a.tick(effects),
             EntityEnum::Rectangle(a) => a.tick(effects),
             EntityEnum::Mover(a) => a.tick(effects),
-            EntityEnum::Empty(_a) => {None}
+            EntityEnum::Crumbling(a) => a.tick(effects),
+            EntityEnum::Empty(_a) => None,
         }
     }
     pub fn get_id(&self) -> i16 {
@@ -194,6 +221,7 @@ impl EntityEnum {
             EntityEnum::Cube(a) => a.get_id(),
             EntityEnum::Rectangle(a) => a.get_id(),
             EntityEnum::Mover(a) => a.get_id(),
+            EntityEnum::Crumbling(a) => a.get_id(),
             EntityEnum::Empty(_a) => -1,
         }
     }
@@ -202,6 +230,7 @@ impl EntityEnum {
             EntityEnum::Cube(a) => a.set_id(id),
             EntityEnum::Rectangle(a) => a.set_id(id),
             EntityEnum::Mover(a) => a.set_id(id),
+            EntityEnum::Crumbling(a) => a.set_id(id),
             EntityEnum::Empty(_a) => {}
         }
     }
@@ -365,6 +394,9 @@ pub fn check_support_below(entity_array: &[EntityEnum], element: usize) -> (Fixe
     let mut height: Fixed = Fixed::const_new(-999);
     let mut collider_id: i16 = -1;
     for (i, e) in entity_array.iter().enumerate() {
+        if let EntityEnum::Empty(_) = e {
+            break;
+        }
         if i != 0 && i != 1 {
             let top: BoundingBox = e.bounding_box();
             let d: Fixed = vertical_room_check(&top, &bottom, Fixed::const_new(-999));
@@ -386,6 +418,9 @@ pub fn check_block_above(entity_array: &[EntityEnum], element: usize) -> Fixed {
     let top: BoundingBox = entity_array[element].bounding_box();
     let mut max_height: Fixed = Fixed::const_new(999);
     for (i, e) in entity_array.iter().enumerate() {
+        if let EntityEnum::Empty(_) = e {
+            break;
+        }
         if i != 0 && i != 1 {
             let bottom = e.bounding_box();
             let overlap_height: Fixed = vertical_room_check(&bottom, &top, Fixed::const_new(999));

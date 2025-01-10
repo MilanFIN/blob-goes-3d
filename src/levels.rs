@@ -1,17 +1,15 @@
-pub const LEVELSIZE: usize = 3;
-
+pub const LEVELSIZE: usize = 100;
 
 const LEVEL1: &str = r#"
 [
-    { "type": "cube", "data": { "size": 3, "x": 0, "y": 0, "z": 0 } },
-    { "type": "empty", "data": {} }
+    { "type": "cube", "data": { "size": 3, "x": 0, "y": 0, "z": 0 } }
 ]
 "#;
 
 const LEVEL2: &str = r#"
 [
     { "type": "rectangle", "data": { "xsize": 5, "ysize": 1, "zsize": 5, "x": 0, "y": -5, "z": 0, "color": 2 } },
-    { "type": "rectangle", "data": { "xsize": 5, "ysize": 1, "zsize": 5, "x": 0, "y": -3.5, "z": 3, "rotation": -0.1 } },
+    { "type": "crumbling", "data": { "xsize": 5, "ysize": 1, "zsize": 5, "x": 0, "y": -3.5, "z": 3, "rotation": -0.1, "lifetime": 60 } },
     {
         "type": "mover",
         "data": { "xsize": 5, "ysize": 1, "zsize": 5, "x": 0, "y": -3.5, "z": -5,
@@ -22,9 +20,6 @@ const LEVEL2: &str = r#"
     }
 ] 
 "#;
-
-
-
 
 /*
     { "type": "rectangle", "data": { "xsize": 5, "ysize": 1, "zsize": 5, "x": 0, "y": -3.5, "z": -5 } }
