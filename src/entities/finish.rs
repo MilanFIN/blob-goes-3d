@@ -191,15 +191,15 @@ impl Entity for Finish {
         //not implemented
     }
 
-    fn render(&mut self, camera: &Camera, page: u32) {
-
+    fn render(&mut self, camera: &Camera, page: u16) {
+        
         renderer::draw_rect(
             &self.model_rotated_points,
             self.x,
             self.y,
             self.z,
             self.y_rotation,
-            camera,
+            camera ,
             self.color,
             page,
         );
@@ -240,6 +240,7 @@ impl Entity for Finish {
     }
     
     fn tick(&mut self, _effects: &effects::InputPlayerEffects) -> Option<effects::OutputPlayerEffects> {
+        //TODO: perform collision check between player input effect bounding box and self
         None
     }
     

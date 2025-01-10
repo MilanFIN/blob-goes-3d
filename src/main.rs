@@ -59,7 +59,7 @@ fn main(mut gba: agb::Gba) -> ! {
     let mut input = ButtonController::new();
 
     let mut bitmap4: agb::display::bitmap4::Bitmap4 = gba.display.video.bitmap4();
-    let mut page: u32 = 0;
+    let mut page: u16 = 0;
 
     renderer::utils::init_palette(&mut bitmap4);
 
@@ -156,6 +156,7 @@ fn main(mut gba: agb::Gba) -> ! {
 
         let player_input_effects: effects::InputPlayerEffects = effects::InputPlayerEffects {
             support_below_id: bottom_support_id,
+            bounding_box: &entity_array[0].bounding_box(),
         };
 
         for i in 2..levelsize + 2 {

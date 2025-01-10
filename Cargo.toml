@@ -19,5 +19,5 @@ debug = true
 
 [profile.release]
 opt-level = 3
-lto = "fat"
-debug = true
+lto = "thin"
+debug = false

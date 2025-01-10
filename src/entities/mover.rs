@@ -231,7 +231,7 @@ impl Entity for Mover {
         //not implemented
     }
 
-    fn render(&mut self, camera: &Camera, page: u32) {
+    fn render(&mut self, camera: &Camera, page: u16) {
         renderer::draw_rect(
             &self.model_rotated_points,
             self.x,
@@ -354,6 +354,7 @@ impl Entity for Mover {
                 move_x: xmovement,
                 move_y: ymovement,
                 move_z: zmovement,
+                finished: false,
             });
         } else {
             return None;

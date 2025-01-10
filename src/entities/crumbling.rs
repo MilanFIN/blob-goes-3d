@@ -209,7 +209,7 @@ impl Entity for Crumbling {
         //not implemented
     }
 
-    fn render(&mut self, camera: &Camera, page: u32) {
+    fn render(&mut self, camera: &Camera, page: u16) {
         if self.lifetime > 0 {
             let shaking_points: [[Fixed; 3]; 8];
 

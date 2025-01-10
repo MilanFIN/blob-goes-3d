@@ -7,7 +7,7 @@ use fixed::*;
 use math::*;
 
 #[allow(dead_code)]
-pub fn draw_line(mut x1: i32, mut y1: i32, x2: i32, y2: i32, color: u16, page: u32) {
+pub fn draw_line(mut x1: i32, mut y1: i32, x2: i32, y2: i32, color: u16, page: u16) {
     let dx: i32 = (x2 - x1).abs();
     let dy: i32 = (y2 - y1).abs();
 
@@ -53,7 +53,7 @@ pub fn draw_face_outline(
     p2: usize,
     p3: usize,
     p4: usize,
-    page: u32,
+    page: u16,
 ) {
     draw_line(
         screen_points[p1][0],
@@ -124,7 +124,7 @@ pub fn back_face_culling(&points: &[[Fixed; 3]; 8], p1: usize, p2: usize, p3: us
     return dot_prod < Fixed::const_new(0);
 }
 
-pub fn draw_h_line(x1: i32, x2: i32, y: i32, color: u16, page: u32) {
+pub fn draw_h_line(x1: i32, x2: i32, y: i32, color: u16, page: u16) {
     // Ensure x1 is less than or equal to x2 for proper iteration
     let (mut start, mut end) = if x1 <= x2 { (x1, x2) } else { (x2, x1) };
 
@@ -146,7 +146,7 @@ pub fn draw_flat_bottom_triangle(
     p2: [Fixed; 2],
     p3: [Fixed; 2],
     color: u16,
-    page: u32,
+    page: u16,
 ) {
     let mut div1 = p2[1] - p1[1];
     let mut div2 = p3[1] - p1[1];
@@ -188,7 +188,7 @@ pub fn draw_flat_top_triangle(
     p2: [Fixed; 2],
     p3: [Fixed; 2],
     color: u16,
-    page: u32,
+    page: u16,
 ) {
     let mut div1 = p3[1] - p1[1];
     let mut div2 = p3[1] - p2[1];
@@ -257,7 +257,7 @@ pub fn draw_triangle(
     mut p2: [Fixed; 2],
     mut p3: [Fixed; 2],
     color: u16,
-    page: u32,
+    page: u16,
 ) {
     let zero: Fixed = Fixed::const_new(0);
     let x_max: Fixed = Fixed::const_new(240);
@@ -316,7 +316,7 @@ pub fn draw_rect(
     y_rotation: Fixed,
     camera_ptr: &Camera,
     color: u16,
-    page: u32,
+    page: u16,
 ) {
     let width: i32 = 240;
     let height: i32 = 160;

@@ -191,7 +191,7 @@ impl Entity for Cube {
         //not implemented
     }
 
-    fn render(&mut self, camera: &Camera, page: u32) {
+    fn render(&mut self, camera: &Camera, page: u16) {
 
         renderer::draw_rect(
             &self.model_rotated_points,

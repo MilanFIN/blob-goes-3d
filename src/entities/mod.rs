@@ -165,14 +165,14 @@ impl EntityEnum {
             EntityEnum::Empty(_a) => {}
         }
     }
-    pub fn render(&mut self, camera: &Camera, page: u32) {
+    pub fn render(&mut self, camera: &Camera, page: u16) {
         match self {
             EntityEnum::Cube(a) => a.render(camera, page),
             EntityEnum::Rectangle(a) => a.render(camera, page),
             EntityEnum::Mover(a) => a.render(camera, page),
             EntityEnum::Crumbling(a) => a.render(camera, page),
-            EntityEnum::Finish(a) => a.render(camera, page),
             EntityEnum::Empty(_a) => {}
+            EntityEnum::Finish(a) => a.render(camera, page),
         }
     }
     pub fn distance_from_camera(&self, camera: &Camera) -> Fixed {

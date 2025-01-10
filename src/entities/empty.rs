@@ -11,7 +11,7 @@ use fixed::*;
 #[derive(Copy, Clone, Deserialize, Debug)]
 pub struct Empty {}
 impl Entity for Empty {
-    fn render(&mut self, _camera: &Camera, _page: u32) {}
+    fn render(&mut self, _camera: &Camera, _page: u16) {}
     fn set_x_offset(&mut self, _x_offset: Fixed) {}
     fn set_y_offset(&mut self, _y_offset: Fixed) {}
     fn set_z_offset(&mut self, _z_offset: Fixed) {}
