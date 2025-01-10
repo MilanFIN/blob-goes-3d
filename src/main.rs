@@ -17,15 +17,11 @@
 
 use agb::input::*;
 
-extern crate alloc;
-//use alloc::boxed::Box;
-use alloc::vec::Vec;
 
 // use serde_json_core;
 // use serde_json_core::*;
 // use serde::{Deserialize, Serialize};
 
-use serde_json_core::from_slice;
 
 mod entities;
 use cube::Cube;
@@ -38,7 +34,7 @@ mod math;
 mod renderer;
 
 mod utils;
-use levels::LEVELSIZE;
+use levels::levelstore::LEVELSIZE;
 use utils::*;
 
 mod player;
@@ -74,9 +70,7 @@ fn main(mut gba: agb::Gba) -> ! {
         [EntityEnum::Empty(Empty::default()); LEVELSIZE + 2];
     let mut entity_render_order: [usize; LEVELSIZE + 2] = [0; LEVELSIZE + 2];
 
-    let message_bytes = levels::LEVELS[1].trim().as_bytes();
-    //let (parsedentities, _): ([EntityEnum; LEVELSIZE], _) = from_slice(message_bytes).unwrap();
-    let (parsed_entities, _): (Vec<EntityEnum>, usize) = from_slice(message_bytes).unwrap();
+    let levelsize = levels::load_level(1, &mut entity_array);
 
     let mut player1: Player = Player::default();
 
@@ -106,23 +100,10 @@ fn main(mut gba: agb::Gba) -> ! {
         entity_render_order[i] = i;
     }
 
-    for i in 0..parsed_entities.len() {
-        entity_array[i + 2] = parsed_entities[i];
-        //entity_array[i].set_x_rotation(new_num(0));
-        //entity_array[i].set_y_rotation(new_num(0));
-        //entity_array[i].set_z_rotation(new_num(0));
-        entity_array[i + 2].reload_rotation_matrices();
-        //always call after modifying rotation
-
-        entity_array[i + 2].recalculate_points();
-        entity_array[i + 2].refresh_model_matrix();
-
-        entity_render_order[i + 2] = i + 2;
+    for i in 0..entity_render_order.len() {
+        entity_render_order[i] = i;
     }
 
-    for i in 0..LEVELSIZE + 2 {
-        entity_array[i].set_id(i as i16);
-    }
 
     //player entities
     entity_array[0].set_size(new_num(1));
@@ -169,7 +150,7 @@ fn main(mut gba: agb::Gba) -> ! {
             &mut entity_render_order,
             &entity_array,
             0,
-            parsed_entities.len() + 1,
+            levelsize + 1,
             &player1.camera,
         );
 
@@ -177,7 +158,7 @@ fn main(mut gba: agb::Gba) -> ! {
             support_below_id: bottom_support_id,
         };
 
-        for i in 2..LEVELSIZE + 2 {
+        for i in 2..levelsize + 2 {
             if let EntityEnum::Empty(_) = entity_array[i] {
                 break;
             }
@@ -199,7 +180,7 @@ fn main(mut gba: agb::Gba) -> ! {
             entity_array[i].refresh_model_matrix();
         }
 
-        for i in 0..LEVELSIZE + 2 {
+        for i in 0..levelsize + 2 {
             if let EntityEnum::Empty(_) = entity_array[i] {
                 break;
             }

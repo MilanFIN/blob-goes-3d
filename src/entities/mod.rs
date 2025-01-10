@@ -16,6 +16,9 @@ use mover::*;
 pub mod crumbling;
 use crumbling::*;
 
+pub mod finish;
+use finish::*;
+
 pub mod boundingshapes;
 use boundingshapes::*;
 
@@ -42,6 +45,8 @@ pub enum EntityEnum {
     Mover(Mover),
     #[serde(rename = "crumbling")]
     Crumbling(Crumbling),
+    #[serde(rename = "finish2")]
+    Finish(Finish),
     #[serde(rename = "empty")]
     Empty(Empty),
 }
@@ -53,6 +58,7 @@ impl EntityEnum {
             EntityEnum::Rectangle(a) => a.set_x_offset(offset),
             EntityEnum::Mover(a) => a.set_x_offset(offset),
             EntityEnum::Crumbling(a) => a.set_x_offset(offset),
+            EntityEnum::Finish(a) => a.set_x_offset(offset),
             EntityEnum::Empty(_a) => {}
         }
     }
@@ -62,6 +68,7 @@ impl EntityEnum {
             EntityEnum::Rectangle(a) => a.set_y_offset(offset),
             EntityEnum::Mover(a) => a.set_y_offset(offset),
             EntityEnum::Crumbling(a) => a.set_y_offset(offset),
+            EntityEnum::Finish(a) => a.set_y_offset(offset),
             EntityEnum::Empty(_a) => {}
         }
     }
@@ -71,6 +78,7 @@ impl EntityEnum {
             EntityEnum::Rectangle(a) => a.set_z_offset(offset),
             EntityEnum::Mover(a) => a.set_z_offset(offset),
             EntityEnum::Crumbling(a) => a.set_z_offset(offset),
+            EntityEnum::Finish(a) => a.set_z_offset(offset),
             EntityEnum::Empty(_a) => {}
         }
     }
@@ -80,6 +88,7 @@ impl EntityEnum {
             EntityEnum::Rectangle(a) => a.set_x_rotation(rot),
             EntityEnum::Mover(a) => a.set_x_rotation(rot),
             EntityEnum::Crumbling(a) => a.set_x_rotation(rot),
+            EntityEnum::Finish(a) => a.set_x_rotation(rot),
             EntityEnum::Empty(_a) => {}
         }
     }
@@ -89,6 +98,7 @@ impl EntityEnum {
             EntityEnum::Rectangle(a) => a.set_y_rotation(rot),
             EntityEnum::Mover(a) => a.set_y_rotation(rot),
             EntityEnum::Crumbling(a) => a.set_y_rotation(rot),
+            EntityEnum::Finish(a) => a.set_y_rotation(rot),
             EntityEnum::Empty(_a) => {}
         }
     }
@@ -98,6 +108,7 @@ impl EntityEnum {
             EntityEnum::Rectangle(a) => a.set_z_rotation(rot),
             EntityEnum::Mover(a) => a.set_z_rotation(rot),
             EntityEnum::Crumbling(a) => a.set_z_rotation(rot),
+            EntityEnum::Finish(a) => a.set_z_rotation(rot),
             EntityEnum::Empty(_a) => {}
         }
     }
@@ -107,6 +118,7 @@ impl EntityEnum {
             EntityEnum::Rectangle(a) => a.reload_rotation_matrices(),
             EntityEnum::Mover(a) => a.reload_rotation_matrices(),
             EntityEnum::Crumbling(a) => a.reload_rotation_matrices(),
+            EntityEnum::Finish(a) => a.reload_rotation_matrices(),
             EntityEnum::Empty(_a) => {}
         }
     }
@@ -116,6 +128,7 @@ impl EntityEnum {
             EntityEnum::Rectangle(a) => a.refresh_model_matrix(),
             EntityEnum::Mover(a) => a.refresh_model_matrix(),
             EntityEnum::Crumbling(a) => a.refresh_model_matrix(),
+            EntityEnum::Finish(a) => a.refresh_model_matrix(),
             EntityEnum::Empty(_a) => {}
         }
     }
@@ -127,6 +140,7 @@ impl EntityEnum {
             EntityEnum::Rectangle(_a) => {}
             EntityEnum::Mover(_a) => {}
             EntityEnum::Crumbling(_a) => {}
+            EntityEnum::Finish(_a) => {}
             EntityEnum::Empty(_a) => {}
         }
     }
@@ -136,6 +150,7 @@ impl EntityEnum {
             EntityEnum::Rectangle(a) => a.recalculate_points(),
             EntityEnum::Mover(a) => a.recalculate_points(),
             EntityEnum::Crumbling(a) => a.recalculate_points(),
+            EntityEnum::Finish(a) => a.recalculate_points(),
             EntityEnum::Empty(_a) => {}
         }
     }
@@ -146,6 +161,7 @@ impl EntityEnum {
             EntityEnum::Rectangle(a) => a.set_vertex(point, index),
             EntityEnum::Mover(a) => a.set_vertex(point, index),
             EntityEnum::Crumbling(a) => a.set_vertex(point, index),
+            EntityEnum::Finish(a) => a.set_vertex(point, index),
             EntityEnum::Empty(_a) => {}
         }
     }
@@ -155,6 +171,7 @@ impl EntityEnum {
             EntityEnum::Rectangle(a) => a.render(camera, page),
             EntityEnum::Mover(a) => a.render(camera, page),
             EntityEnum::Crumbling(a) => a.render(camera, page),
+            EntityEnum::Finish(a) => a.render(camera, page),
             EntityEnum::Empty(_a) => {}
         }
     }
@@ -164,6 +181,7 @@ impl EntityEnum {
             EntityEnum::Rectangle(a) => a.distance_from_camera(camera),
             EntityEnum::Mover(a) => a.distance_from_camera(camera),
             EntityEnum::Crumbling(a) => a.distance_from_camera(camera),
+            EntityEnum::Finish(a) => a.distance_from_camera(camera),
             EntityEnum::Empty(_a) => Fixed::const_new(999),
         }
     }
@@ -173,6 +191,7 @@ impl EntityEnum {
             EntityEnum::Rectangle(a) => a.bounding_box(),
             EntityEnum::Mover(a) => a.bounding_box(),
             EntityEnum::Crumbling(a) => a.bounding_box(),
+            EntityEnum::Finish(a) => a.bounding_box(),
             EntityEnum::Empty(_a) => BoundingBox::default(),
         }
     }
@@ -182,6 +201,7 @@ impl EntityEnum {
             EntityEnum::Rectangle(a) => a.bounding_cylinder(),
             EntityEnum::Mover(a) => a.bounding_cylinder(),
             EntityEnum::Crumbling(a) => a.bounding_cylinder(),
+            EntityEnum::Finish(a) => a.bounding_cylinder(),
             EntityEnum::Empty(_a) => BoundingCylinder::default(),
         }
     }
@@ -191,6 +211,7 @@ impl EntityEnum {
             EntityEnum::Rectangle(a) => a.get_y(),
             EntityEnum::Mover(a) => a.get_y(),
             EntityEnum::Crumbling(a) => a.get_y(),
+            EntityEnum::Finish(a) => a.get_y(),
             EntityEnum::Empty(_a) => Fixed::const_new(-999),
         }
     }
@@ -200,6 +221,7 @@ impl EntityEnum {
             EntityEnum::Rectangle(a) => a.set_color(color),
             EntityEnum::Mover(a) => a.set_color(color),
             EntityEnum::Crumbling(a) => a.set_color(color),
+            EntityEnum::Finish(a) => a.set_color(color),
             EntityEnum::Empty(_a) => {}
         }
     }
@@ -213,6 +235,7 @@ impl EntityEnum {
             EntityEnum::Rectangle(a) => a.tick(effects),
             EntityEnum::Mover(a) => a.tick(effects),
             EntityEnum::Crumbling(a) => a.tick(effects),
+            EntityEnum::Finish(a) => a.tick(effects),
             EntityEnum::Empty(_a) => None,
         }
     }
@@ -222,6 +245,7 @@ impl EntityEnum {
             EntityEnum::Rectangle(a) => a.get_id(),
             EntityEnum::Mover(a) => a.get_id(),
             EntityEnum::Crumbling(a) => a.get_id(),
+            EntityEnum::Finish(a) => a.get_id(),
             EntityEnum::Empty(_a) => -1,
         }
     }
@@ -231,6 +255,7 @@ impl EntityEnum {
             EntityEnum::Rectangle(a) => a.set_id(id),
             EntityEnum::Mover(a) => a.set_id(id),
             EntityEnum::Crumbling(a) => a.set_id(id),
+            EntityEnum::Finish(a) => a.set_id(id),
             EntityEnum::Empty(_a) => {}
         }
     }

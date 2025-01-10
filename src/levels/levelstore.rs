@@ -1,4 +1,4 @@
-pub const LEVELSIZE: usize = 100;
+pub const LEVELSIZE: usize = 31;
 
 const LEVEL1: &str = r#"
 [
