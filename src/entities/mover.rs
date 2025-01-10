@@ -6,6 +6,7 @@ use super::BoundingCylinder;
 use super::Camera;
 use super::Entity;
 use crate::effects;
+use crate::effects::OutputPlayerEffects;
 use crate::renderer;
 use math::*;
 
@@ -298,7 +299,10 @@ impl Entity for Mover {
         self.color = color;
     }
 
-    fn tick(&mut self, effects: &effects::InputPlayerEffects) -> Option<effects::OutputPlayerEffects> {
+    fn tick(
+        &mut self,
+        effects: &effects::InputPlayerEffects,
+    ) -> Option<effects::OutputPlayerEffects> {
         if self.wait != 0 {
             if self.waitcounter != 0 {
                 self.waitcounter -= 1;
@@ -318,8 +322,15 @@ impl Entity for Mover {
         let zdiff: Fixed = target[2] - self.z;
 
         let distance = vector_len([xdiff, ydiff, zdiff]);
+        let xmovement: Fixed;
+        let ymovement: Fixed;
+        let zmovement: Fixed;
 
         if distance < self.speed {
+            xmovement = target[0] - self.x;
+            ymovement = target[1] - self.y;
+            zmovement = target[2] - self.z;
+
             self.x = target[0];
             self.y = target[1];
             self.z = target[2];
@@ -331,23 +342,28 @@ impl Entity for Mover {
             self.x += movement_vector[0];
             self.y += movement_vector[1];
             self.z += movement_vector[2];
+
+            xmovement = movement_vector[0];
+            ymovement = movement_vector[1];
+            zmovement = movement_vector[2];
         }
 
         //player is standing on the moving block
         if effects.support_below_id == self.id {
-            //TODO: return the amount of movement as an effect if there was movement
+            return Some(OutputPlayerEffects {
+                move_x: xmovement,
+                move_y: ymovement,
+                move_z: zmovement,
+            });
+        } else {
             return None;
         }
-        else {
-            return None;
-        }
-
     }
 
     fn get_id(&self) -> i16 {
         return self.id;
     }
-    
+
     fn set_id(&mut self, id: i16) {
         self.id = id;
     }

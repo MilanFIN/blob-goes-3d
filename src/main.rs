@@ -166,17 +166,6 @@ fn main(mut gba: agb::Gba) -> ! {
 
         player1.update_camera_position();
 
-        //rotate player body blocks and move them where the player is
-        for i in 0..2 {
-            entity_array[i].set_x_offset(player1.x);
-            entity_array[i]
-                .set_y_offset(player1.y + Fixed::from_raw(128) + Fixed::from_raw(192) * i);
-            entity_array[i].set_z_offset(player1.z);
-
-            entity_array[i].set_y_rotation(-player1.angle);
-            entity_array[i].refresh_model_matrix();
-        }
-
         quick_sort(
             &mut entity_render_order,
             &entity_array,
@@ -190,10 +179,22 @@ fn main(mut gba: agb::Gba) -> ! {
         };
 
         for i in 2..LEVELSIZE + 2 {
-            let player_effects: Option<effects::OutputPlayerEffects> = entity_array[i].tick(&player_input_effects);
-            if player_effects.is_some() {
-                //TODO, handle output effects, such as moving player
+            if let Some(player_effects) = entity_array[i].tick(&player_input_effects) {
+                player1.x += player_effects.move_x;
+                player1.y += player_effects.move_y;
+                player1.z += player_effects.move_z;
             }
+        }
+
+        //rotate player body blocks and move them where the player is
+        for i in 0..2 {
+            entity_array[i].set_x_offset(player1.x);
+            entity_array[i]
+                .set_y_offset(player1.y + Fixed::from_raw(128) + Fixed::from_raw(192) * i);
+            entity_array[i].set_z_offset(player1.z);
+
+            entity_array[i].set_y_rotation(-player1.angle);
+            entity_array[i].refresh_model_matrix();
         }
 
         for i in 0..LEVELSIZE + 2 {
