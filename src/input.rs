@@ -1,6 +1,6 @@
 use crate::{
     boundingshapes::BoundingCylinder,
-    horizontal_collision_check,
+    entities::utils::horizontal_collision_check,
     math::{directional_vector_2d, vector_len_2d},
     player, EntityEnum, Fixed,
 };

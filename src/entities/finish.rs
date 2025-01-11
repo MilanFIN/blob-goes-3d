@@ -1,20 +1,20 @@
 use serde::Deserialize;
 
 use super::math;
+use super::utils::rect_overlap;
 use super::BoundingBox;
 use super::BoundingCylinder;
 use super::Camera;
 use super::Entity;
 use crate::effects;
 use crate::renderer;
+use crate::renderer::back_face_culling;
 use math::*;
 
 use crate::fixed;
 use fixed::*;
 
 use crate::utils;
-
-
 
 #[derive(Copy, Clone, Deserialize, Debug)]
 pub struct Finish {
@@ -37,10 +37,10 @@ pub struct Finish {
     #[serde(default = "default_fixed")]
     z_rotation: Fixed,
 
-    #[serde(default = "default_fixed_3_8")]
-    points: [[Fixed; 3]; 8],
-    #[serde(default = "default_fixed_3_8")]
-    model_rotated_points: [[Fixed; 3]; 8],
+    #[serde(default = "default_fixed_3_14")]
+    points: [[Fixed; 3]; 14],
+    #[serde(default = "default_fixed_3_14")]
+    model_rotated_points: [[Fixed; 3]; 14],
 
     #[serde(default = "default_fixed_3_3")]
     x_rotation_matrix: [[Fixed; 3]; 3],
@@ -54,6 +54,7 @@ pub struct Finish {
 }
 
 impl Finish {
+    #[allow(dead_code)]
     pub fn default() -> Self {
         Self {
             x: Fixed::const_new(0),
@@ -63,8 +64,8 @@ impl Finish {
             x_rotation: Fixed::const_new(0),
             y_rotation: Fixed::const_new(0),
             z_rotation: Fixed::const_new(0),
-            points: [[Fixed::const_new(0); 3]; 8],
-            model_rotated_points: [[Fixed::const_new(0); 3]; 8],
+            points: [[Fixed::const_new(0); 3]; 14],
+            model_rotated_points: [[Fixed::const_new(0); 3]; 14],
             x_rotation_matrix: [[Fixed::const_new(0); 3]; 3],
             y_rotation_matrix: [[Fixed::const_new(0); 3]; 3],
             z_rotation_matrix: [[Fixed::const_new(0); 3]; 3],
@@ -72,8 +73,40 @@ impl Finish {
             id: 0,
         }
     }
-    
 
+    fn finish_bounding_box(&self) -> BoundingBox {
+        let points: [[Fixed; 2]; 4] = [
+            [
+                Fixed::const_new(1) + self.x,
+                Fixed::from_raw(4) + self.z,
+            ],
+            [
+                Fixed::const_new(1) + self.x,
+                Fixed::from_raw(-4) + self.z,
+            ],
+            [
+                Fixed::const_new(-1) + self.x,
+                Fixed::from_raw(-4) + self.z,
+            ],
+            [
+                Fixed::const_new(-1) + self.x,
+                Fixed::from_raw(4) + self.z,
+            ],
+        ];
+        BoundingBox {
+            data: points,
+            center: utils::calculate_center(&points),
+            width: (self.model_rotated_points[0][0] + self.x
+                - (self.model_rotated_points[1][0] + self.x))
+                .abs(),
+            height: (self.model_rotated_points[1][2] + self.z
+                - (self.model_rotated_points[5][2] + self.z))
+                .abs(),
+            y_top: Fixed::const_new(1) + self.y,
+            y_bottom: Fixed::const_new(-1) + self.y,
+            rotation: self.y_rotation,
+        }
+    }
 }
 
 impl Entity for Finish {
@@ -94,16 +127,31 @@ impl Entity for Finish {
     }
 
     fn recalculate_points(&mut self) {
-        self.points = [
-            [(self.size / 2), (self.size / 2), (self.size / 2)],
-            [(-self.size / 2), (self.size / 2), (self.size / 2)],
-            [(-self.size / 2), (-self.size / 2), (self.size / 2)],
-            [(self.size / 2), (-self.size / 2), (self.size / 2)],
-            [(self.size / 2), (self.size / 2), (-self.size / 2)],
-            [(-self.size / 2), (self.size / 2), (-self.size / 2)],
-            [(-self.size / 2), (-self.size / 2), (-self.size / 2)],
-            [(self.size / 2), (-self.size / 2), (-self.size / 2)],
+        let depth = Fixed::from_raw(8);
+        //front face
+        self.points[0] = [
+            Fixed::const_new(0),
+            Fixed::const_new(0),
+            Fixed::const_new(1),
         ];
+
+        let radius = Fixed::const_new(1);
+
+        for i in 1..8 {
+            let angle = Fixed::from_raw(43) * i; // Angle in radians (i * 60 degrees)
+            self.points[i] = [
+                radius * angle.cos(),
+                radius * angle.sin(),
+                Fixed::const_new(1),
+            ];
+        }
+        //back face
+        self.points[7] = [Fixed::const_new(0), Fixed::const_new(0), depth / 2];
+
+        for i in 8..14 {
+            let angle = Fixed::from_raw(43) * (i - 7); // Angle in radians (i * 60 degrees)
+            self.points[i] = [radius * angle.cos(), radius * angle.sin(), -depth / 2];
+        }
     }
 
     fn set_x_rotation(&mut self, x_rotation: Fixed) {
@@ -192,17 +240,162 @@ impl Entity for Finish {
     }
 
     fn render(&mut self, camera: &Camera, page: u16) {
-        
-        renderer::draw_rect(
-            &self.model_rotated_points,
-            self.x,
-            self.y,
-            self.z,
-            self.y_rotation,
-            camera ,
-            self.color,
-            page,
-        );
+
+        let mut screen_points: [[Fixed; 2]; 14] = [[Fixed::const_new(0), Fixed::const_new(0)]; 14];
+        let mut translated_points: [[Fixed; 3]; 14] = [[
+            Fixed::const_new(0),
+            Fixed::const_new(0),
+            Fixed::const_new(0),
+        ]; 14];
+
+        for i in 0..(self.model_rotated_points).len() {
+            (translated_points[i], screen_points[i]) = renderer::translate_point(
+                &self.model_rotated_points[i],
+                &camera,
+                self.x,
+                self.y,
+                self.z,
+            );
+            
+        }
+
+        let visible: bool = back_face_culling(&translated_points, 0, 1, 2);
+        if visible {
+            let color: u16 =
+                renderer::utils::get_color(self.color, self.y_rotation + Fixed::from_raw(0));
+            renderer::draw_triangle(
+                screen_points[0],
+                screen_points[1],
+                screen_points[2],
+                color,
+                page,
+            );
+            renderer::draw_triangle(
+                screen_points[0],
+                screen_points[2],
+                screen_points[3],
+                color,
+                page,
+            );
+            renderer::draw_triangle(
+                screen_points[0],
+                screen_points[3],
+                screen_points[4],
+                color,
+                page,
+            );
+
+            renderer::draw_triangle(
+                screen_points[0],
+                screen_points[4],
+                screen_points[5],
+                color,
+                page,
+            );
+            renderer::draw_triangle(
+                screen_points[0],
+                screen_points[5],
+                screen_points[6],
+                color,
+                page,
+            );
+            renderer::draw_triangle(
+                screen_points[0],
+                screen_points[6],
+                screen_points[1],
+                color,
+                page,
+            );
+        }
+        let visible: bool = back_face_culling(&translated_points, 7, 9, 8);
+        if visible {
+            let color: u16 =
+                renderer::utils::get_color(self.color, self.y_rotation + Fixed::from_raw(0));
+            renderer::draw_triangle(
+                screen_points[7],
+                screen_points[8],
+                screen_points[9],
+                color,
+                page,
+            );
+            renderer::draw_triangle(
+                screen_points[7],
+                screen_points[9],
+                screen_points[10],
+                color,
+                page,
+            );
+            renderer::draw_triangle(
+                screen_points[7],
+                screen_points[10],
+                screen_points[11],
+                color,
+                page,
+            );
+
+            renderer::draw_triangle(
+                screen_points[7],
+                screen_points[11],
+                screen_points[12],
+                color,
+                page,
+            );
+            renderer::draw_triangle(
+                screen_points[7],
+                screen_points[12],
+                screen_points[13],
+                color,
+                page,
+            );
+            renderer::draw_triangle(
+                screen_points[7],
+                screen_points[13],
+                screen_points[8],
+                color,
+                page,
+            );
+        }
+
+        for i in 1..6 {
+            let visible: bool = back_face_culling(&translated_points, i, i + 8, i + 1);
+            if visible {
+                let color: u16 =
+                    renderer::utils::get_color(self.color, self.y_rotation + Fixed::from_raw(0));
+                renderer::draw_triangle(
+                    screen_points[i],
+                    screen_points[i + 8],
+                    screen_points[i + 1],
+                    color,
+                    page,
+                );
+                renderer::draw_triangle(
+                    screen_points[i],
+                    screen_points[i + 7],
+                    screen_points[i + 8],
+                    color,
+                    page,
+                );
+            }
+        }
+        let visible: bool = back_face_culling(&translated_points, 6, 13, 8);
+        if visible {
+            let color: u16 =
+                renderer::utils::get_color(self.color, self.y_rotation + Fixed::from_raw(0));
+            renderer::draw_triangle(
+                screen_points[6],
+                screen_points[13],
+                screen_points[8],
+                color,
+                page,
+            );
+            renderer::draw_triangle(
+                screen_points[6],
+                screen_points[1],
+                screen_points[8],
+                color,
+                page,
+            );
+        }
     }
 
     fn distance_from_camera(&self, camera: &Camera) -> Fixed {
@@ -210,6 +403,7 @@ impl Entity for Finish {
     }
 
     fn bounding_box(&self) -> BoundingBox {
+        //the finish has no collision with the player
         BoundingBox {
             data: [[Fixed::const_new(0); 2]; 4],
             center: [Fixed::const_new(0); 2],
@@ -238,19 +432,31 @@ impl Entity for Finish {
     fn set_color(&mut self, color: u16) {
         self.color = color;
     }
-    
-    fn tick(&mut self, _effects: &effects::InputPlayerEffects) -> Option<effects::OutputPlayerEffects> {
-        //TODO: perform collision check between player input effect bounding box and self
-        None
+
+    fn tick(
+        &mut self,
+        effects: &effects::InputPlayerEffects,
+    ) -> Option<effects::OutputPlayerEffects> {
+        let hitbox = self.finish_bounding_box();
+        if (effects.bounding_box.y_top > hitbox.y_bottom
+            && effects.bounding_box.y_bottom < hitbox.y_top)
+            && rect_overlap(effects.bounding_box, &hitbox)
+        {
+            return Some(effects::OutputPlayerEffects {
+                move_x: Fixed::const_new(0),
+                move_y: Fixed::const_new(0),
+                move_z: Fixed::const_new(0),
+                finished: true,
+            });
+        } else {
+            None
+        }
     }
-    
     fn get_id(&self) -> i16 {
-        return self.id
+        return self.id;
     }
-    
+
     fn set_id(&mut self, id: i16) {
         self.id = id
     }
-    
-
 }

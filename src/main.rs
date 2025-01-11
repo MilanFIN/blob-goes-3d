@@ -17,15 +17,19 @@
 
 use agb::input::*;
 
+extern crate alloc;
+// use agb::ExternalAllocator;
+// use agb::InternalAllocator;
+// use alloc::vec::Vec;
 
 // use serde_json_core;
 // use serde_json_core::*;
 // use serde::{Deserialize, Serialize};
 
-
 mod entities;
 use cube::Cube;
 use empty::Empty;
+use entities::utils::{check_block_above, check_support_below, quick_sort};
 use entities::*;
 
 mod camera;
@@ -63,11 +67,16 @@ fn main(mut gba: agb::Gba) -> ! {
 
     renderer::utils::init_palette(&mut bitmap4);
 
-    let mut angle: Fixed = Fixed::const_new(0);
-    let increment: Fixed = Fixed::const_new(1) / 256;
-
     let mut entity_array: [EntityEnum; LEVELSIZE + 2] =
         [EntityEnum::Empty(Empty::default()); LEVELSIZE + 2];
+    
+    //todo: if stack runs out of space, use this instead
+    /*
+    let mut entity_array: Vec<EntityEnum, ExternalAllocator> = Vec::new_in(ExternalAllocator);
+    for i in 0..LEVELSIZE + 2 {
+        entity_array.push(EntityEnum::Empty(Empty::default()));
+    }*/
+
     let mut entity_render_order: [usize; LEVELSIZE + 2] = [0; LEVELSIZE + 2];
 
     let levelsize = levels::load_level(1, &mut entity_array);
@@ -97,13 +106,12 @@ fn main(mut gba: agb::Gba) -> ! {
         //entity_array[i].recalculate_points();
         //entity_array[i].refresh_model_matrix();
 
-        entity_render_order[i] = i;
+        //entity_render_order[i] = i;
     }
 
     for i in 0..entity_render_order.len() {
         entity_render_order[i] = i;
     }
-
 
     //player entities
     entity_array[0].set_size(new_num(1));
@@ -129,10 +137,6 @@ fn main(mut gba: agb::Gba) -> ! {
         );
 
         renderer::hw::fill(page, 128);
-        angle += increment;
-        if angle > Fixed::const_new(1) {
-            angle = Fixed::const_new(0);
-        }
 
         let mut bottom_support_id: i16 = -1;
         if player1.yspeed <= Fixed::const_new(0) {
@@ -167,6 +171,11 @@ fn main(mut gba: agb::Gba) -> ! {
                 player1.x += player_effects.move_x;
                 player1.y += player_effects.move_y;
                 player1.z += player_effects.move_z;
+
+                if player_effects.finished {
+                    //TODO: actually implement level finishes at some point
+                    agb::println!("finished");
+                }
             }
         }
 

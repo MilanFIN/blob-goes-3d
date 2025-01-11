@@ -29,6 +29,11 @@ pub fn default_fixed_3_8() -> [[Fixed; 3]; 8] {
     [[Fixed::const_new(0); 3]; 8]
 }
 
+pub fn default_fixed_3_14() -> [[Fixed; 3]; 14] {
+    [[Fixed::const_new(0); 3]; 14]
+}
+
+
 pub fn default_fixed_3_3() -> [[Fixed; 3]; 3] {
     [[Fixed::const_new(0); 3]; 3]
 }

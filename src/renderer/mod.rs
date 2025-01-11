@@ -90,7 +90,7 @@ pub fn draw_face_outline(
 }
 
 //return true if visible, presume points to be defined in counter clockwise direction
-pub fn back_face_culling(&points: &[[Fixed; 3]; 8], p1: usize, p2: usize, p3: usize) -> bool {
+pub fn back_face_culling(points: &[[Fixed; 3]], p1: usize, p2: usize, p3: usize) -> bool {
     //checking if some of the points are behind the camera?
     //then dont draw
     if points[p1][2] < Fixed::const_new(0)
@@ -318,10 +318,6 @@ pub fn draw_rect(
     color: u16,
     page: u16,
 ) {
-    let width: i32 = 240;
-    let height: i32 = 160;
-    let middle: [Fixed; 2] = [Fixed::const_new(width / 2), Fixed::const_new(height / 2)]; // x, y
-
     let mut screen_points: [[Fixed; 2]; 8] = [[Fixed::const_new(0), Fixed::const_new(0)]; 8];
     let mut translated_points: [[Fixed; 3]; 8] = [[
         Fixed::const_new(0),
@@ -330,44 +326,14 @@ pub fn draw_rect(
     ]; 8];
 
     for i in 0..(*model_rotated_points).len() {
-        let mut translated_point: [Fixed; 4] = [
-            (*model_rotated_points)[i][0] + (x - (*camera_ptr).x),
-            (*model_rotated_points)[i][1] + (y - (*camera_ptr).y),
-            (*model_rotated_points)[i][2] + (z - (*camera_ptr).z),
-            Fixed::const_new(1),
-        ];
-
-        translated_point = matmul_4((*camera_ptr).y_rotation_matrix, translated_point);
-        translated_point = matmul_4((*camera_ptr).x_rotation_matrix, translated_point);
-        translated_point = matmul_4((*camera_ptr).z_rotation_matrix, translated_point);
-
-        // Apply projection matrix
-        let projected_point = matmul_4(utils::PROJECTION_MATRIX, translated_point);
-
-        // Perform perspective divide (convert to 2D)
-        if projected_point[3] != Fixed::const_new(0) {
-            let x: Fixed = projected_point[0] / projected_point[3];
-            let y: Fixed = projected_point[1] / projected_point[3];
-            // Convert to screen space
-            screen_points[i] = [
-                (x * Fixed::const_new(width) / Fixed::const_new(2)) + middle[0],
-                (y * Fixed::const_new(height) / Fixed::const_new(2)) + middle[1],
-            ];
-        } else {
-            screen_points[i] = [middle[0], middle[1]];
-        }
-
-        translated_points[i] = [
-            translated_point[0],
-            translated_point[1],
-            translated_point[2],
-        ];
+        (translated_points[i], screen_points[i]) =
+            translate_point(&model_rotated_points[i], camera_ptr, x, y, z);
     }
 
-    let visible = back_face_culling(&translated_points, 0, 1, 2);
+    let visible: bool = back_face_culling(&translated_points, 0, 1, 2);
     if visible {
         //draw_face_outline(&mut bitmap4, screenPoints, 0, 1, 2, 3);
-        let color = utils::get_color(color, y_rotation + Fixed::from_raw(0));
+        let color: u16 = utils::get_color(color, y_rotation + Fixed::from_raw(0));
         draw_triangle(
             screen_points[0],
             screen_points[1],
@@ -483,4 +449,53 @@ pub fn draw_rect(
             page,
         );
     }
+}
+
+pub fn translate_point(
+    model_rotated_point: &[Fixed; 3],
+    camera_ptr: &Camera,
+    x: Fixed,
+    y: Fixed,
+    z: Fixed,
+) -> ([Fixed; 3], [Fixed; 2]) {
+    let width: i32 = 240;
+    let height: i32 = 160;
+    let middle: [Fixed; 2] = [Fixed::const_new(width / 2), Fixed::const_new(height / 2)]; // x, y
+
+    let mut translated_point: [Fixed; 4] = [
+        (*model_rotated_point)[0] + (x - (*camera_ptr).x),
+        (*model_rotated_point)[1] + (y - (*camera_ptr).y),
+        (*model_rotated_point)[2] + (z - (*camera_ptr).z),
+        Fixed::const_new(1),
+    ];
+
+    translated_point = matmul_4((*camera_ptr).y_rotation_matrix, translated_point);
+    translated_point = matmul_4((*camera_ptr).x_rotation_matrix, translated_point);
+    translated_point = matmul_4((*camera_ptr).z_rotation_matrix, translated_point);
+
+    // Apply projection matrix
+    let projected_point = matmul_4(utils::PROJECTION_MATRIX, translated_point);
+
+    let screen_point: [Fixed; 2];
+
+    // Perform perspective divide (convert to 2D)
+    if projected_point[3] != Fixed::const_new(0) {
+        let x: Fixed = projected_point[0] / projected_point[3];
+        let y: Fixed = projected_point[1] / projected_point[3];
+        // Convert to screen space
+        screen_point = [
+            (x * Fixed::const_new(width) / Fixed::const_new(2)) + middle[0],
+            (y * Fixed::const_new(height) / Fixed::const_new(2)) + middle[1],
+        ];
+    } else {
+        screen_point = [middle[0], middle[1]];
+    }
+
+    let translated_point: [Fixed; 3] = [
+        translated_point[0],
+        translated_point[1],
+        translated_point[2],
+    ];
+
+    return (translated_point, screen_point);
 }
