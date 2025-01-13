@@ -161,8 +161,8 @@ fn main(mut gba: agb::Gba) -> ! {
         let player_input_effects: effects::InputPlayerEffects = effects::InputPlayerEffects {
             support_below_id: bottom_support_id,
             bounding_box: &entity_array[0].bounding_box(),
+            action_requested: player1.action,
         };
-
         for i in 2..levelsize + 2 {
             if let EntityEnum::Empty(_) = entity_array[i] {
                 break;
@@ -176,8 +176,12 @@ fn main(mut gba: agb::Gba) -> ! {
                     //TODO: actually implement level finishes at some point
                     agb::println!("finished");
                 }
+                if player_effects.switch_flip {
+                    //TODO: call switch action on all items, that might cause something to happen...
+                }
             }
         }
+        player1.action = false;
 
         //rotate player body blocks and move them where the player is
         for i in 0..2 {

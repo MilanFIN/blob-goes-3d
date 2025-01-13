@@ -4,7 +4,7 @@ const REG_DISPCNT: *mut u32 = 0x0400_0000 as *mut u32;
 const DCNT_PAGE: u32 = 0x0010;
 
 pub fn draw_wide_point(x: i32, y: i32, color: u16, page: u16) {
-    let index = (y * 240 + x) / 2;
+    let index = (y * 240 + x) >> 1;
     let value = ((color as u16) << 8) | (color as u16);
 
     unsafe {

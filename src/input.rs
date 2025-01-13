@@ -132,6 +132,10 @@ pub fn handle_input(
         }
     }
 
+    if input.is_just_pressed(Button::B) {
+        player.action = true;
+    }
+
     if input.is_pressed(Button::UP) && input.is_pressed(Button::LEFT) {
         let (x, z) = player.forward_left();
         if attempt_move(player, x, z, entities, body) {

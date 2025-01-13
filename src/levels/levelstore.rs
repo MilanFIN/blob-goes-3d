@@ -18,7 +18,9 @@ const LEVEL2: &str = r#"
                 "speed": 1, "wait": 20
                 }
     },
-    { "type": "finish", "data": {"size": 2, "x": 0, "y": -3, "z": 3, "color": 2 } }
+    { "type": "finish", "data": {"size": 2, "x": 0, "y": -5, "z": 3, "color": 2 } },
+    { "type": "switch", "data": {"size": 2, "x": 0, "y": -3.5, "z": 1, "color": 2, "rotation": 0.0 } }
+
 ] 
 "#;
 

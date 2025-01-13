@@ -7,6 +7,10 @@ use serde::Deserializer;
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Fixed(Num<i32, 8>);
 
+pub fn default_bool() -> bool {
+    false
+}
+
 pub fn default_u16() -> u16 {
     0
 }

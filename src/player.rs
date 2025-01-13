@@ -15,6 +15,7 @@ pub struct Player {
     pub y: Fixed,
     pub z: Fixed,
     pub yspeed: Fixed,
+    pub action: bool,
 
     pub angle: Fixed,
     camera_angle: usize,
@@ -31,6 +32,7 @@ impl Player {
             yspeed: Fixed::const_new(0),
             camera_angle: 0,
             camera: Camera::default(),
+            action: false,
         }
     }
 

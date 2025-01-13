@@ -447,6 +447,7 @@ impl Entity for Finish {
                 move_y: Fixed::const_new(0),
                 move_z: Fixed::const_new(0),
                 finished: true,
+                switch_flip: false,
             });
         } else {
             None

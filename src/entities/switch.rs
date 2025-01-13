@@ -6,16 +6,16 @@ use super::BoundingCylinder;
 use super::Camera;
 use super::Entity;
 use crate::effects;
-use crate::effects::OutputPlayerEffects;
 use crate::renderer;
 use math::*;
 
 use crate::fixed;
-use crate::utils;
 use fixed::*;
 
+use crate::utils;
+
 #[derive(Copy, Clone, Deserialize, Debug)]
-pub struct Mover {
+pub struct Switch {
     #[serde(default = "default_i16")]
     id: i16,
     #[serde(default = "default_fixed")]
@@ -54,65 +54,32 @@ pub struct Mover {
     #[serde(default = "default_u16")]
     color: u16,
 
-    //moving platform positions
-    #[serde(default = "default_fixed")]
-    pos_a_x: Fixed,
-    #[serde(default = "default_fixed")]
-    pos_a_y: Fixed,
-    #[serde(default = "default_fixed")]
-    pos_a_z: Fixed,
-    #[serde(default = "default_fixed")]
-    pos_b_x: Fixed,
-    #[serde(default = "default_fixed")]
-    pos_b_y: Fixed,
-    #[serde(default = "default_fixed")]
-    pos_b_z: Fixed,
-
-    #[serde(default = "default_fixed")]
-    speed: Fixed,
-    #[serde(default = "positive_i16")]
-    direction: i16,
-    #[serde(default = "default_u16")]
-    wait: u16,
-    #[serde(default = "default_u16")]
-    waitcounter: u16,
+    #[serde(default = "default_bool")]
+    state: bool,
 }
 
-impl Mover {
-    #[allow(dead_code)]
-    pub fn default() -> Self {
-        Self {
-            x: Fixed::const_new(0),
-            y: Fixed::const_new(0),
-            z: Fixed::const_new(0),
-            xsize: Fixed::const_new(0),
-            ysize: Fixed::const_new(0),
-            zsize: Fixed::const_new(0),
-            x_rotation: Fixed::const_new(0),
-            y_rotation: Fixed::const_new(0),
-            z_rotation: Fixed::const_new(0),
-            points: [[Fixed::const_new(0); 3]; 8],
-            model_rotated_points: [[Fixed::const_new(0); 3]; 8],
-            x_rotation_matrix: [[Fixed::const_new(0); 3]; 3],
-            y_rotation_matrix: [[Fixed::const_new(0); 3]; 3],
-            z_rotation_matrix: [[Fixed::const_new(0); 3]; 3],
-            color: 0,
-            pos_a_x: Fixed::const_new(0),
-            pos_a_y: Fixed::const_new(0),
-            pos_a_z: Fixed::const_new(0),
-            pos_b_x: Fixed::const_new(0),
-            pos_b_y: Fixed::const_new(0),
-            pos_b_z: Fixed::const_new(0),
-            speed: Fixed::const_new(0),
-            direction: 1,
-            wait: 0,
-            waitcounter: 0,
-            id: 0,
+impl Switch {
+    pub fn position_offset_from_state(&self) -> (Fixed, Fixed) {
+        //90 derived from: LENGTH * cos(45) / 2
+        //where the length is the height of the stick in y dir
+        let mut result: Fixed = (self.points[1][1] - self.points[2][1]).abs() * Fixed::from_raw(90);
+        if !self.state {
+            result = -result;
         }
+
+        let x_add = result * self.y_rotation.sin();
+        let z_add = result * self.y_rotation.cos();
+        return (x_add, z_add);
+    }
+
+    pub fn flip(&mut self) {
+        self.state = !self.state;
+        self.reload_rotation_matrices();
+        self.refresh_model_matrix();
     }
 }
 
-impl Entity for Mover {
+impl Entity for Switch {
     fn set_x_offset(&mut self, x_offset: Fixed) {
         self.x = x_offset;
     }
@@ -125,13 +92,13 @@ impl Entity for Mover {
         self.z = z_offset;
     }
 
-    fn set_size(&mut self, size: Fixed) {
-        self.xsize = size;
-        self.ysize = size;
-        self.zsize = size;
-    }
+    fn set_size(&mut self, _size: Fixed) {}
 
     fn recalculate_points(&mut self) {
+        self.xsize = Fixed::from_raw(48);
+        self.ysize = Fixed::from_raw(300);
+        self.zsize = Fixed::from_raw(48);
+
         let halfx: Fixed = self.xsize / 2;
         let halfy: Fixed = self.ysize / 2;
         let halfz: Fixed = self.zsize / 2;
@@ -211,10 +178,17 @@ impl Entity for Mover {
     }
 
     fn reload_rotation_matrices(&mut self) {
+        if self.state {
+            self.x_rotation = Fixed::from_raw(32);
+        } else {
+            self.x_rotation = Fixed::from_raw(224);
+        }
+
         self.set_x_rotation(self.x_rotation);
         self.set_y_rotation(self.y_rotation);
         self.set_z_rotation(self.z_rotation);
     }
+
     fn refresh_model_matrix(&mut self) {
         for i in 0..self.points.len() {
             let point: &[Fixed; 3] = &self.points[i];
@@ -232,11 +206,12 @@ impl Entity for Mover {
     }
 
     fn render(&mut self, camera: &Camera, page: u16) {
+        let (x_add, z_add) = self.position_offset_from_state();
         renderer::draw_rect(
             &self.model_rotated_points,
-            self.x,
+            self.x + x_add,
             self.y,
-            self.z,
+            self.z + z_add,
             self.y_rotation,
             camera,
             self.color,
@@ -249,22 +224,23 @@ impl Entity for Mover {
     }
 
     fn bounding_box(&self) -> BoundingBox {
+        let (x_add, z_add) = self.position_offset_from_state();
         let points: [[Fixed; 2]; 4] = [
             [
-                self.model_rotated_points[0][0] + self.x,
-                self.model_rotated_points[0][2] + self.z,
+                self.model_rotated_points[0][0] + self.x - x_add,
+                self.model_rotated_points[0][2] + self.z - z_add,
             ],
             [
-                self.model_rotated_points[1][0] + self.x,
-                self.model_rotated_points[1][2] + self.z,
+                self.model_rotated_points[1][0] + self.x - x_add,
+                self.model_rotated_points[1][2] + self.z - z_add,
             ],
             [
-                self.model_rotated_points[5][0] + self.x,
-                self.model_rotated_points[5][2] + self.z,
+                self.model_rotated_points[5][0] + self.x - x_add,
+                self.model_rotated_points[5][2] + self.z - z_add,
             ],
             [
-                self.model_rotated_points[4][0] + self.x,
-                self.model_rotated_points[4][2] + self.z,
+                self.model_rotated_points[4][0] + self.x - x_add,
+                self.model_rotated_points[4][2] + self.z - z_add,
             ],
         ];
 
@@ -279,7 +255,7 @@ impl Entity for Mover {
                 .abs(),
             y_top: self.model_rotated_points[0][1] + self.y,
             y_bottom: self.model_rotated_points[2][1] + self.y,
-            rotation: -self.y_rotation,
+            rotation: self.y_rotation,
         }
     }
 
@@ -292,9 +268,11 @@ impl Entity for Mover {
             y_bottom: self.model_rotated_points[2][1] + self.y,
         }
     }
+
     fn get_y(&self) -> Fixed {
         return self.y;
     }
+
     fn set_color(&mut self, color: u16) {
         self.color = color;
     }
@@ -303,63 +281,21 @@ impl Entity for Mover {
         &mut self,
         effects: &effects::InputPlayerEffects,
     ) -> Option<effects::OutputPlayerEffects> {
-        if self.wait != 0 {
-            if self.waitcounter != 0 {
-                self.waitcounter -= 1;
-                return None;
+        if effects.action_requested {
+            if math::vector_len_2d(vector_sub_2d(effects.bounding_box.center, [self.x, self.z]))
+                < Fixed::from_raw(400)
+            {
+                self.flip();
+                return Option::Some(effects::OutputPlayerEffects {
+                    move_x: Fixed::const_new(0),
+                    move_y: Fixed::const_new(0),
+                    move_z: Fixed::const_new(0),
+                    finished: false,
+                    switch_flip: true,
+                });
             }
         }
-
-        let target: [Fixed; 3];
-        if self.direction > 0 {
-            target = [self.pos_b_x, self.pos_b_y, self.pos_b_z];
-        } else {
-            target = [self.pos_a_x, self.pos_a_y, self.pos_a_z];
-        }
-
-        let xdiff: Fixed = target[0] - self.x;
-        let ydiff: Fixed = target[1] - self.y;
-        let zdiff: Fixed = target[2] - self.z;
-
-        let distance = vector_len([xdiff, ydiff, zdiff]);
-        let xmovement: Fixed;
-        let ymovement: Fixed;
-        let zmovement: Fixed;
-
-        if distance < self.speed {
-            xmovement = target[0] - self.x;
-            ymovement = target[1] - self.y;
-            zmovement = target[2] - self.z;
-
-            self.x = target[0];
-            self.y = target[1];
-            self.z = target[2];
-            self.direction = 1 - self.direction;
-            self.waitcounter = self.wait
-        } else {
-            let dir: [Fixed; 3] = normalize([xdiff, ydiff, zdiff]);
-            let movement_vector = vector_mul(dir, self.speed);
-            self.x += movement_vector[0];
-            self.y += movement_vector[1];
-            self.z += movement_vector[2];
-
-            xmovement = movement_vector[0];
-            ymovement = movement_vector[1];
-            zmovement = movement_vector[2];
-        }
-
-        //player is standing on the moving block
-        if effects.support_below_id == self.id {
-            return Some(OutputPlayerEffects {
-                move_x: xmovement,
-                move_y: ymovement,
-                move_z: zmovement,
-                finished: false,
-                switch_flip: false,
-            });
-        } else {
-            return None;
-        }
+        None
     }
 
     fn get_id(&self) -> i16 {
@@ -367,6 +303,6 @@ impl Entity for Mover {
     }
 
     fn set_id(&mut self, id: i16) {
-        self.id = id;
+        self.id = id
     }
 }
