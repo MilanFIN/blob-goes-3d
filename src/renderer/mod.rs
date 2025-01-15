@@ -8,28 +8,32 @@ use math::*;
 
 #[allow(dead_code)]
 pub fn draw_line(mut x1: i32, mut y1: i32, x2: i32, y2: i32, color: u16, page: u16) {
+    const SCREEN_MIN_X: i32 = 0;
+    const SCREEN_MAX_X: i32 = 239;
+    const SCREEN_MIN_Y: i32 = 0;
+    const SCREEN_MAX_Y: i32 = 159;
+
     let dx: i32 = (x2 - x1).abs();
     let dy: i32 = (y2 - y1).abs();
 
-    let sx: i32;
-    let sy: i32;
-
-    if x1 < x2 {
-        sx = 1
-    } else {
-        sx = -1
-    }
-    if y1 < y2 {
-        sy = 1
-    } else {
-        sy = -1;
-    }
+    let sx: i32 = if x1 < x2 { 1 } else { -1 };
+    let sy: i32 = if y1 < y2 { 1 } else { -1 };
 
     let mut err: i32 = dx - dy;
 
     loop {
-        //bitmap.draw_point(x1, y1, color);
-        hw::draw_wide_point(x1, y1, color, page);
+        // Check if the current point is within the screen bounds
+        if x1 >= SCREEN_MIN_X && x1 <= SCREEN_MAX_X && y1 >= SCREEN_MIN_Y && y1 <= SCREEN_MAX_Y {
+            hw::draw_wide_point(x1, y1, color, page);
+        } else if (x1 < SCREEN_MIN_X && sx == -1)
+            || (x1 > SCREEN_MAX_X && sx == 1)
+            || (y1 < SCREEN_MIN_Y && sy == -1)
+            || (y1 > SCREEN_MAX_Y && sy == 1)
+        {
+            // Stop the loop if moving further will remain out of bounds
+            break;
+        }
+
         if x1 == x2 && y1 == y2 {
             break;
         }
@@ -37,7 +41,7 @@ pub fn draw_line(mut x1: i32, mut y1: i32, x2: i32, y2: i32, color: u16, page: u
         let e2: i32 = 2 * err;
         if e2 > -dy {
             err -= dy;
-            x1 += sx
+            x1 += sx;
         }
         if e2 < dx {
             err += dx;
@@ -48,45 +52,56 @@ pub fn draw_line(mut x1: i32, mut y1: i32, x2: i32, y2: i32, color: u16, page: u
 
 #[allow(dead_code)]
 pub fn draw_face_outline(
-    screen_points: [[i32; 2]; 8],
+    screen_points: &[[i32; 2]],
+    world_points: &[[Fixed; 3]],
     p1: usize,
     p2: usize,
     p3: usize,
     p4: usize,
     page: u16,
+    color: u16,
 ) {
-    draw_line(
-        screen_points[p1][0],
-        screen_points[p1][1],
-        screen_points[p2][0],
-        screen_points[p2][1],
-        1,
-        page,
-    );
-    draw_line(
-        screen_points[p2][0],
-        screen_points[p2][1],
-        screen_points[p3][0],
-        screen_points[p3][1],
-        1,
-        page,
-    );
-    draw_line(
-        screen_points[p3][0],
-        screen_points[p3][1],
-        screen_points[p4][0],
-        screen_points[p4][1],
-        1,
-        page,
-    );
-    draw_line(
-        screen_points[p4][0],
-        screen_points[p4][1],
-        screen_points[p1][0],
-        screen_points[p1][1],
-        1,
-        page,
-    );
+    if world_points[p1][2] > 0 && world_points[p2][2] > 0 {
+        draw_line(
+            screen_points[p1][0],
+            screen_points[p1][1],
+            screen_points[p2][0],
+            screen_points[p2][1],
+            color,
+            page,
+        );
+    }
+    if world_points[p2][2] > 0 && world_points[p3][2] > 0 {
+        draw_line(
+            screen_points[p2][0],
+            screen_points[p2][1],
+            screen_points[p3][0],
+            screen_points[p3][1],
+            color,
+            page,
+        );
+    }
+
+    if world_points[p3][2] > 0 && world_points[p4][2] > 0 {
+        draw_line(
+            screen_points[p3][0],
+            screen_points[p3][1],
+            screen_points[p4][0],
+            screen_points[p4][1],
+            color,
+            page,
+        );
+    }
+    if world_points[p4][2] > 0 && world_points[p1][2] > 0 {
+        draw_line(
+            screen_points[p4][0],
+            screen_points[p4][1],
+            screen_points[p1][0],
+            screen_points[p1][1],
+            color,
+            page,
+        );
+    }
 }
 
 //return true if visible, presume points to be defined in counter clockwise direction
@@ -264,6 +279,7 @@ pub fn draw_triangle(
     let y_max: Fixed = Fixed::const_new(160);
 
     //jank way to avoid giant polygons near zero plane
+    //TODO: Fix this like with the draw_face_outline and world coordinates
     if p1[0] > Fixed::const_new(400) || p1[0] < Fixed::const_new(-100) {
         return;
     }
@@ -332,7 +348,6 @@ pub fn draw_rect(
 
     let visible: bool = back_face_culling(&translated_points, 0, 1, 2);
     if visible {
-        //draw_face_outline(&mut bitmap4, screenPoints, 0, 1, 2, 3);
         let color: u16 = utils::get_color(color, y_rotation + Fixed::from_raw(0));
         draw_triangle(
             screen_points[0],
@@ -351,7 +366,6 @@ pub fn draw_rect(
     }
     let visible = back_face_culling(&translated_points, 7, 6, 5);
     if visible {
-        //draw_face_outline(&mut bitmap4, screenPoints, 7, 6, 5, 4);
         let color = utils::get_color(color, y_rotation + Fixed::from_raw(128));
         draw_triangle(
             screen_points[7],
@@ -371,7 +385,6 @@ pub fn draw_rect(
     let visible = back_face_culling(&translated_points, 0, 3, 7);
 
     if visible {
-        //draw_face_outline(&mut bitmap4, screenPoints, 0, 3, 7, 4);
         let color = utils::get_color(color, y_rotation + Fixed::from_raw(64));
 
         draw_triangle(
@@ -391,7 +404,6 @@ pub fn draw_rect(
     }
     let visible = back_face_culling(&translated_points, 1, 5, 6);
     if visible {
-        //draw_face_outline(&mut bitmap4, screenPoints, 1, 5, 6, 2);
         let color = utils::get_color(color, y_rotation + Fixed::from_raw(192));
 
         draw_triangle(
@@ -411,7 +423,6 @@ pub fn draw_rect(
     }
     let visible = back_face_culling(&translated_points, 7, 3, 2);
     if visible {
-        //draw_face_outline(&mut bitmap4, screenPoints, 7, 3, 2, 6);
         let color = utils::get_color(color, Fixed::from_raw(0));
 
         draw_triangle(
@@ -431,7 +442,6 @@ pub fn draw_rect(
     }
     let visible = back_face_culling(&translated_points, 0, 4, 5);
     if visible {
-        //draw_face_outline(&mut bitmap4, screenPoints, 0, 4, 5, 1);
         let color = utils::get_color(color, Fixed::from_raw(0));
 
         draw_triangle(
@@ -449,6 +459,37 @@ pub fn draw_rect(
             page,
         );
     }
+}
+
+#[inline(always)]
+pub fn draw_wireframe_rect(
+    model_rotated_points: &[[Fixed; 3]; 8],
+    x: Fixed,
+    y: Fixed,
+    z: Fixed,
+    _y_rotation: Fixed,
+    camera_ptr: &Camera,
+    color: u16,
+    page: u16,
+) {
+    let mut screen_points: [[i32; 2]; 8] = [[0; 2]; 8];
+    let mut translated_points: [[Fixed; 3]; 8] = [[
+        Fixed::const_new(0),
+        Fixed::const_new(0),
+        Fixed::const_new(0),
+    ]; 8];
+
+    for i in 0..(*model_rotated_points).len() {
+        let screen_point: [Fixed; 2];
+        (translated_points[i], screen_point) =
+            translate_point(&model_rotated_points[i], camera_ptr, x, y, z);
+        screen_points[i] = [screen_point[0].trunc(), screen_point[1].trunc()];
+    }
+
+    draw_face_outline(&screen_points, &translated_points, 0, 1, 2, 3, page, color);
+    draw_face_outline(&screen_points, &translated_points, 4, 5, 6, 7, page, color);
+    draw_face_outline(&screen_points, &translated_points, 3, 2, 6, 7, page, color);
+    draw_face_outline(&screen_points, &translated_points, 0, 1, 5, 4, page, color);
 }
 
 pub fn translate_point(

@@ -19,7 +19,8 @@ const LEVEL2: &str = r#"
                 }
     },
     { "type": "finish", "data": {"size": 2, "x": 0, "y": -5, "z": 3, "color": 2 } },
-    { "type": "switch", "data": {"size": 2, "x": 0, "y": -3.5, "z": 1, "color": 2, "rotation": 0.0 } }
+    { "type": "switch", "data": {"size": 2, "x": 0, "y": -3.5, "z": 1, "color": 3, "rotation": 0.0 } },
+    { "type": "wireframe", "data": {"xsize": 5, "ysize": 1, "zsize": 5, "x": 3, "y": -5, "z": 3, "color": 2 } }
 
 ] 
 "#;

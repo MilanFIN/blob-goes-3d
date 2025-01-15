@@ -404,25 +404,11 @@ impl Entity for Finish {
 
     fn bounding_box(&self) -> BoundingBox {
         //the finish has no collision with the player
-        BoundingBox {
-            data: [[Fixed::const_new(0); 2]; 4],
-            center: [Fixed::const_new(0); 2],
-            width: Fixed::const_new(0),
-            height: Fixed::const_new(0),
-            y_top: Fixed::const_new(-999),
-            y_bottom: Fixed::const_new(-999),
-            rotation: Fixed::const_new(0),
-        }
+        BoundingBox::empty()
     }
 
     fn bounding_cylinder(&self) -> BoundingCylinder {
-        BoundingCylinder {
-            x: self.x,
-            z: self.z,
-            radius: self.size / 2,
-            y_top: self.model_rotated_points[0][1] + self.y,
-            y_bottom: self.model_rotated_points[2][1] + self.y,
-        }
+        BoundingCylinder::empty()
     }
 
     fn get_y(&self) -> Fixed {

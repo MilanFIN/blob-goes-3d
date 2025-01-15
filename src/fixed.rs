@@ -1,4 +1,5 @@
 use agb::fixnum::Num;
+use core::cmp::Ordering;
 use core::ops::Neg;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 use serde::Deserialize;
@@ -84,6 +85,13 @@ impl Fixed {
     pub fn modulo(self, other: Self) -> Self {
         let remainder: Num<i32, 8> = self.0 % other.0;
         Fixed(remainder)
+    }
+    
+    pub fn cos(self) -> Self {
+        Fixed(self.0.cos())
+    }
+    pub fn sin(self) -> Self {
+        Fixed(self.0.sin())
     }
 }
 
@@ -206,15 +214,17 @@ impl DivAssign<i32> for Fixed {
     }
 }
 
-///
-/// Num traits
-///
 
-impl Fixed {
-    pub fn cos(self) -> Self {
-        Fixed(self.0.cos())
+
+
+impl PartialEq<i32> for Fixed {
+    fn eq(&self, other: &i32) -> bool {
+        self.0 == Num::new(*other) // Convert `i32` to `Fixed`-compatible `Num` and compare
     }
-    pub fn sin(self) -> Self {
-        Fixed(self.0.sin())
+}
+
+impl PartialOrd<i32> for Fixed {
+    fn partial_cmp(&self, other: &i32) -> Option<Ordering> {
+        self.0.partial_cmp(&Num::new(*other)) // Convert `i32` to `Num` and compare
     }
 }

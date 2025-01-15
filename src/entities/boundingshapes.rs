@@ -58,6 +58,18 @@ impl BoundingBox {
             rotation: old_box.rotation,
         }
     }
+
+    pub fn empty() -> BoundingBox {
+        BoundingBox {
+            data: [[Fixed::const_new(0); 2]; 4],
+            center: [Fixed::const_new(0); 2],
+            width: Fixed::const_new(0),
+            height: Fixed::const_new(0),
+            y_top: Fixed::const_new(-999),
+            y_bottom: Fixed::const_new(-999),
+            rotation: Fixed::const_new(0),
+        }
+    }
 }
 
 pub struct BoundingCylinder {
@@ -86,6 +98,16 @@ impl BoundingCylinder {
             radius: old.radius,
             y_top: old.y_top,
             y_bottom: old.y_bottom,
+        }
+    }
+
+    pub fn empty() -> Self {
+        BoundingCylinder {
+            x: Fixed::const_new(0),
+            z: Fixed::const_new(0),
+            radius: Fixed::const_new(0),
+            y_top: Fixed::const_new(-999),
+            y_bottom: Fixed::const_new(-999),
         }
     }
 }
