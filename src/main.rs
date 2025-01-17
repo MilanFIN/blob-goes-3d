@@ -165,6 +165,7 @@ fn main(mut gba: agb::Gba) -> ! {
         let game_state: effects::InputGameState = effects::InputGameState {
             support_below_id: bottom_support_id,
             bounding_box: &entity_array[0].bounding_box(),
+            bounding_cylinder: &entity_array[0].bounding_cylinder(),
             action_requested: player1.action,
         };
         for i in 2..levelsize + 2 {
@@ -192,7 +193,6 @@ fn main(mut gba: agb::Gba) -> ! {
                         w.toggle();
                     }
                 }
-                //TODO: call flip action on all wireframe entities
             }
         }
         event_loop.clear();

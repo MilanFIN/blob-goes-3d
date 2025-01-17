@@ -1,7 +1,9 @@
 use serde::Deserialize;
 
 use super::math;
+use super::utils::cylinder_and_rotated_rect_collision;
 use super::utils::rect_overlap;
+use super::utils::rect_simple_overlap_check;
 use super::BoundingBox;
 use super::BoundingCylinder;
 use super::Camera;
@@ -51,6 +53,11 @@ pub struct Finish {
 
     #[serde(default = "default_u16")]
     color: u16,
+
+    #[serde(default = "default_fixed")]
+    radius: Fixed,
+    #[serde(default = "default_fixed")]
+    depth: Fixed,
 }
 
 impl Finish {
@@ -71,15 +78,17 @@ impl Finish {
             z_rotation_matrix: [[Fixed::const_new(0); 3]; 3],
             color: 0,
             id: 0,
+            radius: Fixed::const_new(0),
+            depth: Fixed::const_new(0),
         }
     }
 
     fn finish_bounding_box(&self) -> BoundingBox {
         let points: [[Fixed; 2]; 4] = [
-            [Fixed::const_new(1) + self.x, Fixed::from_raw(4) + self.z],
-            [Fixed::const_new(1) + self.x, Fixed::from_raw(-4) + self.z],
-            [Fixed::const_new(-1) + self.x, Fixed::from_raw(-4) + self.z],
-            [Fixed::const_new(-1) + self.x, Fixed::from_raw(4) + self.z],
+            [self.radius + self.x, self.depth / 2 + self.z],
+            [ self.radius + self.x, -self.depth / 2  + self.z],
+            [-self.radius + self.x, -self.depth / 2  + self.z],
+            [-self.radius + self.x, self.depth / 2  + self.z],
         ];
         BoundingBox {
             data: points,
@@ -90,8 +99,8 @@ impl Finish {
             height: (self.model_rotated_points[1][2] + self.z
                 - (self.model_rotated_points[5][2] + self.z))
                 .abs(),
-            y_top: Fixed::const_new(1) + self.y,
-            y_bottom: Fixed::const_new(-1) + self.y,
+            y_top: self.radius + self.y,
+            y_bottom: -self.radius + self.y,
             rotation: self.y_rotation,
         }
     }
@@ -115,30 +124,30 @@ impl Entity for Finish {
     }
 
     fn recalculate_points(&mut self) {
-        let depth = Fixed::from_raw(8);
+        self.depth = Fixed::from_raw(32);
         //front face
-        self.points[0] = [
-            Fixed::const_new(0),
-            Fixed::const_new(0),
-            Fixed::const_new(1),
-        ];
+        self.points[0] = [Fixed::const_new(0), Fixed::const_new(0), self.depth / 2];
 
-        let radius = Fixed::const_new(1);
+        self.radius = Fixed::const_new(2);
 
         for i in 1..8 {
             let angle = Fixed::from_raw(43) * i; // Angle in radians (i * 60 degrees)
             self.points[i] = [
-                radius * angle.cos(),
-                radius * angle.sin(),
-                Fixed::const_new(1),
+                self.radius * angle.cos(),
+                self.radius * angle.sin(),
+                self.depth/2,
             ];
         }
         //back face
-        self.points[7] = [Fixed::const_new(0), Fixed::const_new(0), depth / 2];
+        self.points[7] = [Fixed::const_new(0), Fixed::const_new(0), -self.depth / 2];
 
         for i in 8..14 {
             let angle = Fixed::from_raw(43) * (i - 7); // Angle in radians (i * 60 degrees)
-            self.points[i] = [radius * angle.cos(), radius * angle.sin(), -depth / 2];
+            self.points[i] = [
+                self.radius * angle.cos(),
+                self.radius * angle.sin(),
+                -self.depth / 2,
+            ];
         }
     }
 
@@ -247,8 +256,7 @@ impl Entity for Finish {
 
         let visible: bool = back_face_culling(&translated_points, 0, 1, 2);
         if visible {
-            let color: u16 =
-                renderer::utils::get_color(self.color, self.y_rotation + Fixed::from_raw(0));
+            let color: u16 = renderer::utils::get_color(self.color, 0);
             renderer::draw_triangle(
                 screen_points[0],
                 screen_points[1],
@@ -295,8 +303,7 @@ impl Entity for Finish {
         }
         let visible: bool = back_face_culling(&translated_points, 7, 9, 8);
         if visible {
-            let color: u16 =
-                renderer::utils::get_color(self.color, self.y_rotation + Fixed::from_raw(0));
+            let color: u16 = renderer::utils::get_color(self.color, 0);
             renderer::draw_triangle(
                 screen_points[7],
                 screen_points[8],
@@ -345,8 +352,7 @@ impl Entity for Finish {
         for i in 1..6 {
             let visible: bool = back_face_culling(&translated_points, i, i + 8, i + 1);
             if visible {
-                let color: u16 =
-                    renderer::utils::get_color(self.color, self.y_rotation + Fixed::from_raw(0));
+                let color: u16 = renderer::utils::get_color(self.color, (i % 3 + 1) as i16);
                 renderer::draw_triangle(
                     screen_points[i],
                     screen_points[i + 8],
@@ -365,8 +371,7 @@ impl Entity for Finish {
         }
         let visible: bool = back_face_culling(&translated_points, 6, 13, 8);
         if visible {
-            let color: u16 =
-                renderer::utils::get_color(self.color, self.y_rotation + Fixed::from_raw(0));
+            let color: u16 = renderer::utils::get_color(self.color, 3);
             renderer::draw_triangle(
                 screen_points[6],
                 screen_points[13],
@@ -409,10 +414,12 @@ impl Entity for Finish {
         let hitbox = self.finish_bounding_box();
         if (effects.bounding_box.y_top > hitbox.y_bottom
             && effects.bounding_box.y_bottom < hitbox.y_top)
-            && rect_overlap(effects.bounding_box, &hitbox)
+            && rect_simple_overlap_check(effects.bounding_box, &hitbox)
+                && (rect_overlap(&hitbox, effects.bounding_box)
+                    || cylinder_and_rotated_rect_collision(effects.bounding_cylinder, &hitbox).1)
         {
             return Some(effects::OutputEvents::GameFinish(effects::Finished {
-                finished: true,
+                //finished: true,
             }));
         } else {
             None

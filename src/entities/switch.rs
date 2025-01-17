@@ -284,16 +284,8 @@ impl Entity for Switch {
             {
                 self.flip();
                 return Some(effects::OutputEvents::SwitchAction(effects::SwitchFlip {
-                    switch_flip: true,
+                    //switch_flip: true,
                 }));
-                /*
-                return Option::Some(effects::OutputEvents {
-                    move_x: Fixed::const_new(0),
-                    move_y: Fixed::const_new(0),
-                    move_z: Fixed::const_new(0),
-                    finished: false,
-                    switch_flip: true,
-                });*/
             }
         }
         None

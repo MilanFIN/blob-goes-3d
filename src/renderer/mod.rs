@@ -326,7 +326,7 @@ pub fn draw_rect(
     x: Fixed,
     y: Fixed,
     z: Fixed,
-    y_rotation: Fixed,
+    _y_rotation: Fixed,
     camera_ptr: &Camera,
     color: u16,
     page: u16,
@@ -345,7 +345,7 @@ pub fn draw_rect(
 
     let visible: bool = back_face_culling(&translated_points, 0, 1, 2);
     if visible {
-        let color: u16 = utils::get_color(color, y_rotation + Fixed::from_raw(0));
+        let color: u16 = utils::get_color(color, 1);
         draw_triangle(
             screen_points[0],
             screen_points[1],
@@ -363,7 +363,7 @@ pub fn draw_rect(
     }
     let visible = back_face_culling(&translated_points, 7, 6, 5);
     if visible {
-        let color = utils::get_color(color, y_rotation + Fixed::from_raw(128));
+        let color = utils::get_color(color, 1);
         draw_triangle(
             screen_points[7],
             screen_points[6],
@@ -382,7 +382,7 @@ pub fn draw_rect(
     let visible = back_face_culling(&translated_points, 0, 3, 7);
 
     if visible {
-        let color = utils::get_color(color, y_rotation + Fixed::from_raw(64));
+        let color = utils::get_color(color, 2);
 
         draw_triangle(
             screen_points[0],
@@ -401,7 +401,7 @@ pub fn draw_rect(
     }
     let visible = back_face_culling(&translated_points, 1, 5, 6);
     if visible {
-        let color = utils::get_color(color, y_rotation + Fixed::from_raw(192));
+        let color = utils::get_color(color, 2);
 
         draw_triangle(
             screen_points[1],
@@ -420,7 +420,7 @@ pub fn draw_rect(
     }
     let visible = back_face_culling(&translated_points, 7, 3, 2);
     if visible {
-        let color = utils::get_color(color, Fixed::from_raw(0));
+        let color = utils::get_color(color, 0);
 
         draw_triangle(
             screen_points[7],
@@ -439,7 +439,7 @@ pub fn draw_rect(
     }
     let visible = back_face_culling(&translated_points, 0, 4, 5);
     if visible {
-        let color = utils::get_color(color, Fixed::from_raw(0));
+        let color = utils::get_color(color, 0);
 
         draw_triangle(
             screen_points[0],

@@ -8,7 +8,7 @@ const LEVEL1: &str = r#"
 
 const LEVEL2: &str = r#"
 [
-    { "type": "rectangle", "data": { "xsize": 5, "ysize": 1, "zsize": 5, "x": 0, "y": -5, "z": 0, "color": 2 } },
+    { "type": "rectangle", "data": { "xsize": 0.1, "ysize": 1, "zsize": 5, "x": 0, "y": -5, "z": 0, "color": 2 } },
     { "type": "crumbling", "data": { "xsize": 5, "ysize": 1, "zsize": 5, "x": 0, "y": -3.5, "z": 3, "rotation": -0.1, "lifetime": 1 } },
     {
         "type": "mover",
@@ -18,7 +18,7 @@ const LEVEL2: &str = r#"
                 "speed": 1, "wait": 20
                 }
     },
-    { "type": "finish", "data": {"size": 2, "x": 0, "y": -5, "z": 3, "color": 2 } },
+    { "type": "finish", "data": {"size": 2, "x": 0, "y": -3, "z": 2, "color": 2 } },
     { "type": "switch", "data": {"size": 2, "x": 0, "y": -3.5, "z": 1, "color": 3, "rotation": 0.0 } },
     { "type": "wireframe", "data": {"xsize": 5, "ysize": 1, "zsize": 5, "x": 3, "y": -5, "z": 3, "color": 0 } }
 

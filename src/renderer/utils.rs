@@ -33,7 +33,7 @@ fn init_palette_slice(
     g: i32,
     b: i32,
     i: u32,
-    scale: i32
+    scale: i32,
 ) {
     let red: Fixed = Fixed::new(r);
     let green: Fixed = Fixed::const_new(g);
@@ -41,9 +41,9 @@ fn init_palette_slice(
 
     for j in 0..8 {
         let red_shade: u16 = (red - (red / 8 / scale) * j as i32).trunc() as u16;
-        let green_shade: u16 = ((green - (green / 8/ scale) * j as i32).trunc() << 5) as u16 ;
-        let blue_shade: u16 = ((blue - (blue / 8/ scale) * j as i32).trunc() << 10) as u16 ;
-        bitmap4.set_palette_entry((i*8 - j) as u32, red_shade | green_shade | blue_shade);
+        let green_shade: u16 = ((green - (green / 8 / scale) * j as i32).trunc() << 5) as u16;
+        let blue_shade: u16 = ((blue - (blue / 8 / scale) * j as i32).trunc() << 10) as u16;
+        bitmap4.set_palette_entry((i * 8 - j) as u32, red_shade | green_shade | blue_shade);
     }
 }
 
@@ -56,7 +56,16 @@ pub fn init_palette(bitmap4: &mut agb::display::bitmap4::Bitmap4) {
     init_palette_slice(bitmap4, 15, 10, 7, 4, 2);
 }
 
-pub fn get_color(index: u16, angle: Fixed) -> u16 {
+pub fn get_color(index: u16, shade: i16) -> u16 {
+    if shade == 0 {
+        return index * 8 + 7;
+    } else if shade == 1 {
+        return index * 8 + 5;
+    } else if shade == 2 {
+        return index * 8 + 4;
+    }
+    return index*8+3;
+    /*
     const SUN_ANGLE: Fixed = Fixed::from_raw(32);
     const BASE_COLOR: Fixed = Fixed::const_new(7);
     const QUARTER: Fixed = Fixed::from_raw(128);
@@ -73,4 +82,5 @@ pub fn get_color(index: u16, angle: Fixed) -> u16 {
 
     // Convert to integer index
     return ((offset.trunc()) as u16) + index * 8;
+    */
 }

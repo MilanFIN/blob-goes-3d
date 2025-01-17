@@ -6,7 +6,6 @@ use super::BoundingCylinder;
 use super::Camera;
 use super::Entity;
 use crate::effects;
-use crate::effects::OutputEvents;
 use crate::renderer;
 use math::*;
 

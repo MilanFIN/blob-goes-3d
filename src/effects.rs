@@ -1,8 +1,9 @@
-use crate::{boundingshapes::BoundingBox, Fixed};
+use crate::{boundingshapes::{BoundingBox, BoundingCylinder}, Fixed};
 
 pub struct InputGameState<'a> {
 	pub support_below_id: i16,
 	pub bounding_box: &'a BoundingBox,
+	pub bounding_cylinder: &'a BoundingCylinder,
 	pub action_requested: bool,
 }
 
@@ -21,11 +22,11 @@ pub struct MoveXYZ {
 }
 
 pub struct Finished {
-	pub finished: bool,
+	//pub finished: bool,
 }
 
 pub struct SwitchFlip {
-	pub switch_flip: bool,
+	//pub switch_flip: bool,
 }
 
 

@@ -2,7 +2,6 @@ use crate::math::cross_product;
 
 use super::{BoundingBox, BoundingCylinder, Camera, EntityEnum, Fixed};
 
-
 fn partition(
     entity_render_order: &mut [usize],
     entity_array: &[EntityEnum],
@@ -54,7 +53,7 @@ pub fn quick_sort(
     }
 }
 
-fn rect_simple_overlap_check(first: &BoundingBox, second: &BoundingBox) -> bool {
+pub fn rect_simple_overlap_check(first: &BoundingBox, second: &BoundingBox) -> bool {
     let mut first_smallest_x = first.data[0][0];
     let mut first_largest_x = first.data[0][0];
     let mut first_smallest_y = first.data[0][1];
@@ -106,10 +105,10 @@ fn rect_simple_overlap_check(first: &BoundingBox, second: &BoundingBox) -> bool 
 
 pub fn rect_overlap(first: &BoundingBox, second: &BoundingBox) -> bool {
     for i in 0..4 {
-        let cross1 = cross_product(second.data[0], second.data[1], first.data[i]);
-        let cross2 = cross_product(second.data[1], second.data[2], first.data[i]);
-        let cross3 = cross_product(second.data[2], second.data[3], first.data[i]);
-        let cross4 = cross_product(second.data[3], second.data[0], first.data[i]);
+        let cross1: Fixed = cross_product(second.data[0], second.data[1], first.data[i]);
+        let cross2: Fixed = cross_product(second.data[1], second.data[2], first.data[i]);
+        let cross3: Fixed = cross_product(second.data[2], second.data[3], first.data[i]);
+        let cross4: Fixed = cross_product(second.data[3], second.data[0], first.data[i]);
         const Z: Fixed = Fixed::const_new(0);
         if (cross1 >= Z && cross2 >= Z && cross3 >= Z && cross4 >= Z)
             || (cross1 <= Z && cross2 <= Z && cross3 <= Z && cross4 <= Z)
@@ -118,10 +117,10 @@ pub fn rect_overlap(first: &BoundingBox, second: &BoundingBox) -> bool {
         }
     }
     for i in 0..4 {
-        let cross1 = cross_product(first.data[0], first.data[1], second.data[i]);
-        let cross2 = cross_product(first.data[1], first.data[2], second.data[i]);
-        let cross3 = cross_product(first.data[2], first.data[3], second.data[i]);
-        let cross4 = cross_product(first.data[3], first.data[0], second.data[i]);
+        let cross1: Fixed = cross_product(first.data[0], first.data[1], second.data[i]);
+        let cross2: Fixed = cross_product(first.data[1], first.data[2], second.data[i]);
+        let cross3: Fixed = cross_product(first.data[2], first.data[3], second.data[i]);
+        let cross4: Fixed = cross_product(first.data[3], first.data[0], second.data[i]);
 
         if (cross1 >= 0 && cross2 >= 0 && cross3 >= 0 && cross4 >= 0)
             || (cross1 <= 0 && cross2 <= 0 && cross3 <= 0 && cross4 <= 0)
@@ -132,17 +131,23 @@ pub fn rect_overlap(first: &BoundingBox, second: &BoundingBox) -> bool {
     return false;
 }
 
-pub fn vertical_room_check(first: &BoundingBox, second: &BoundingBox, limit: Fixed) -> Fixed {
-    if (limit < 0 && first.y_top > second.y_bottom)
-        || (limit > 0 && first.y_bottom < second.y_top)
+pub fn vertical_room_check(
+    first: &BoundingBox,
+    second: &BoundingBox,
+    first_fallback: &BoundingCylinder,
+    limit: Fixed,
+) -> Fixed {
+    if (limit < 0 && first.y_top > second.y_bottom) || (limit > 0 && first.y_bottom < second.y_top)
     {
         return limit;
     }
 
+    //fast check to see if we are even close to each other
     if !rect_simple_overlap_check(first, second) {
         return limit;
     }
 
+    //more detailed check
     if rect_overlap(first, second) {
         if limit < 0 {
             return first.y_top;
@@ -151,12 +156,24 @@ pub fn vertical_room_check(first: &BoundingBox, second: &BoundingBox, limit: Fix
         }
     }
 
+    //if the more detailed check doesn't produce an answer, check with the cylinder to account for a
+    //special edge case, where the player is standing on a super narrow platform
+    if cylinder_and_rotated_rect_collision(first_fallback, second).1 {
+        if limit < 0 {
+            return first.y_top;
+        } else {
+            return first.y_bottom;
+        }
+    }
+
+
     return limit;
 }
 
 //determine if the element in the entiry array is below us and how far
 pub fn check_support_below(entity_array: &[EntityEnum], element: usize) -> (Fixed, i16) {
     let bottom: BoundingBox = entity_array[element].bounding_box();
+    let fallback: BoundingCylinder = entity_array[element].bounding_cylinder();
     let mut height: Fixed = Fixed::const_new(-999);
     let mut collider_id: i16 = -1;
     for (i, e) in entity_array.iter().enumerate() {
@@ -165,7 +182,7 @@ pub fn check_support_below(entity_array: &[EntityEnum], element: usize) -> (Fixe
         }
         if i != 0 && i != 1 {
             let top: BoundingBox = e.bounding_box();
-            let d: Fixed = vertical_room_check(&top, &bottom, Fixed::const_new(-999));
+            let d: Fixed = vertical_room_check(&top, &bottom, &fallback, Fixed::const_new(-999));
             if d > height {
                 height = d;
                 if height == bottom.y_bottom {
@@ -182,6 +199,8 @@ pub fn check_support_below(entity_array: &[EntityEnum], element: usize) -> (Fixe
 //if that - head height > max_height -> override
 pub fn check_block_above(entity_array: &[EntityEnum], element: usize) -> Fixed {
     let top: BoundingBox = entity_array[element].bounding_box();
+    let fallback: BoundingCylinder = entity_array[element].bounding_cylinder();
+
     let mut max_height: Fixed = Fixed::const_new(999);
     for (i, e) in entity_array.iter().enumerate() {
         if let EntityEnum::Empty(_) = e {
@@ -189,7 +208,8 @@ pub fn check_block_above(entity_array: &[EntityEnum], element: usize) -> Fixed {
         }
         if i != 0 && i != 1 {
             let bottom = e.bounding_box();
-            let overlap_height: Fixed = vertical_room_check(&bottom, &top, Fixed::const_new(999));
+            let overlap_height: Fixed =
+                vertical_room_check(&bottom, &top, &fallback, Fixed::const_new(999));
             if overlap_height < max_height {
                 max_height = overlap_height;
             }
