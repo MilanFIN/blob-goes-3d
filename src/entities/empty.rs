@@ -38,7 +38,7 @@ impl Entity for Empty {
 
     fn set_color(&mut self, _color: u16) {}
 
-    fn tick(&mut self, _effects: &effects::InputPlayerEffects)-> Option<effects::OutputPlayerEffects> {None}
+    fn tick(&mut self, _effects: &effects::InputGameState)-> Option<effects::OutputEvents> {None}
 
     fn get_id(&self) -> i16 {-1}
 

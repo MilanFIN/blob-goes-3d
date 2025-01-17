@@ -123,9 +123,8 @@ pub fn rect_overlap(first: &BoundingBox, second: &BoundingBox) -> bool {
         let cross3 = cross_product(first.data[2], first.data[3], second.data[i]);
         let cross4 = cross_product(first.data[3], first.data[0], second.data[i]);
 
-        const Z: Fixed = Fixed::const_new(0);
-        if (cross1 >= Z && cross2 >= Z && cross3 >= Z && cross4 >= Z)
-            || (cross1 <= Z && cross2 <= Z && cross3 <= Z && cross4 <= Z)
+        if (cross1 >= 0 && cross2 >= 0 && cross3 >= 0 && cross4 >= 0)
+            || (cross1 <= 0 && cross2 <= 0 && cross3 <= 0 && cross4 <= 0)
         {
             return true;
         }
@@ -134,8 +133,8 @@ pub fn rect_overlap(first: &BoundingBox, second: &BoundingBox) -> bool {
 }
 
 pub fn vertical_room_check(first: &BoundingBox, second: &BoundingBox, limit: Fixed) -> Fixed {
-    if (limit < Fixed::const_new(0) && first.y_top > second.y_bottom)
-        || (limit > Fixed::const_new(0) && first.y_bottom < second.y_top)
+    if (limit < 0 && first.y_top > second.y_bottom)
+        || (limit > 0 && first.y_bottom < second.y_top)
     {
         return limit;
     }
@@ -145,7 +144,7 @@ pub fn vertical_room_check(first: &BoundingBox, second: &BoundingBox, limit: Fix
     }
 
     if rect_overlap(first, second) {
-        if limit < Fixed::const_new(0) {
+        if limit < 0 {
             return first.y_top;
         } else {
             return first.y_bottom;

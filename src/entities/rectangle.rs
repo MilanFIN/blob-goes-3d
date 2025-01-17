@@ -267,7 +267,7 @@ impl Entity for Rectangle {
     fn set_color(&mut self, color: u16) {
         self.color = color;
     }
-    fn tick(&mut self, _effects: &effects::InputPlayerEffects) -> Option<effects::OutputPlayerEffects> {
+    fn tick(&mut self, _effects: &effects::InputGameState) -> Option<effects::OutputEvents> {
         return None
     }
     

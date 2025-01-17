@@ -80,6 +80,9 @@ impl Wireframe {
             solid: false,
         }
     }
+    pub fn toggle(&mut self) {
+        self.solid = !self.solid;
+    }
 }
 
 impl Entity for Wireframe {
@@ -287,8 +290,8 @@ impl Entity for Wireframe {
     }
     fn tick(
         &mut self,
-        _effects: &effects::InputPlayerEffects,
-    ) -> Option<effects::OutputPlayerEffects> {
+        _effects: &effects::InputGameState,
+    ) -> Option<effects::OutputEvents> {
         return None;
     }
 

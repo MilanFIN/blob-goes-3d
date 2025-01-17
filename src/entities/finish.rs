@@ -76,22 +76,10 @@ impl Finish {
 
     fn finish_bounding_box(&self) -> BoundingBox {
         let points: [[Fixed; 2]; 4] = [
-            [
-                Fixed::const_new(1) + self.x,
-                Fixed::from_raw(4) + self.z,
-            ],
-            [
-                Fixed::const_new(1) + self.x,
-                Fixed::from_raw(-4) + self.z,
-            ],
-            [
-                Fixed::const_new(-1) + self.x,
-                Fixed::from_raw(-4) + self.z,
-            ],
-            [
-                Fixed::const_new(-1) + self.x,
-                Fixed::from_raw(4) + self.z,
-            ],
+            [Fixed::const_new(1) + self.x, Fixed::from_raw(4) + self.z],
+            [Fixed::const_new(1) + self.x, Fixed::from_raw(-4) + self.z],
+            [Fixed::const_new(-1) + self.x, Fixed::from_raw(-4) + self.z],
+            [Fixed::const_new(-1) + self.x, Fixed::from_raw(4) + self.z],
         ];
         BoundingBox {
             data: points,
@@ -240,7 +228,6 @@ impl Entity for Finish {
     }
 
     fn render(&mut self, camera: &Camera, page: u16) {
-
         let mut screen_points: [[Fixed; 2]; 14] = [[Fixed::const_new(0), Fixed::const_new(0)]; 14];
         let mut translated_points: [[Fixed; 3]; 14] = [[
             Fixed::const_new(0),
@@ -256,7 +243,6 @@ impl Entity for Finish {
                 self.y,
                 self.z,
             );
-            
         }
 
         let visible: bool = back_face_culling(&translated_points, 0, 1, 2);
@@ -419,22 +405,15 @@ impl Entity for Finish {
         self.color = color;
     }
 
-    fn tick(
-        &mut self,
-        effects: &effects::InputPlayerEffects,
-    ) -> Option<effects::OutputPlayerEffects> {
+    fn tick(&mut self, effects: &effects::InputGameState) -> Option<effects::OutputEvents> {
         let hitbox = self.finish_bounding_box();
         if (effects.bounding_box.y_top > hitbox.y_bottom
             && effects.bounding_box.y_bottom < hitbox.y_top)
             && rect_overlap(effects.bounding_box, &hitbox)
         {
-            return Some(effects::OutputPlayerEffects {
-                move_x: Fixed::const_new(0),
-                move_y: Fixed::const_new(0),
-                move_z: Fixed::const_new(0),
+            return Some(effects::OutputEvents::GameFinish(effects::Finished {
                 finished: true,
-                switch_flip: false,
-            });
+            }));
         } else {
             None
         }

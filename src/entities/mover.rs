@@ -6,7 +6,7 @@ use super::BoundingCylinder;
 use super::Camera;
 use super::Entity;
 use crate::effects;
-use crate::effects::OutputPlayerEffects;
+use crate::effects::OutputEvents;
 use crate::renderer;
 use math::*;
 
@@ -301,8 +301,8 @@ impl Entity for Mover {
 
     fn tick(
         &mut self,
-        effects: &effects::InputPlayerEffects,
-    ) -> Option<effects::OutputPlayerEffects> {
+        effects: &effects::InputGameState,
+    ) -> Option<effects::OutputEvents> {
         if self.wait != 0 {
             if self.waitcounter != 0 {
                 self.waitcounter -= 1;
@@ -350,13 +350,12 @@ impl Entity for Mover {
 
         //player is standing on the moving block
         if effects.support_below_id == self.id {
-            return Some(OutputPlayerEffects {
+            return Some(effects::OutputEvents::PlayerEvent(effects::MoveXYZ {
                 move_x: xmovement,
                 move_y: ymovement,
                 move_z: zmovement,
-                finished: false,
-                switch_flip: false,
-            });
+            }));
+
         } else {
             return None;
         }

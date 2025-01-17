@@ -108,9 +108,9 @@ pub fn draw_face_outline(
 pub fn back_face_culling(points: &[[Fixed; 3]], p1: usize, p2: usize, p3: usize) -> bool {
     //checking if some of the points are behind the camera?
     //then dont draw
-    if points[p1][2] < Fixed::const_new(0)
-        || points[p2][2] < Fixed::const_new(0)
-        || points[p3][2] < Fixed::const_new(0)
+    if points[p1][2] < 0
+        || points[p2][2] < 0
+        || points[p3][2] < 0
     {
         return false;
     }
@@ -127,16 +127,13 @@ pub fn back_face_culling(points: &[[Fixed; 3]], p1: usize, p2: usize, p3: usize)
         (points[p1][2] + points[p2][2] + points[p3][2]) / 3,
     ];
 
-    /*
-    if polygon_center[2] < Fixed::const_new(0) {
-        return false;
-    }*/
+
 
     //calculate view direction towards the center of the polygon
     let view_dir: [Fixed; 3] = normalize(polygon_center);
 
     let dot_prod: Fixed = vector_dot(normal, view_dir);
-    return dot_prod < Fixed::const_new(0);
+    return dot_prod < 0;
 }
 
 pub fn draw_h_line(x1: i32, x2: i32, y: i32, color: u16, page: u16) {
@@ -166,10 +163,10 @@ pub fn draw_flat_bottom_triangle(
     let mut div1 = p2[1] - p1[1];
     let mut div2 = p3[1] - p1[1];
 
-    if div1 < Fixed::const_new(3) {
+    if div1 < 3 {
         div1 = Fixed::const_new(3);
     }
-    if div2 < Fixed::const_new(3) {
+    if div2 < 3 {
         div2 = Fixed::const_new(3);
     }
 
@@ -207,10 +204,10 @@ pub fn draw_flat_top_triangle(
 ) {
     let mut div1 = p3[1] - p1[1];
     let mut div2 = p3[1] - p2[1];
-    if div1 < Fixed::const_new(3) {
+    if div1 < 3 {
         div1 = Fixed::const_new(3);
     }
-    if div2 < Fixed::const_new(3) {
+    if div2 < 3 {
         div2 = Fixed::const_new(3);
     }
     // Calculate the slopes (invslope1 and invslope2)
@@ -473,11 +470,7 @@ pub fn draw_wireframe_rect(
     page: u16,
 ) {
     let mut screen_points: [[i32; 2]; 8] = [[0; 2]; 8];
-    let mut translated_points: [[Fixed; 3]; 8] = [[
-        Fixed::const_new(0),
-        Fixed::const_new(0),
-        Fixed::const_new(0),
-    ]; 8];
+    let mut translated_points: [[Fixed; 3]; 8] = [[Fixed::const_new(0); 3]; 8];
 
     for i in 0..(*model_rotated_points).len() {
         let screen_point: [Fixed; 2];
@@ -486,10 +479,48 @@ pub fn draw_wireframe_rect(
         screen_points[i] = [screen_point[0].trunc(), screen_point[1].trunc()];
     }
 
-    draw_face_outline(&screen_points, &translated_points, 0, 1, 2, 3, page, color);
-    draw_face_outline(&screen_points, &translated_points, 4, 5, 6, 7, page, color);
-    draw_face_outline(&screen_points, &translated_points, 3, 2, 6, 7, page, color);
-    draw_face_outline(&screen_points, &translated_points, 0, 1, 5, 4, page, color);
+    let wire_color = color * 8 + 7;
+
+    draw_face_outline(
+        &screen_points,
+        &translated_points,
+        0,
+        1,
+        2,
+        3,
+        page,
+        wire_color,
+    );
+    draw_face_outline(
+        &screen_points,
+        &translated_points,
+        4,
+        5,
+        6,
+        7,
+        page,
+        wire_color,
+    );
+    draw_face_outline(
+        &screen_points,
+        &translated_points,
+        3,
+        2,
+        6,
+        7,
+        page,
+        wire_color,
+    );
+    draw_face_outline(
+        &screen_points,
+        &translated_points,
+        0,
+        1,
+        5,
+        4,
+        page,
+        wire_color,
+    );
 }
 
 pub fn translate_point(

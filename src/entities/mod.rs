@@ -273,8 +273,8 @@ impl EntityEnum {
 
     pub fn tick(
         &mut self,
-        effects: &effects::InputPlayerEffects,
-    ) -> Option<effects::OutputPlayerEffects> {
+        effects: &effects::InputGameState,
+    ) -> Option<effects::OutputEvents> {
         match self {
             EntityEnum::Cube(a) => a.tick(effects),
             EntityEnum::Rectangle(a) => a.tick(effects),

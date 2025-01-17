@@ -312,8 +312,8 @@ impl Entity for Crumbling {
     }
     fn tick(
         &mut self,
-        effects: &effects::InputPlayerEffects,
-    ) -> Option<effects::OutputPlayerEffects> {
+        effects: &effects::InputGameState,
+    ) -> Option<effects::OutputEvents> {
         if self.lifetime > 0 && effects.support_below_id == self.id {
             self.lifetime -= 1;
 			self.player_standing_on_rect = 1;

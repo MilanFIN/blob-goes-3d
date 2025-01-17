@@ -18,8 +18,10 @@
 use agb::input::*;
 
 extern crate alloc;
+use alloc::vec::Vec;
+
 // use agb::ExternalAllocator;
-// use agb::InternalAllocator;
+use agb::InternalAllocator;
 // use alloc::vec::Vec;
 
 // use serde_json_core;
@@ -28,6 +30,7 @@ extern crate alloc;
 
 mod entities;
 use cube::Cube;
+use effects::OutputEvents;
 use empty::Empty;
 use entities::utils::{check_block_above, check_support_below, quick_sort};
 use entities::*;
@@ -69,7 +72,7 @@ fn main(mut gba: agb::Gba) -> ! {
 
     let mut entity_array: [EntityEnum; LEVELSIZE + 2] =
         [EntityEnum::Empty(Empty::default()); LEVELSIZE + 2];
-    
+
     //todo: if stack runs out of space, use this instead
     /*
     let mut entity_array: Vec<EntityEnum, ExternalAllocator> = Vec::new_in(ExternalAllocator);
@@ -126,6 +129,7 @@ fn main(mut gba: agb::Gba) -> ! {
     entity_array[1].recalculate_points();
     entity_array[1].refresh_model_matrix();
 
+    let mut event_loop: Vec<OutputEvents, InternalAllocator> = Vec::new_in(InternalAllocator);
     loop {
         input.update();
 
@@ -158,7 +162,7 @@ fn main(mut gba: agb::Gba) -> ! {
             &player1.camera,
         );
 
-        let player_input_effects: effects::InputPlayerEffects = effects::InputPlayerEffects {
+        let game_state: effects::InputGameState = effects::InputGameState {
             support_below_id: bottom_support_id,
             bounding_box: &entity_array[0].bounding_box(),
             action_requested: player1.action,
@@ -167,20 +171,31 @@ fn main(mut gba: agb::Gba) -> ! {
             if let EntityEnum::Empty(_) = entity_array[i] {
                 break;
             }
-            if let Some(player_effects) = entity_array[i].tick(&player_input_effects) {
-                player1.x += player_effects.move_x;
-                player1.y += player_effects.move_y;
-                player1.z += player_effects.move_z;
-
-                if player_effects.finished {
-                    //TODO: actually implement level finishes at some point
-                    agb::println!("finished");
-                }
-                if player_effects.switch_flip {
-                    //TODO: call switch action on all items, that might cause something to happen...
-                }
+            if let Some(event) = entity_array[i].tick(&game_state) {
+                event_loop.push(event);
             }
         }
+
+        for event in event_loop.iter() {
+            if let OutputEvents::PlayerEvent(event) = event {
+                player1.x += event.move_x;
+                player1.y += event.move_y;
+                player1.z += event.move_z;
+            }
+            else if let OutputEvents::GameFinish(_event) = event {
+                //TODO: actually implement level finishes at some point
+                agb::println!("finished");
+            }
+            else if let OutputEvents::SwitchAction(_event) = event {
+                for i in 2..levelsize + 2 {
+                    if let EntityEnum::Wireframe(w) = &mut entity_array[i] {
+                        w.toggle();
+                    }
+                }
+                //TODO: call flip action on all wireframe entities
+            }
+        }
+        event_loop.clear();
         player1.action = false;
 
         //rotate player body blocks and move them where the player is

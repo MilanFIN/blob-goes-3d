@@ -261,7 +261,7 @@ impl Entity for Cube {
         self.color = color;
     }
     
-    fn tick(&mut self, _effects: &effects::InputPlayerEffects) -> Option<effects::OutputPlayerEffects> {
+    fn tick(&mut self, _effects: &effects::InputGameState) -> Option<effects::OutputEvents> {
         None
     }
     

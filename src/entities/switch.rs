@@ -277,22 +277,23 @@ impl Entity for Switch {
         self.color = color;
     }
 
-    fn tick(
-        &mut self,
-        effects: &effects::InputPlayerEffects,
-    ) -> Option<effects::OutputPlayerEffects> {
+    fn tick(&mut self, effects: &effects::InputGameState) -> Option<effects::OutputEvents> {
         if effects.action_requested {
             if math::vector_len_2d(vector_sub_2d(effects.bounding_box.center, [self.x, self.z]))
                 < Fixed::from_raw(400)
             {
                 self.flip();
-                return Option::Some(effects::OutputPlayerEffects {
+                return Some(effects::OutputEvents::SwitchAction(effects::SwitchFlip {
+                    switch_flip: true,
+                }));
+                /*
+                return Option::Some(effects::OutputEvents {
                     move_x: Fixed::const_new(0),
                     move_y: Fixed::const_new(0),
                     move_z: Fixed::const_new(0),
                     finished: false,
                     switch_flip: true,
-                });
+                });*/
             }
         }
         None
