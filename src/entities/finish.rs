@@ -86,9 +86,9 @@ impl Finish {
     fn finish_bounding_box(&self) -> BoundingBox {
         let points: [[Fixed; 2]; 4] = [
             [self.radius + self.x, self.depth / 2 + self.z],
-            [ self.radius + self.x, -self.depth / 2  + self.z],
-            [-self.radius + self.x, -self.depth / 2  + self.z],
-            [-self.radius + self.x, self.depth / 2  + self.z],
+            [self.radius + self.x, -self.depth / 2 + self.z],
+            [-self.radius + self.x, -self.depth / 2 + self.z],
+            [-self.radius + self.x, self.depth / 2 + self.z],
         ];
         BoundingBox {
             data: points,
@@ -135,7 +135,7 @@ impl Entity for Finish {
             self.points[i] = [
                 self.radius * angle.cos(),
                 self.radius * angle.sin(),
-                self.depth/2,
+                self.depth / 2,
             ];
         }
         //back face
@@ -371,7 +371,7 @@ impl Entity for Finish {
         }
         let visible: bool = back_face_culling(&translated_points, 6, 13, 8);
         if visible {
-            let color: u16 = renderer::utils::get_color(self.color, 3);
+            let color: u16 = renderer::utils::get_color(self.color, 1);
             renderer::draw_triangle(
                 screen_points[6],
                 screen_points[13],
@@ -405,6 +405,9 @@ impl Entity for Finish {
     fn get_y(&self) -> Fixed {
         return self.y;
     }
+    fn get_height(&self) -> Fixed {
+        return self.radius * 2;
+    }
 
     fn set_color(&mut self, color: u16) {
         self.color = color;
@@ -415,8 +418,8 @@ impl Entity for Finish {
         if (effects.bounding_box.y_top > hitbox.y_bottom
             && effects.bounding_box.y_bottom < hitbox.y_top)
             && rect_simple_overlap_check(effects.bounding_box, &hitbox)
-                && (rect_overlap(&hitbox, effects.bounding_box)
-                    || cylinder_and_rotated_rect_collision(effects.bounding_cylinder, &hitbox).1)
+            && (rect_overlap(&hitbox, effects.bounding_box)
+                || cylinder_and_rotated_rect_collision(effects.bounding_cylinder, &hitbox).1)
         {
             return Some(effects::OutputEvents::GameFinish(effects::Finished {
                 //finished: true,

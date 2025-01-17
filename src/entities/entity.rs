@@ -24,10 +24,9 @@ pub trait Entity {
     fn bounding_box(&self) -> BoundingBox;
     fn bounding_cylinder(&self) -> BoundingCylinder;
     fn get_y(&self) -> Fixed;
+    fn get_height(&self) -> Fixed;
     fn set_color(&mut self, color: u16);
     fn tick(&mut self, _effects: &effects::InputGameState) -> Option<effects::OutputEvents>;
     fn get_id(&self) -> i16;
     fn set_id(&mut self, id: i16);
-
-
 }

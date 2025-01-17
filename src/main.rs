@@ -63,6 +63,8 @@ and interrupt handlers correctly. It will also handle creating the `Gba` struct 
 */
 #[agb::entry]
 fn main(mut gba: agb::Gba) -> ! {
+    use body::Body;
+
     let mut input = ButtonController::new();
 
     let mut bitmap4: agb::display::bitmap4::Bitmap4 = gba.display.video.bitmap4();
@@ -95,39 +97,30 @@ fn main(mut gba: agb::Gba) -> ! {
     player1.z = new_num(0);
     player1.camera_left(0);
 
-    for i in 0..2 {
-        entity_array[i] = EntityEnum::Cube(Cube::default());
+    //player body
+    entity_array[0] = EntityEnum::Body(Body::default());
+    entity_array[0].set_x_rotation(new_num(0));
+    entity_array[0].set_y_rotation(new_num(0));
+    entity_array[0].set_z_rotation(new_num(0));
+    entity_array[0].set_color(1);
+    entity_array[0].set_size(new_num(1));
+    entity_array[0].recalculate_points();
+    entity_array[0].refresh_model_matrix();
 
-        entity_array[i].set_z_offset(new_num(0));
-        entity_array[i].set_x_rotation(new_num(0));
-        entity_array[i].set_y_rotation(new_num(0));
-        entity_array[i].set_z_rotation(new_num(0));
-        entity_array[i].set_color(1);
 
-        //always call after modifying rotation
-        //entity_array[i].set_size(new_num(2));
-        //entity_array[i].recalculate_points();
-        //entity_array[i].refresh_model_matrix();
-
-        //entity_render_order[i] = i;
-    }
+    entity_array[1] = EntityEnum::Cube(Cube::default());
+    entity_array[1].set_x_rotation(new_num(0));
+    entity_array[1].set_y_rotation(new_num(0));
+    entity_array[1].set_z_rotation(new_num(0));
+    entity_array[1].set_color(1);
+    entity_array[1].set_size(Fixed::from_raw(160));
+    entity_array[1].recalculate_points();
+    entity_array[1].refresh_model_matrix();
 
     for i in 0..entity_render_order.len() {
         entity_render_order[i] = i;
     }
 
-    //player entities
-    entity_array[0].set_size(new_num(1));
-    entity_array[0].set_y_offset(new_num(0));
-    entity_array[0].set_y_rotation(Fixed::from_raw(64));
-    entity_array[0].recalculate_points();
-    entity_array[0].refresh_model_matrix();
-
-    entity_array[1].set_size(Fixed::from_raw(128));
-    entity_array[1].set_y_offset(Fixed::from_raw(-192));
-    entity_array[1].set_y_rotation(Fixed::from_raw(64));
-    entity_array[1].recalculate_points();
-    entity_array[1].refresh_model_matrix();
 
     let mut event_loop: Vec<OutputEvents, InternalAllocator> = Vec::new_in(InternalAllocator);
     loop {
@@ -167,8 +160,9 @@ fn main(mut gba: agb::Gba) -> ! {
             bounding_box: &entity_array[0].bounding_box(),
             bounding_cylinder: &entity_array[0].bounding_cylinder(),
             action_requested: player1.action,
+            yspeed: player1.yspeed,
         };
-        for i in 2..levelsize + 2 {
+        for i in 0..levelsize + 2 {
             if let EntityEnum::Empty(_) = entity_array[i] {
                 break;
             }
@@ -182,12 +176,10 @@ fn main(mut gba: agb::Gba) -> ! {
                 player1.x += event.move_x;
                 player1.y += event.move_y;
                 player1.z += event.move_z;
-            }
-            else if let OutputEvents::GameFinish(_event) = event {
+            } else if let OutputEvents::GameFinish(_event) = event {
                 //TODO: actually implement level finishes at some point
                 agb::println!("finished");
-            }
-            else if let OutputEvents::SwitchAction(_event) = event {
+            } else if let OutputEvents::SwitchAction(_event) = event {
                 for i in 2..levelsize + 2 {
                     if let EntityEnum::Wireframe(w) = &mut entity_array[i] {
                         w.toggle();
@@ -198,11 +190,17 @@ fn main(mut gba: agb::Gba) -> ! {
         event_loop.clear();
         player1.action = false;
 
+        //update player position on screen
+        entity_array[0].set_y_offset(player1.y + entity_array[0].get_height() / 2);
+        entity_array[1].set_y_offset(
+            player1.y + entity_array[0].get_height()  + entity_array[1].get_height() / 2,
+        );
+        /*entity_array[0]
+        .set_y_offset(player1.y + Fixed::from_raw(128) + Fixed::from_raw(192) * i);*/
+
         //rotate player body blocks and move them where the player is
         for i in 0..2 {
             entity_array[i].set_x_offset(player1.x);
-            entity_array[i]
-                .set_y_offset(player1.y + Fixed::from_raw(128) + Fixed::from_raw(192) * i);
             entity_array[i].set_z_offset(player1.z);
 
             entity_array[i].set_y_rotation(-player1.angle);

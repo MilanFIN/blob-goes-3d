@@ -14,7 +14,7 @@ use crate::utils;
 use fixed::*;
 
 #[derive(Copy, Clone, Deserialize, Debug)]
-pub struct Crumbling {
+pub struct Body {
     #[serde(default = "default_i16")]
     id: i16,
     #[serde(default = "default_fixed")]
@@ -53,17 +53,18 @@ pub struct Crumbling {
     #[serde(default = "default_u16")]
     color: u16,
 
-    #[serde(default = "default_i16")]
-    lifetime: i16,
+    #[serde(default = "default_i32")]
+    tick: i32,
+    #[serde(default = "default_fixed")]
+    y_offset: Fixed,
+    #[serde(default = "default_fixed")]
+    width_offset: Fixed,
 
-	#[serde(default = "default_i16")]
-	player_standing_on_rect: i16,
-
-	#[serde(default = "positive_i16")]
-	shake_direction: i16,
+    #[serde(default = "default_fixed")]
+    previous_y_direction: Fixed,
 }
 
-impl Crumbling {
+impl Body {
     #[allow(dead_code)]
     pub fn default() -> Self {
         Self {
@@ -83,14 +84,15 @@ impl Crumbling {
             y_rotation_matrix: [[Fixed::const_new(0); 3]; 3],
             z_rotation_matrix: [[Fixed::const_new(0); 3]; 3],
             color: 0,
-            lifetime: 0,
-            player_standing_on_rect: 0,
-			shake_direction: 1,
+            tick: 0,
+            y_offset: Fixed::const_new(0),
+            width_offset: Fixed::const_new(0),
+            previous_y_direction: Fixed::const_new(0),
         }
     }
 }
 
-impl Entity for Crumbling {
+impl Entity for Body {
     fn set_x_offset(&mut self, x_offset: Fixed) {
         self.x = x_offset;
     }
@@ -107,12 +109,14 @@ impl Entity for Crumbling {
         self.xsize = size;
         self.ysize = size;
         self.zsize = size;
+        self.recalculate_points();
+        self.refresh_model_matrix();
     }
 
     fn recalculate_points(&mut self) {
-        let halfx: Fixed = self.xsize / 2;
-        let halfy: Fixed = self.ysize / 2;
-        let halfz: Fixed = self.zsize / 2;
+        let halfx: Fixed = (self.xsize + self.width_offset) / 2;
+        let halfy: Fixed = (self.ysize + self.y_offset) / 2;
+        let halfz: Fixed = (self.zsize + self.width_offset) / 2;
         self.points = [
             [(halfx), (halfy), (halfz)],
             [(-halfx), (halfy), (halfz)],
@@ -210,38 +214,16 @@ impl Entity for Crumbling {
     }
 
     fn render(&mut self, camera: &Camera, page: u16) {
-        if self.lifetime > 0 {
-            let shaking_points: [[Fixed; 3]; 8];
-
-            let mut shake: i16 = 60 - self.lifetime;
-			if shake < 0 {
-				shake = 0;
-			}
-			shake *= self.shake_direction;
-			self.shake_direction *= -1;
-			let offset = Fixed::const_new(shake as i32) / 200;
-
-            if shake > 0 && self.player_standing_on_rect == 1 {
-                shaking_points = self.model_rotated_points.map(|point| {
-                    let mut new_point = point;
-                    new_point[0] += offset;
-                    new_point
-                });
-            } else {
-                shaking_points = self.model_rotated_points;
-            }
-
-            renderer::draw_rect(
-                &shaking_points,
-                self.x,
-                self.y,
-                self.z,
-                self.y_rotation,
-                camera,
-                self.color,
-                page,
-            );
-        }
+        renderer::draw_rect(
+            &self.model_rotated_points,
+            self.x,
+            self.y,
+            self.z,
+            self.y_rotation,
+            camera,
+            self.color,
+            page,
+        );
     }
 
     fn distance_from_camera(&self, camera: &Camera) -> Fixed {
@@ -249,49 +231,37 @@ impl Entity for Crumbling {
     }
 
     fn bounding_box(&self) -> BoundingBox {
-        if self.lifetime == 0 {
-            BoundingBox {
-                data: [[Fixed::const_new(0); 2]; 4],
-                center: [Fixed::const_new(0); 2],
-                width: Fixed::const_new(0),
-                height: Fixed::const_new(0),
-                y_top: Fixed::const_new(-999),
-                y_bottom: Fixed::const_new(-999),
-                rotation: Fixed::const_new(0),
-            }
-        } else {
-            let points: [[Fixed; 2]; 4] = [
-                [
-                    self.model_rotated_points[0][0] + self.x,
-                    self.model_rotated_points[0][2] + self.z,
-                ],
-                [
-                    self.model_rotated_points[1][0] + self.x,
-                    self.model_rotated_points[1][2] + self.z,
-                ],
-                [
-                    self.model_rotated_points[5][0] + self.x,
-                    self.model_rotated_points[5][2] + self.z,
-                ],
-                [
-                    self.model_rotated_points[4][0] + self.x,
-                    self.model_rotated_points[4][2] + self.z,
-                ],
-            ];
+        let points: [[Fixed; 2]; 4] = [
+            [
+                self.model_rotated_points[0][0] + self.x,
+                self.model_rotated_points[0][2] + self.z,
+            ],
+            [
+                self.model_rotated_points[1][0] + self.x,
+                self.model_rotated_points[1][2] + self.z,
+            ],
+            [
+                self.model_rotated_points[5][0] + self.x,
+                self.model_rotated_points[5][2] + self.z,
+            ],
+            [
+                self.model_rotated_points[4][0] + self.x,
+                self.model_rotated_points[4][2] + self.z,
+            ],
+        ];
 
-            BoundingBox {
-                data: points,
-                center: utils::calculate_center(&points),
-                width: (self.model_rotated_points[0][0] + self.x
-                    - (self.model_rotated_points[1][0] + self.x))
-                    .abs(),
-                height: (self.model_rotated_points[1][2] + self.z
-                    - (self.model_rotated_points[5][2] + self.z))
-                    .abs(),
-                y_top: self.model_rotated_points[0][1] + self.y,
-                y_bottom: self.model_rotated_points[2][1] + self.y,
-                rotation: -self.y_rotation,
-            }
+        BoundingBox {
+            data: points,
+            center: utils::calculate_center(&points),
+            width: (self.model_rotated_points[0][0] + self.x
+                - (self.model_rotated_points[1][0] + self.x))
+                .abs(),
+            height: (self.model_rotated_points[1][2] + self.z
+                - (self.model_rotated_points[5][2] + self.z))
+                .abs(),
+            y_top: self.model_rotated_points[0][1] + self.y,
+            y_bottom: self.model_rotated_points[2][1] + self.y,
+            rotation: -self.y_rotation,
         }
     }
 
@@ -308,22 +278,33 @@ impl Entity for Crumbling {
         return self.y;
     }
     fn get_height(&self) -> Fixed {
-        return self.ysize;
+        return self.ysize + self.y_offset;
     }
     fn set_color(&mut self, color: u16) {
         self.color = color;
     }
-    fn tick(
-        &mut self,
-        effects: &effects::InputGameState,
-    ) -> Option<effects::OutputEvents> {
-        if self.lifetime > 0 && effects.support_below_id == self.id {
-            self.lifetime -= 1;
-			self.player_standing_on_rect = 1;
+    fn tick(&mut self, effects: &effects::InputGameState) -> Option<effects::OutputEvents> {
+        //todo, fix flicker, when reaching top of jump arc
+        //if prev yspeed > 0 and now it's 0, should still do the first branch
+        //only if prev is 0 and now is 0, consider to be on the ground
+        if effects.yspeed != 0 {
+            self.y_offset = effects.yspeed / 3;
+            self.width_offset = -effects.yspeed / 3;
+        } else if self.previous_y_direction <= 0 {
+            if self.tick == 0 {
+                self.tick = 50;
+            }
+            self.tick -= 1;
+            self.y_offset =
+                (Fixed::const_new(25) - Fixed::new(self.tick)).abs() / Fixed::const_new(100);
+            self.width_offset = (Fixed::const_new(50)
+                - (Fixed::const_new(25) - Fixed::new(self.tick)).abs())
+                / Fixed::const_new(100);
         }
-		else {
-			self.player_standing_on_rect = 0;
-		}
+        self.recalculate_points();
+        self.refresh_model_matrix();
+        self.previous_y_direction = effects.yspeed;
+
         return None;
     }
 

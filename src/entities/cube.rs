@@ -256,6 +256,9 @@ impl Entity for Cube {
     fn get_y(&self) -> Fixed {
         return self.y;
     }
+    fn get_height(&self) -> Fixed {
+        return self.size;
+    }
 
     fn set_color(&mut self, color: u16) {
         self.color = color;

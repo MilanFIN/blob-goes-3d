@@ -5,6 +5,7 @@ pub struct InputGameState<'a> {
 	pub bounding_box: &'a BoundingBox,
 	pub bounding_cylinder: &'a BoundingCylinder,
 	pub action_requested: bool,
+	pub yspeed: Fixed,
 }
 
 

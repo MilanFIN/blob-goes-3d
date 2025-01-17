@@ -21,6 +21,10 @@ pub fn default_i16() -> i16 {
     0
 }
 
+pub fn default_i32() -> i32 {
+    0
+}
+
 pub fn positive_i16() -> i16 {
     1
 }
