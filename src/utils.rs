@@ -23,3 +23,22 @@ pub fn calculate_center(points: &[[Fixed; 2]; 4]) -> [Fixed; 2] {
 
     [center_x, center_z]
 }
+
+
+pub fn rectangle_model_points(xsize: Fixed, ysize: Fixed, zsize: Fixed) -> [[Fixed; 3]; 8] {
+    let halfx: Fixed = xsize / Fixed::const_new(2);
+    let halfy: Fixed = ysize / Fixed::const_new(2);
+    let halfz: Fixed = zsize / Fixed::const_new(2);
+
+    [
+        [(halfx), (halfy), (halfz)],
+        [(-halfx), (halfy), (halfz)],
+        [(-halfx), (-halfy), (halfz)],
+        [(halfx), (-halfy), (halfz)],
+        [(halfx), (halfy), (-halfz)],
+        [(-halfx), (halfy), (-halfz)],
+        [(-halfx), (-halfy), (-halfz)],
+        [(halfx), (-halfy), (-halfz)],
+    ]
+}
+

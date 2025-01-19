@@ -99,19 +99,8 @@ impl Entity for Switch {
         self.ysize = Fixed::from_raw(300);
         self.zsize = Fixed::from_raw(48);
 
-        let halfx: Fixed = self.xsize / 2;
-        let halfy: Fixed = self.ysize / 2;
-        let halfz: Fixed = self.zsize / 2;
-        self.points = [
-            [(halfx), (halfy), (halfz)],
-            [(-halfx), (halfy), (halfz)],
-            [(-halfx), (-halfy), (halfz)],
-            [(halfx), (-halfy), (halfz)],
-            [(halfx), (halfy), (-halfz)],
-            [(-halfx), (halfy), (-halfz)],
-            [(-halfx), (-halfy), (-halfz)],
-            [(halfx), (-halfy), (-halfz)],
-        ];
+        self.points = utils::rectangle_model_points(self.xsize, self.ysize, self.zsize)
+
     }
 
     fn set_x_rotation(&mut self, x_rotation: Fixed) {

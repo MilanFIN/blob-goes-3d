@@ -6,6 +6,7 @@ use super::BoundingCylinder;
 use super::Camera;
 use super::Entity;
 use crate::effects;
+use crate::rectangle_model_points;
 use crate::renderer;
 use math::*;
 
@@ -110,19 +111,7 @@ impl Entity for Crumbling {
     }
 
     fn recalculate_points(&mut self) {
-        let halfx: Fixed = self.xsize / 2;
-        let halfy: Fixed = self.ysize / 2;
-        let halfz: Fixed = self.zsize / 2;
-        self.points = [
-            [(halfx), (halfy), (halfz)],
-            [(-halfx), (halfy), (halfz)],
-            [(-halfx), (-halfy), (halfz)],
-            [(halfx), (-halfy), (halfz)],
-            [(halfx), (halfy), (-halfz)],
-            [(-halfx), (halfy), (-halfz)],
-            [(-halfx), (-halfy), (-halfz)],
-            [(halfx), (-halfy), (-halfz)],
-        ];
+        self.points = rectangle_model_points(self.xsize, self.ysize, self.zsize);
     }
 
     fn set_x_rotation(&mut self, x_rotation: Fixed) {

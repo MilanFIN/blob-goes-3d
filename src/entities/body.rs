@@ -114,19 +114,11 @@ impl Entity for Body {
     }
 
     fn recalculate_points(&mut self) {
-        let halfx: Fixed = (self.xsize + self.width_offset) / 2;
-        let halfy: Fixed = (self.ysize + self.y_offset) / 2;
-        let halfz: Fixed = (self.zsize + self.width_offset) / 2;
-        self.points = [
-            [(halfx), (halfy), (halfz)],
-            [(-halfx), (halfy), (halfz)],
-            [(-halfx), (-halfy), (halfz)],
-            [(halfx), (-halfy), (halfz)],
-            [(halfx), (halfy), (-halfz)],
-            [(-halfx), (halfy), (-halfz)],
-            [(-halfx), (-halfy), (-halfz)],
-            [(halfx), (-halfy), (-halfz)],
-        ];
+        self.points = utils::rectangle_model_points(
+            self.xsize + self.width_offset,
+            self.ysize + self.y_offset,
+            self.zsize + self.width_offset,
+        );
     }
 
     fn set_x_rotation(&mut self, x_rotation: Fixed) {

@@ -76,8 +76,6 @@ impl Rectangle {
             color: 0,
         }
     }
-    
-
 }
 
 impl Entity for Rectangle {
@@ -100,19 +98,7 @@ impl Entity for Rectangle {
     }
 
     fn recalculate_points(&mut self) {
-        let halfx: Fixed = self.xsize / 2;
-        let halfy: Fixed = self.ysize / 2;
-        let halfz: Fixed = self.zsize / 2;
-        self.points = [
-            [(halfx), (halfy), (halfz)],
-            [(-halfx), (halfy), (halfz)],
-            [(-halfx), (-halfy), (halfz)],
-            [(halfx), (-halfy), (halfz)],
-            [(halfx), (halfy), (-halfz)],
-            [(-halfx), (halfy), (-halfz)],
-            [(-halfx), (-halfy), (-halfz)],
-            [(halfx), (-halfy), (-halfz)],
-        ];
+        self.points = utils::rectangle_model_points(self.xsize, self.ysize, self.zsize)
     }
 
     fn set_x_rotation(&mut self, x_rotation: Fixed) {
@@ -200,7 +186,6 @@ impl Entity for Rectangle {
     }
 
     fn render(&mut self, camera: &Camera, page: u16) {
-
         renderer::draw_rect(
             &self.model_rotated_points,
             self.x,
@@ -272,13 +257,13 @@ impl Entity for Rectangle {
         self.color = color;
     }
     fn tick(&mut self, _effects: &effects::InputGameState) -> Option<effects::OutputEvents> {
-        return None
+        return None;
     }
-    
+
     fn get_id(&self) -> i16 {
-        return self.id
+        return self.id;
     }
-    
+
     fn set_id(&mut self, id: i16) {
         self.id = id
     }

@@ -94,16 +94,8 @@ impl Entity for Cube {
     }
 
     fn recalculate_points(&mut self) {
-        self.points = [
-            [(self.size / 2), (self.size / 2), (self.size / 2)],
-            [(-self.size / 2), (self.size / 2), (self.size / 2)],
-            [(-self.size / 2), (-self.size / 2), (self.size / 2)],
-            [(self.size / 2), (-self.size / 2), (self.size / 2)],
-            [(self.size / 2), (self.size / 2), (-self.size / 2)],
-            [(-self.size / 2), (self.size / 2), (-self.size / 2)],
-            [(-self.size / 2), (-self.size / 2), (-self.size / 2)],
-            [(self.size / 2), (-self.size / 2), (-self.size / 2)],
-        ];
+        self.points = utils::rectangle_model_points(self.size, self.size, self.size)
+
     }
 
     fn set_x_rotation(&mut self, x_rotation: Fixed) {
