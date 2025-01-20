@@ -1,3 +1,5 @@
+use agb::InternalAllocator;
+use alloc::vec::Vec;
 use serde::Deserialize;
 
 use super::math;
@@ -8,6 +10,7 @@ use super::Entity;
 use crate::effects;
 use crate::rectangle_model_points;
 use crate::renderer;
+use crate::renderer::polygon::Polygon;
 use math::*;
 
 use crate::fixed;
@@ -198,7 +201,7 @@ impl Entity for Crumbling {
         //not implemented
     }
 
-    fn render(&mut self, camera: &Camera, page: u16) {
+    fn render(&mut self, camera: &Camera, page: u16) -> Option<Vec<Polygon, InternalAllocator>>{
         if self.lifetime > 0 {
             let shaking_points: [[Fixed; 3]; 8];
 
@@ -220,7 +223,7 @@ impl Entity for Crumbling {
                 shaking_points = self.model_rotated_points;
             }
 
-            renderer::draw_rect(
+            return Some(renderer::draw_rect(
                 &shaking_points,
                 self.x,
                 self.y,
@@ -229,8 +232,9 @@ impl Entity for Crumbling {
                 camera,
                 self.color,
                 page,
-            );
+            ));
         }
+        return None;
     }
 
     fn distance_from_camera(&self, camera: &Camera) -> Fixed {

@@ -1,10 +1,17 @@
 pub mod hw;
+pub mod polygon;
 pub mod utils;
 use crate::camera::Camera;
 use crate::fixed;
 use crate::math;
+use agb::InternalAllocator;
 use fixed::*;
 use math::*;
+use polygon::Polygon;
+use polygon::Shape; // Assuming Polygon is defined in the polygon module
+
+extern crate alloc;
+use alloc::vec::Vec;
 
 #[inline(always)]
 fn safe_fraction_fixed(numerator: Fixed, denominator: Fixed) -> Fixed {
@@ -372,7 +379,9 @@ pub fn draw_rect(
     camera_ptr: &Camera,
     color: u16,
     page: u16,
-) {
+) -> Vec<Polygon, InternalAllocator> {
+    let mut polygons: Vec<Polygon, InternalAllocator> = Vec::new_in(InternalAllocator);
+
     let mut screen_points: [[Fixed; 2]; 8] = [[Fixed::const_new(0), Fixed::const_new(0)]; 8];
     let mut translated_points: [[Fixed; 3]; 8] = [[
         Fixed::const_new(0),
@@ -388,6 +397,22 @@ pub fn draw_rect(
     let visible: bool = back_face_culling(&translated_points, 0, 1, 2);
     if visible {
         let color: u16 = utils::get_color(color, 1);
+        //todo, calculate the average distance from camera, possibly as the average of the 3 z coordinates
+        //get via a function to make it easy to change later on
+        let distance0 = utils::polygon_avg_z(&translated_points, 0, 1, 2);
+        polygons.push(Polygon {
+            distance_from_camera: distance0,
+            shape: Shape::Triangle([screen_points[0], screen_points[1], screen_points[2]]),
+            color,
+        });
+        let distance1 = utils::polygon_avg_z(&translated_points, 0, 2, 3);
+        polygons.push(Polygon {
+            distance_from_camera: distance1,
+            shape: Shape::Triangle([screen_points[0], screen_points[2], screen_points[3]]),
+            color,
+        });
+
+        /*
         draw_triangle(
             screen_points[0],
             screen_points[1],
@@ -401,11 +426,24 @@ pub fn draw_rect(
             screen_points[3],
             color,
             page,
-        );
+        );*/
     }
     let visible = back_face_culling(&translated_points, 7, 6, 5);
     if visible {
         let color = utils::get_color(color, 1);
+        let distance0 = utils::polygon_avg_z(&translated_points, 7, 6, 5);
+        polygons.push(Polygon {
+            distance_from_camera: distance0,
+            shape: Shape::Triangle([screen_points[7], screen_points[6], screen_points[5]]),
+            color,
+        });
+        let distance1 = utils::polygon_avg_z(&translated_points, 7, 5, 4);
+        polygons.push(Polygon {
+            distance_from_camera: distance1,
+            shape: Shape::Triangle([screen_points[7], screen_points[5], screen_points[4]]),
+            color,
+        });
+        /*
         draw_triangle(
             screen_points[7],
             screen_points[6],
@@ -419,13 +457,25 @@ pub fn draw_rect(
             screen_points[4],
             color,
             page,
-        );
+        );*/
     }
     let visible = back_face_culling(&translated_points, 0, 3, 7);
 
     if visible {
         let color = utils::get_color(color, 2);
-
+        let distance0 = utils::polygon_avg_z(&translated_points, 0, 3, 7);
+        polygons.push(Polygon {
+            distance_from_camera: distance0,
+            shape: Shape::Triangle([screen_points[0], screen_points[3], screen_points[7]]),
+            color,
+        });
+        let distance1 = utils::polygon_avg_z(&translated_points, 0, 7, 4);
+        polygons.push(Polygon {
+            distance_from_camera: distance1,
+            shape: Shape::Triangle([screen_points[0], screen_points[7], screen_points[4]]),
+            color,
+        });
+        /*
         draw_triangle(
             screen_points[0],
             screen_points[3],
@@ -439,12 +489,24 @@ pub fn draw_rect(
             screen_points[4],
             color,
             page,
-        );
+        );*/
     }
     let visible = back_face_culling(&translated_points, 1, 5, 6);
     if visible {
         let color = utils::get_color(color, 2);
-
+        let distance0 = utils::polygon_avg_z(&translated_points, 1, 5, 6);
+        polygons.push(Polygon {
+            distance_from_camera: distance0,
+            shape: Shape::Triangle([screen_points[1], screen_points[5], screen_points[6]]),
+            color,
+        });
+        let distance1 = utils::polygon_avg_z(&translated_points, 1, 6, 2);
+        polygons.push(Polygon {
+            distance_from_camera: distance1,
+            shape: Shape::Triangle([screen_points[1], screen_points[6], screen_points[2]]),
+            color,
+        });
+        /*
         draw_triangle(
             screen_points[1],
             screen_points[5],
@@ -458,12 +520,24 @@ pub fn draw_rect(
             screen_points[2],
             color,
             page,
-        );
+        );*/
     }
     let visible = back_face_culling(&translated_points, 7, 3, 2);
     if visible {
         let color = utils::get_color(color, 0);
-
+        let distance0 = utils::polygon_avg_z(&translated_points, 7, 3, 2);
+        polygons.push(Polygon {
+            distance_from_camera: distance0,
+            shape: Shape::Triangle([screen_points[7], screen_points[3], screen_points[2]]),
+            color,
+        });
+        let distance1 = utils::polygon_avg_z(&translated_points, 7, 2, 6);
+        polygons.push(Polygon {
+            distance_from_camera: distance1,
+            shape: Shape::Triangle([screen_points[7], screen_points[2], screen_points[6]]),
+            color,
+        });
+        /*
         draw_triangle(
             screen_points[7],
             screen_points[3],
@@ -478,11 +552,24 @@ pub fn draw_rect(
             color,
             page,
         );
+        */
     }
     let visible = back_face_culling(&translated_points, 0, 4, 5);
     if visible {
         let color = utils::get_color(color, 0);
-
+        let distance0 = utils::polygon_avg_z(&translated_points, 0, 4, 5);
+        polygons.push(Polygon {
+            distance_from_camera: distance0,
+            shape: Shape::Triangle([screen_points[0], screen_points[4], screen_points[5]]),
+            color,
+        });
+        let distance1 = utils::polygon_avg_z(&translated_points, 0, 5, 1);
+        polygons.push(Polygon {
+            distance_from_camera: distance1,
+            shape: Shape::Triangle([screen_points[0], screen_points[5], screen_points[1]]),
+            color,
+        });
+        /*
         draw_triangle(
             screen_points[0],
             screen_points[4],
@@ -496,8 +583,9 @@ pub fn draw_rect(
             screen_points[1],
             color,
             page,
-        );
+        );*/
     }
+    return polygons;
 }
 
 #[inline(always)]

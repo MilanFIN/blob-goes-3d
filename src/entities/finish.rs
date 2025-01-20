@@ -1,3 +1,5 @@
+use agb::InternalAllocator;
+use alloc::vec::Vec;
 use serde::Deserialize;
 
 use super::math;
@@ -11,6 +13,7 @@ use super::Entity;
 use crate::effects;
 use crate::renderer;
 use crate::renderer::back_face_culling;
+use crate::renderer::polygon::Polygon;
 use math::*;
 
 use crate::fixed;
@@ -236,7 +239,7 @@ impl Entity for Finish {
         //not implemented
     }
 
-    fn render(&mut self, camera: &Camera, page: u16) {
+    fn render(&mut self, camera: &Camera, page: u16) -> Option<Vec<Polygon, InternalAllocator>>  {
         let mut screen_points: [[Fixed; 2]; 14] = [[Fixed::const_new(0), Fixed::const_new(0)]; 14];
         let mut translated_points: [[Fixed; 3]; 14] = [[
             Fixed::const_new(0),
@@ -387,6 +390,7 @@ impl Entity for Finish {
                 page,
             );
         }
+        return None;
     }
 
     fn distance_from_camera(&self, camera: &Camera) -> Fixed {

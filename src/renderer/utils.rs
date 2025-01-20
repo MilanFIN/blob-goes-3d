@@ -84,3 +84,7 @@ pub fn get_color(index: u16, shade: i16) -> u16 {
     return ((offset.trunc()) as u16) + index * 8;
     */
 }
+
+pub fn polygon_avg_z(points: &[[Fixed; 3]], a: usize, b: usize, c:usize) -> Fixed {
+    return (points[a][2] + points[b][2] + points[c][2]) / Fixed::const_new(3);
+}

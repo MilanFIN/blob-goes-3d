@@ -1,4 +1,6 @@
 pub mod entity;
+use agb::InternalAllocator;
+use alloc::vec::Vec;
 use entity::*;
 
 pub mod cube;
@@ -42,6 +44,7 @@ use camera::*;
 
 use crate::effects;
 use crate::fixed;
+use crate::renderer::polygon::Polygon;
 use fixed::*;
 
 #[derive(Copy, Clone, Deserialize, Debug)]
@@ -215,13 +218,13 @@ impl EntityEnum {
             EntityEnum::Empty(_a) => {}
         }
     }
-    pub fn render(&mut self, camera: &Camera, page: u16) {
+    pub fn render(&mut self, camera: &Camera, page: u16) -> Option<Vec<Polygon, InternalAllocator>> {
         match self {
             EntityEnum::Cube(a) => a.render(camera, page),
             EntityEnum::Rectangle(a) => a.render(camera, page),
             EntityEnum::Mover(a) => a.render(camera, page),
             EntityEnum::Crumbling(a) => a.render(camera, page),
-            EntityEnum::Empty(_a) => {}
+            EntityEnum::Empty(_a) => {None}
             EntityEnum::Finish(a) => a.render(camera, page),
             EntityEnum::Switch(a) => a.render(camera, page),
             EntityEnum::Wireframe(a) => a.render(camera, page),

@@ -1,3 +1,5 @@
+use agb::InternalAllocator;
+use alloc::vec::Vec;
 use serde::Deserialize;
 
 use super::math;
@@ -7,6 +9,7 @@ use super::Camera;
 use super::Entity;
 use crate::effects;
 use crate::renderer;
+use crate::renderer::polygon::Polygon;
 use math::*;
 
 use crate::fixed;
@@ -183,9 +186,9 @@ impl Entity for Cube {
         //not implemented
     }
 
-    fn render(&mut self, camera: &Camera, page: u16) {
+    fn render(&mut self, camera: &Camera, page: u16) -> Option<Vec<Polygon, InternalAllocator>> {
 
-        renderer::draw_rect(
+        return Some(renderer::draw_rect(
             &self.model_rotated_points,
             self.x,
             self.y,
@@ -194,7 +197,7 @@ impl Entity for Cube {
             camera,
             self.color,
             page,
-        );
+        ));
     }
 
     fn distance_from_camera(&self, camera: &Camera) -> Fixed {

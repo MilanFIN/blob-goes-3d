@@ -1,3 +1,5 @@
+use agb::InternalAllocator;
+use alloc::vec::Vec;
 use serde::Deserialize;
 
 use super::math;
@@ -7,6 +9,7 @@ use super::Camera;
 use super::Entity;
 use crate::effects;
 use crate::renderer;
+use crate::renderer::polygon::Polygon;
 use math::*;
 
 use crate::fixed;
@@ -193,9 +196,9 @@ impl Entity for Wireframe {
         //not implemented
     }
 
-    fn render(&mut self, camera: &Camera, page: u16) {
+    fn render(&mut self, camera: &Camera, page: u16) -> Option<Vec<Polygon, InternalAllocator>> {
         if self.solid {
-            renderer::draw_rect(
+            return Some(renderer::draw_rect(
                 &self.model_rotated_points,
                 self.x,
                 self.y,
@@ -204,7 +207,7 @@ impl Entity for Wireframe {
                 camera,
                 self.color,
                 page,
-            );
+            ));
         } else {
             renderer::draw_wireframe_rect(
                 &self.model_rotated_points,
@@ -216,6 +219,7 @@ impl Entity for Wireframe {
                 self.color,
                 page,
             );
+            return None;
         }
     }
 

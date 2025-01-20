@@ -1,3 +1,5 @@
+use agb::InternalAllocator;
+use alloc::vec::Vec;
 use serde::Deserialize;
 
 use super::{entity, BoundingBox, BoundingCylinder};
@@ -5,13 +7,15 @@ use entity::*;
 
 use super::Camera;
 
-use crate::{effects, fixed};
+use crate::{effects, fixed, renderer::polygon::Polygon};
 use fixed::*;
 
 #[derive(Copy, Clone, Deserialize, Debug)]
 pub struct Empty {}
 impl Entity for Empty {
-    fn render(&mut self, _camera: &Camera, _page: u16) {}
+    fn render(&mut self, _camera: &Camera, _page: u16) -> Option<Vec<Polygon, InternalAllocator>> {
+        None
+    }
     fn set_x_offset(&mut self, _x_offset: Fixed) {}
     fn set_y_offset(&mut self, _y_offset: Fixed) {}
     fn set_z_offset(&mut self, _z_offset: Fixed) {}
@@ -41,9 +45,13 @@ impl Entity for Empty {
 
     fn set_color(&mut self, _color: u16) {}
 
-    fn tick(&mut self, _effects: &effects::InputGameState)-> Option<effects::OutputEvents> {None}
+    fn tick(&mut self, _effects: &effects::InputGameState) -> Option<effects::OutputEvents> {
+        None
+    }
 
-    fn get_id(&self) -> i16 {-1}
+    fn get_id(&self) -> i16 {
+        -1
+    }
 
     fn set_id(&mut self, _id: i16) {}
 }

@@ -64,6 +64,7 @@ and interrupt handlers correctly. It will also handle creating the `Gba` struct 
 #[agb::entry]
 fn main(mut gba: agb::Gba) -> ! {
     use body::Body;
+    use renderer::polygon::Polygon;
 
     let mut input = ButtonController::new();
 
@@ -107,7 +108,6 @@ fn main(mut gba: agb::Gba) -> ! {
     entity_array[0].recalculate_points();
     entity_array[0].refresh_model_matrix();
 
-
     entity_array[1] = EntityEnum::Cube(Cube::default());
     entity_array[1].set_x_rotation(new_num(0));
     entity_array[1].set_y_rotation(new_num(0));
@@ -120,7 +120,6 @@ fn main(mut gba: agb::Gba) -> ! {
     for i in 0..entity_render_order.len() {
         entity_render_order[i] = i;
     }
-
 
     let mut event_loop: Vec<OutputEvents, InternalAllocator> = Vec::new_in(InternalAllocator);
     loop {
@@ -193,7 +192,7 @@ fn main(mut gba: agb::Gba) -> ! {
         //update player position on screen
         entity_array[0].set_y_offset(player1.y + entity_array[0].get_height() / 2);
         entity_array[1].set_y_offset(
-            player1.y + entity_array[0].get_height()  + entity_array[1].get_height() / 2,
+            player1.y + entity_array[0].get_height() + entity_array[1].get_height() / 2,
         );
         /*entity_array[0]
         .set_y_offset(player1.y + Fixed::from_raw(128) + Fixed::from_raw(192) * i);*/
@@ -206,13 +205,27 @@ fn main(mut gba: agb::Gba) -> ! {
             entity_array[i].set_y_rotation(-player1.angle);
             entity_array[i].refresh_model_matrix();
         }
+        let mut polygons: Vec<Polygon, InternalAllocator> = Vec::new_in(InternalAllocator);
 
         for i in 0..levelsize + 2 {
             if let EntityEnum::Empty(_) = entity_array[i] {
                 break;
             }
 
-            entity_array[entity_render_order[i]].render(&player1.camera, page);
+            let res: Option<Vec<Polygon, InternalAllocator>> =
+                entity_array[entity_render_order[i]].render(&player1.camera, page);
+            if (res.is_some()) {
+                polygons.extend(res.unwrap());
+            }
+        }
+        //todo, create a vector of the same length as the polygons with content
+        //0...len(polygons)-1, and sort it by the distance of the polygon to the camera
+        //then loop through polygons in that order
+        polygons.sort_by(|a, b| b.distance_from_camera.cmp(&a.distance_from_camera));
+        for polygon in polygons.iter() {
+            if let Some(vertices) = polygon.as_triangle() {
+                renderer::draw_triangle(vertices[0], vertices[1], vertices[2], polygon.color, page);
+            }
         }
 
         renderer::hw::flip(&mut page);
