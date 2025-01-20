@@ -122,6 +122,8 @@ fn main(mut gba: agb::Gba) -> ! {
     }
 
     let mut event_loop: Vec<OutputEvents, InternalAllocator> = Vec::new_in(InternalAllocator);
+    let mut polygons: Vec<Polygon, InternalAllocator> = Vec::new_in(InternalAllocator);
+
     loop {
         input.update();
 
@@ -205,7 +207,6 @@ fn main(mut gba: agb::Gba) -> ! {
             entity_array[i].set_y_rotation(-player1.angle);
             entity_array[i].refresh_model_matrix();
         }
-        let mut polygons: Vec<Polygon, InternalAllocator> = Vec::new_in(InternalAllocator);
 
         for i in 0..levelsize + 2 {
             if let EntityEnum::Empty(_) = entity_array[i] {
@@ -227,6 +228,7 @@ fn main(mut gba: agb::Gba) -> ! {
                 renderer::draw_triangle(vertices[0], vertices[1], vertices[2], polygon.color, page);
             }
         }
+        polygons.clear();
 
         renderer::hw::flip(&mut page);
     }
