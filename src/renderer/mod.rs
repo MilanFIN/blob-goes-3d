@@ -6,25 +6,63 @@ use crate::math;
 use fixed::*;
 use math::*;
 
-#[allow(dead_code)]
-pub fn draw_line(mut x1: i32, mut y1: i32, x2: i32, y2: i32, color: u16, page: u16) {
-    const SCREEN_MIN_X: i32 = 0;
-    const SCREEN_MAX_X: i32 = 239;
-    const SCREEN_MIN_Y: i32 = 0;
-    const SCREEN_MAX_Y: i32 = 159;
+#[inline(always)]
+fn safe_fraction_fixed(numerator: Fixed, denominator: Fixed) -> Fixed {
+    if denominator == 0 {
+        return Fixed::const_new(0);
+    }
+    return numerator / denominator;
+}
 
-    let dx: i32 = (x2 - x1).abs();
-    let dy: i32 = (y2 - y1).abs();
+pub fn draw_line_fixed(mut x1: Fixed, mut y1: Fixed, x2: Fixed, y2: Fixed, color: u16, page: u16) {
+    const SCREEN_MIN_X: Fixed = Fixed::const_new(0);
+    const SCREEN_MAX_X: Fixed = Fixed::const_new(239);
+    const SCREEN_MIN_Y: Fixed = Fixed::const_new(0);
+    const SCREEN_MAX_Y: Fixed = Fixed::const_new(159);
 
-    let sx: i32 = if x1 < x2 { 1 } else { -1 };
-    let sy: i32 = if y1 < y2 { 1 } else { -1 };
+    let sx: Fixed = if x1 < x2 {
+        Fixed::const_new(1)
+    } else {
+        Fixed::const_new(-1)
+    };
+    let sy: Fixed = if y1 < y2 {
+        Fixed::const_new(1)
+    } else {
+        Fixed::const_new(-1)
+    };
 
-    let mut err: i32 = dx - dy;
+    if x1 < SCREEN_MIN_X && sx > 0 {
+        let remaining_x = x2 - SCREEN_MIN_X;
+        let x_part = safe_fraction_fixed(remaining_x, x2 - x1);
+        x1 = SCREEN_MIN_X;
+        y1 = y2 - (y2 - y1) * x_part
+    } else if x1 > SCREEN_MAX_X && sx < 0 {
+        let remaining_x = x1 - SCREEN_MAX_X;
+        let x_part = safe_fraction_fixed(remaining_x, x1 - x2);
+        x1 = SCREEN_MAX_X;
+        y1 = y1 - (y1 - y2) * x_part;
+    }
+
+    if y1 < SCREEN_MIN_Y && sy > 0 {
+        let remaining_y = y2 - SCREEN_MIN_Y;
+        let y_part = safe_fraction_fixed(remaining_y, y2 - y1);
+        y1 = SCREEN_MIN_Y;
+        x1 = x2 - (x2 - x1) * y_part;
+    } else if y1 > SCREEN_MAX_Y && sy < 0 {
+        let remaining_y = y1 - SCREEN_MAX_X;
+        let y_part = safe_fraction_fixed(remaining_y, y1 - y2);
+        y1 = SCREEN_MAX_X;
+        x1 = x1 - (x1 - x2) * y_part;
+    }
+
+    let dx: Fixed = (x2 - x1).abs();
+    let dy: Fixed = (y2 - y1).abs();
+    let mut err: Fixed = dx - dy;
 
     loop {
         // Check if the current point is within the screen bounds
         if x1 >= SCREEN_MIN_X && x1 <= SCREEN_MAX_X && y1 >= SCREEN_MIN_Y && y1 <= SCREEN_MAX_Y {
-            hw::draw_wide_point(x1, y1, color, page);
+            hw::draw_wide_point(x1.trunc(), y1.trunc(), color, page);
         } else if (x1 < SCREEN_MIN_X && sx == -1)
             || (x1 > SCREEN_MAX_X && sx == 1)
             || (y1 < SCREEN_MIN_Y && sy == -1)
@@ -34,11 +72,18 @@ pub fn draw_line(mut x1: i32, mut y1: i32, x2: i32, y2: i32, color: u16, page: u
             break;
         }
 
-        if x1 == x2 && y1 == y2 {
+        //check for >< instead of > here, so x1 > x2, if sx is 1
+        if (sx == Fixed::const_new(1) && x1 > x2) || (sx == Fixed::const_new(-1) && x1 < x2) {
+            break;
+        }
+        if (sy == Fixed::const_new(1) && y1 > y2) || (sy == Fixed::const_new(-1) && y1 < y2) {
+            break;
+        }
+        if x1.trunc() == x2.trunc() && y1.trunc() == y2.trunc() {
             break;
         }
 
-        let e2: i32 = 2 * err;
+        let e2: Fixed = err * 2;
         if e2 > -dy {
             err -= dy;
             x1 += sx;
@@ -52,7 +97,7 @@ pub fn draw_line(mut x1: i32, mut y1: i32, x2: i32, y2: i32, color: u16, page: u
 
 #[allow(dead_code)]
 pub fn draw_face_outline(
-    screen_points: &[[i32; 2]],
+    screen_points: &[[Fixed; 2]],
     world_points: &[[Fixed; 3]],
     p1: usize,
     p2: usize,
@@ -61,8 +106,10 @@ pub fn draw_face_outline(
     page: u16,
     color: u16,
 ) {
-    if world_points[p1][2] > 0 && world_points[p2][2] > 0 {
-        draw_line(
+    let near = Fixed::from_raw(16);
+
+    if world_points[p1][2] > near && world_points[p2][2] > near {
+        draw_line_fixed(
             screen_points[p1][0],
             screen_points[p1][1],
             screen_points[p2][0],
@@ -71,8 +118,8 @@ pub fn draw_face_outline(
             page,
         );
     }
-    if world_points[p2][2] > 0 && world_points[p3][2] > 0 {
-        draw_line(
+    if world_points[p2][2] > near && world_points[p3][2] > near {
+        draw_line_fixed(
             screen_points[p2][0],
             screen_points[p2][1],
             screen_points[p3][0],
@@ -82,8 +129,8 @@ pub fn draw_face_outline(
         );
     }
 
-    if world_points[p3][2] > 0 && world_points[p4][2] > 0 {
-        draw_line(
+    if world_points[p3][2] > near && world_points[p4][2] > near {
+        draw_line_fixed(
             screen_points[p3][0],
             screen_points[p3][1],
             screen_points[p4][0],
@@ -92,8 +139,8 @@ pub fn draw_face_outline(
             page,
         );
     }
-    if world_points[p4][2] > 0 && world_points[p1][2] > 0 {
-        draw_line(
+    if world_points[p4][2] > near && world_points[p1][2] > near {
+        draw_line_fixed(
             screen_points[p4][0],
             screen_points[p4][1],
             screen_points[p1][0],
@@ -108,10 +155,7 @@ pub fn draw_face_outline(
 pub fn back_face_culling(points: &[[Fixed; 3]], p1: usize, p2: usize, p3: usize) -> bool {
     //checking if some of the points are behind the camera?
     //then dont draw
-    if points[p1][2] < 0
-        || points[p2][2] < 0
-        || points[p3][2] < 0
-    {
+    if points[p1][2] <= 0 || points[p2][2] <= 0 || points[p3][2] <= 0 {
         return false;
     }
 
@@ -126,8 +170,6 @@ pub fn back_face_culling(points: &[[Fixed; 3]], p1: usize, p2: usize, p3: usize)
         (points[p1][1] + points[p2][1] + points[p3][1]) / 3,
         (points[p1][2] + points[p2][2] + points[p3][2]) / 3,
     ];
-
-
 
     //calculate view direction towards the center of the polygon
     let view_dir: [Fixed; 3] = normalize(polygon_center);
@@ -277,22 +319,22 @@ pub fn draw_triangle(
 
     //jank way to avoid giant polygons near zero plane
     //TODO: Fix this like with the draw_face_outline and world coordinates
-    if p1[0] > Fixed::const_new(400) || p1[0] < Fixed::const_new(-100) {
+    if p1[0] > Fixed::const_new(340) || p1[0] < Fixed::const_new(-100) {
         return;
     }
-    if p2[0] > Fixed::const_new(400) || p2[0] < Fixed::const_new(-100) {
+    if p2[0] > Fixed::const_new(340) || p2[0] < Fixed::const_new(-100) {
         return;
     }
-    if p3[0] > Fixed::const_new(400) || p3[0] < Fixed::const_new(-100) {
+    if p3[0] > Fixed::const_new(340) || p3[0] < Fixed::const_new(-100) {
         return;
     }
-    if p1[1] > Fixed::const_new(400) || p1[1] < Fixed::const_new(-100) {
+    if p1[1] > Fixed::const_new(260) || p1[1] < Fixed::const_new(-100) {
         return;
     }
-    if p2[1] > Fixed::const_new(400) || p2[1] < Fixed::const_new(-100) {
+    if p2[1] > Fixed::const_new(260) || p2[1] < Fixed::const_new(-100) {
         return;
     }
-    if p3[1] > Fixed::const_new(400) || p3[1] < Fixed::const_new(-100) {
+    if p3[1] > Fixed::const_new(260) || p3[1] < Fixed::const_new(-100) {
         return;
     }
 
@@ -469,14 +511,14 @@ pub fn draw_wireframe_rect(
     color: u16,
     page: u16,
 ) {
-    let mut screen_points: [[i32; 2]; 8] = [[0; 2]; 8];
+    let mut screen_points: [[Fixed; 2]; 8] = [[Fixed::const_new(0); 2]; 8];
     let mut translated_points: [[Fixed; 3]; 8] = [[Fixed::const_new(0); 3]; 8];
 
     for i in 0..(*model_rotated_points).len() {
         let screen_point: [Fixed; 2];
         (translated_points[i], screen_point) =
             translate_point(&model_rotated_points[i], camera_ptr, x, y, z);
-        screen_points[i] = [screen_point[0].trunc(), screen_point[1].trunc()];
+        screen_points[i] = [screen_point[0], screen_point[1]];
     }
 
     let wire_color = color * 8 + 7;
