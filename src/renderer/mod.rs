@@ -112,49 +112,71 @@ pub fn draw_face_outline(
     p4: usize,
     page: u16,
     color: u16,
+    polygons: &mut Vec<Polygon, InternalAllocator>
 ) {
     let near = Fixed::from_raw(16);
 
     if world_points[p1][2] > near && world_points[p2][2] > near {
-        draw_line_fixed(
-            screen_points[p1][0],
-            screen_points[p1][1],
-            screen_points[p2][0],
-            screen_points[p2][1],
+        polygons.push(Polygon {
+            distance_from_camera: utils::polygon_avg_z_2(world_points, p1, p2),
+            shape: Shape::Line([screen_points[p1], screen_points[p2]]),
             color,
-            page,
-        );
+        });
+
+        // draw_line_fixed(
+        //     screen_points[p1][0],
+        //     screen_points[p1][1],
+        //     screen_points[p2][0],
+        //     screen_points[p2][1],
+        //     color,
+        //     page,
+        // );
     }
     if world_points[p2][2] > near && world_points[p3][2] > near {
-        draw_line_fixed(
-            screen_points[p2][0],
-            screen_points[p2][1],
-            screen_points[p3][0],
-            screen_points[p3][1],
+        polygons.push(Polygon {
+            distance_from_camera: utils::polygon_avg_z_2(world_points, p2, p3),
+            shape: Shape::Line([screen_points[p2], screen_points[p3]]),
             color,
-            page,
-        );
+        });
+        // draw_line_fixed(
+        //     screen_points[p2][0],
+        //     screen_points[p2][1],
+        //     screen_points[p3][0],
+        //     screen_points[p3][1],
+        //     color,
+        //     page,
+        // );
     }
 
     if world_points[p3][2] > near && world_points[p4][2] > near {
-        draw_line_fixed(
-            screen_points[p3][0],
-            screen_points[p3][1],
-            screen_points[p4][0],
-            screen_points[p4][1],
+        polygons.push(Polygon {
+            distance_from_camera: utils::polygon_avg_z_2(world_points, p3, p4),
+            shape: Shape::Line([screen_points[p3], screen_points[p4]]),
             color,
-            page,
-        );
+        });
+        // draw_line_fixed(
+        //     screen_points[p3][0],
+        //     screen_points[p3][1],
+        //     screen_points[p4][0],
+        //     screen_points[p4][1],
+        //     color,
+        //     page,
+        // );
     }
     if world_points[p4][2] > near && world_points[p1][2] > near {
-        draw_line_fixed(
-            screen_points[p4][0],
-            screen_points[p4][1],
-            screen_points[p1][0],
-            screen_points[p1][1],
+        polygons.push(Polygon {
+            distance_from_camera: utils::polygon_avg_z_2(world_points, p4, p1),
+            shape: Shape::Line([screen_points[p4], screen_points[p1]]),
             color,
-            page,
-        );
+        });
+        // draw_line_fixed(
+        //     screen_points[p4][0],
+        //     screen_points[p4][1],
+        //     screen_points[p1][0],
+        //     screen_points[p1][1],
+        //     color,
+        //     page,
+        // );
     }
 }
 
@@ -598,7 +620,7 @@ pub fn draw_wireframe_rect(
     camera_ptr: &Camera,
     color: u16,
     page: u16,
-) {
+) -> Vec<Polygon, InternalAllocator> {
     let mut screen_points: [[Fixed; 2]; 8] = [[Fixed::const_new(0); 2]; 8];
     let mut translated_points: [[Fixed; 3]; 8] = [[Fixed::const_new(0); 3]; 8];
 
@@ -611,6 +633,10 @@ pub fn draw_wireframe_rect(
 
     let wire_color = color * 8 + 7;
 
+    let mut polygons: Vec<Polygon, InternalAllocator> = Vec::new_in(InternalAllocator);
+
+    
+
     draw_face_outline(
         &screen_points,
         &translated_points,
@@ -620,6 +646,7 @@ pub fn draw_wireframe_rect(
         3,
         page,
         wire_color,
+        &mut polygons
     );
     draw_face_outline(
         &screen_points,
@@ -630,6 +657,7 @@ pub fn draw_wireframe_rect(
         7,
         page,
         wire_color,
+        &mut polygons
     );
     draw_face_outline(
         &screen_points,
@@ -640,6 +668,7 @@ pub fn draw_wireframe_rect(
         7,
         page,
         wire_color,
+        &mut polygons
     );
     draw_face_outline(
         &screen_points,
@@ -650,7 +679,10 @@ pub fn draw_wireframe_rect(
         4,
         page,
         wire_color,
+        &mut polygons
     );
+
+    return polygons;
 }
 
 pub fn translate_point(

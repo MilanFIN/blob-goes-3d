@@ -123,6 +123,7 @@ fn main(mut gba: agb::Gba) -> ! {
 
     let mut event_loop: Vec<OutputEvents, InternalAllocator> = Vec::new_in(InternalAllocator);
     let mut polygons: Vec<Polygon, InternalAllocator> = Vec::new_in(InternalAllocator);
+    let mut polygon_indices: Vec<usize, InternalAllocator> = Vec::new_in(InternalAllocator);
 
     loop {
         input.update();
@@ -219,16 +220,33 @@ fn main(mut gba: agb::Gba) -> ! {
                 polygons.extend(res.unwrap());
             }
         }
-        //todo, create a vector of the same length as the polygons with content
-        //0...len(polygons)-1, and sort it by the distance of the polygon to the camera
-        //then loop through polygons in that order
-        polygons.sort_by(|a, b| b.distance_from_camera.cmp(&a.distance_from_camera));
-        for polygon in polygons.iter() {
+        let mut polygon_indices: Vec<usize, InternalAllocator> = Vec::new_in(InternalAllocator);
+        for i in 0..polygons.len() {
+            polygon_indices.push(i);
+        }
+        polygon_indices.sort_by(|&a, &b| {
+            polygons[b]
+                .distance_from_camera
+                .cmp(&polygons[a].distance_from_camera)
+        });
+        for p in 0..polygon_indices.len() {
+            let polygon = &polygons[polygon_indices[p]];
             if let Some(vertices) = polygon.as_triangle() {
                 renderer::draw_triangle(vertices[0], vertices[1], vertices[2], polygon.color, page);
             }
+            if let Some(vertices) = polygon.as_line() {
+                renderer::draw_line_fixed(
+                    vertices[0][0],
+                    vertices[0][1],
+                    vertices[1][0],
+                    vertices[1][1],
+                    polygon.color,
+                    page,
+                );
+            }
         }
         polygons.clear();
+        polygon_indices.clear();
 
         renderer::hw::flip(&mut page);
     }

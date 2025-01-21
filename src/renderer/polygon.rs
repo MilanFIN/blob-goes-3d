@@ -14,6 +14,13 @@ impl Polygon {
             None
         }
     }
+    pub fn as_line(&self) -> Option<[[Fixed; 2]; 2]> {
+        if let Shape::Line(vertices) = self.shape {
+            Some(vertices)
+        } else {
+            None
+        }
+    }
 }
 
 pub enum Shape {

@@ -1,3 +1,5 @@
+use crate::math;
+
 use super::Fixed;
 
 pub const PROJECTION_MATRIX: [[Fixed; 4]; 4] = [
@@ -86,5 +88,17 @@ pub fn get_color(index: u16, shade: i16) -> u16 {
 }
 
 pub fn polygon_avg_z(points: &[[Fixed; 3]], a: usize, b: usize, c:usize) -> Fixed {
+    let x = points[a][0] + points[b][0] + points[c][0] / Fixed::const_new(3);
+    let y = points[a][1] + points[b][1] + points[c][1] / Fixed::const_new(3);
+    let z = points[a][2] + points[b][2] + points[c][2] / Fixed::const_new(3);
+    //return math::vector_len([x,y,z]);
     return (points[a][2] + points[b][2] + points[c][2]) / Fixed::const_new(3);
+}
+
+pub fn polygon_avg_z_2(points: &[[Fixed; 3]], a: usize, b: usize) -> Fixed {
+    let x = points[a][0] + points[b][0]  / Fixed::const_new(2);
+    let y = points[a][1] + points[b][1] / Fixed::const_new(2);
+    let z = points[a][2] + points[b][2] / Fixed::const_new(2);
+    //return math::vector_len([x,y,z]);
+    return (points[a][2] + points[b][2]) / Fixed::const_new(2);
 }

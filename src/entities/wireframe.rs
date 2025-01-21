@@ -209,7 +209,7 @@ impl Entity for Wireframe {
                 page,
             ));
         } else {
-            renderer::draw_wireframe_rect(
+            return Some(renderer::draw_wireframe_rect(
                 &self.model_rotated_points,
                 self.x,
                 self.y,
@@ -218,8 +218,7 @@ impl Entity for Wireframe {
                 camera,
                 self.color,
                 page,
-            );
-            return None;
+            ));
         }
     }
 
