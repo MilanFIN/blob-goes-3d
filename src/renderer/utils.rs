@@ -1,5 +1,3 @@
-use crate::math;
-
 use super::Fixed;
 
 pub const PROJECTION_MATRIX: [[Fixed; 4]; 4] = [
@@ -67,38 +65,21 @@ pub fn get_color(index: u16, shade: i16) -> u16 {
         return index * 8 + 4;
     }
     return index*8+3;
-    /*
-    const SUN_ANGLE: Fixed = Fixed::from_raw(32);
-    const BASE_COLOR: Fixed = Fixed::const_new(7);
-    const QUARTER: Fixed = Fixed::from_raw(128);
 
-    // Calculate the shortest angular difference
-    let raw_diff = (angle - SUN_ANGLE).abs();
-    let a2 = raw_diff.modulo(Fixed::const_new(1));
-
-    let diff = a2.min(Fixed::const_new(1) - a2);
-
-    // Clamp the difference to the range [0, 0.25] and calculate the index
-    let clamped_diff = diff.min(QUARTER);
-    let offset = BASE_COLOR * (Fixed::const_new(1) - clamped_diff / QUARTER);
-
-    // Convert to integer index
-    return ((offset.trunc()) as u16) + index * 8;
-    */
 }
 
 pub fn polygon_avg_z(points: &[[Fixed; 3]], a: usize, b: usize, c:usize) -> Fixed {
-    let x = points[a][0] + points[b][0] + points[c][0] / Fixed::const_new(3);
-    let y = points[a][1] + points[b][1] + points[c][1] / Fixed::const_new(3);
-    let z = points[a][2] + points[b][2] + points[c][2] / Fixed::const_new(3);
-    //return math::vector_len([x,y,z]);
+    // let x = points[a][0] + points[b][0] + points[c][0] / Fixed::const_new(3);
+    // let y = points[a][1] + points[b][1] + points[c][1] / Fixed::const_new(3);
+    // let z = points[a][2] + points[b][2] + points[c][2] / Fixed::const_new(3);
+    // return math::vector_square_len([x,y,z]);
     return (points[a][2] + points[b][2] + points[c][2]) / Fixed::const_new(3);
 }
 
 pub fn polygon_avg_z_2(points: &[[Fixed; 3]], a: usize, b: usize) -> Fixed {
-    let x = points[a][0] + points[b][0]  / Fixed::const_new(2);
-    let y = points[a][1] + points[b][1] / Fixed::const_new(2);
-    let z = points[a][2] + points[b][2] / Fixed::const_new(2);
-    //return math::vector_len([x,y,z]);
+    // let x = points[a][0] + points[b][0]  / Fixed::const_new(2);
+    // let y = points[a][1] + points[b][1] / Fixed::const_new(2);
+    // let z = points[a][2] + points[b][2] / Fixed::const_new(2);
+    // return math::vector_square_len([x,y,z]);
     return (points[a][2] + points[b][2]) / Fixed::const_new(2);
 }

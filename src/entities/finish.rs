@@ -239,7 +239,7 @@ impl Entity for Finish {
         //not implemented
     }
 
-    fn render(&mut self, camera: &Camera, page: u16) -> Option<Vec<Polygon, InternalAllocator>> {
+    fn render(&mut self, camera: &Camera, polygons: &mut Vec<Polygon, InternalAllocator>) {
         let mut screen_points: [[Fixed; 2]; 14] = [[Fixed::const_new(0), Fixed::const_new(0)]; 14];
         let mut translated_points: [[Fixed; 3]; 14] = [[
             Fixed::const_new(0),
@@ -256,7 +256,6 @@ impl Entity for Finish {
                 self.z,
             );
         }
-        let mut polygons: Vec<Polygon, InternalAllocator> = Vec::new_in(InternalAllocator);
 
         let visible: bool = back_face_culling(&translated_points, 0, 1, 2);
         if visible {
@@ -439,7 +438,6 @@ impl Entity for Finish {
             });
 
         }
-        return Some(polygons);
     }
 
     fn distance_from_camera(&self, camera: &Camera) -> Fixed {

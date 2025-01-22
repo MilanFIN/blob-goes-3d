@@ -196,9 +196,9 @@ impl Entity for Wireframe {
         //not implemented
     }
 
-    fn render(&mut self, camera: &Camera, page: u16) -> Option<Vec<Polygon, InternalAllocator>> {
+    fn render(&mut self, camera: &Camera, polygons: &mut Vec<Polygon, InternalAllocator>) {
         if self.solid {
-            return Some(renderer::draw_rect(
+            renderer::draw_rect(
                 &self.model_rotated_points,
                 self.x,
                 self.y,
@@ -206,10 +206,10 @@ impl Entity for Wireframe {
                 self.y_rotation,
                 camera,
                 self.color,
-                page,
-            ));
+                polygons,
+            );
         } else {
-            return Some(renderer::draw_wireframe_rect(
+            renderer::draw_wireframe_rect(
                 &self.model_rotated_points,
                 self.x,
                 self.y,
@@ -217,8 +217,8 @@ impl Entity for Wireframe {
                 self.y_rotation,
                 camera,
                 self.color,
-                page,
-            ));
+                polygons,
+            );
         }
     }
 

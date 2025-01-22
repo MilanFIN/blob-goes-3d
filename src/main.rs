@@ -32,7 +32,7 @@ mod entities;
 use cube::Cube;
 use effects::OutputEvents;
 use empty::Empty;
-use entities::utils::{check_block_above, check_support_below, quick_sort};
+use entities::utils::{check_block_above, check_support_below};
 use entities::*;
 
 mod camera;
@@ -148,14 +148,14 @@ fn main(mut gba: agb::Gba) -> ! {
         }
 
         player1.update_camera_position();
-
+        /*
         quick_sort(
             &mut entity_render_order,
             &entity_array,
             0,
             levelsize + 1,
             &player1.camera,
-        );
+        );*/
 
         let game_state: effects::InputGameState = effects::InputGameState {
             support_below_id: bottom_support_id,
@@ -213,14 +213,8 @@ fn main(mut gba: agb::Gba) -> ! {
             if let EntityEnum::Empty(_) = entity_array[i] {
                 break;
             }
-
-            let res: Option<Vec<Polygon, InternalAllocator>> =
-                entity_array[entity_render_order[i]].render(&player1.camera, page);
-            if (res.is_some()) {
-                polygons.extend(res.unwrap());
-            }
+            entity_array[entity_render_order[i]].render(&player1.camera, &mut polygons);
         }
-        let mut polygon_indices: Vec<usize, InternalAllocator> = Vec::new_in(InternalAllocator);
         for i in 0..polygons.len() {
             polygon_indices.push(i);
         }

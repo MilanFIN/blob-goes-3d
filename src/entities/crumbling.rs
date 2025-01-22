@@ -60,11 +60,11 @@ pub struct Crumbling {
     #[serde(default = "default_i16")]
     lifetime: i16,
 
-	#[serde(default = "default_i16")]
-	player_standing_on_rect: i16,
+    #[serde(default = "default_i16")]
+    player_standing_on_rect: i16,
 
-	#[serde(default = "positive_i16")]
-	shake_direction: i16,
+    #[serde(default = "positive_i16")]
+    shake_direction: i16,
 }
 
 impl Crumbling {
@@ -89,7 +89,7 @@ impl Crumbling {
             color: 0,
             lifetime: 0,
             player_standing_on_rect: 0,
-			shake_direction: 1,
+            shake_direction: 1,
         }
     }
 }
@@ -201,17 +201,17 @@ impl Entity for Crumbling {
         //not implemented
     }
 
-    fn render(&mut self, camera: &Camera, page: u16) -> Option<Vec<Polygon, InternalAllocator>>{
+    fn render(&mut self, camera: &Camera, polygons: &mut Vec<Polygon, InternalAllocator>) {
         if self.lifetime > 0 {
             let shaking_points: [[Fixed; 3]; 8];
 
             let mut shake: i16 = 60 - self.lifetime;
-			if shake < 0 {
-				shake = 0;
-			}
-			shake *= self.shake_direction;
-			self.shake_direction *= -1;
-			let offset = Fixed::const_new(shake as i32) / 200;
+            if shake < 0 {
+                shake = 0;
+            }
+            shake *= self.shake_direction;
+            self.shake_direction *= -1;
+            let offset = Fixed::const_new(shake as i32) / 200;
 
             if shake > 0 && self.player_standing_on_rect == 1 {
                 shaking_points = self.model_rotated_points.map(|point| {
@@ -223,7 +223,7 @@ impl Entity for Crumbling {
                 shaking_points = self.model_rotated_points;
             }
 
-            return Some(renderer::draw_rect(
+            renderer::draw_rect(
                 &shaking_points,
                 self.x,
                 self.y,
@@ -231,10 +231,9 @@ impl Entity for Crumbling {
                 self.y_rotation,
                 camera,
                 self.color,
-                page,
-            ));
+                polygons,
+            );
         }
-        return None;
     }
 
     fn distance_from_camera(&self, camera: &Camera) -> Fixed {
@@ -306,17 +305,13 @@ impl Entity for Crumbling {
     fn set_color(&mut self, color: u16) {
         self.color = color;
     }
-    fn tick(
-        &mut self,
-        effects: &effects::InputGameState,
-    ) -> Option<effects::OutputEvents> {
+    fn tick(&mut self, effects: &effects::InputGameState) -> Option<effects::OutputEvents> {
         if self.lifetime > 0 && effects.support_below_id == self.id {
             self.lifetime -= 1;
-			self.player_standing_on_rect = 1;
+            self.player_standing_on_rect = 1;
+        } else {
+            self.player_standing_on_rect = 0;
         }
-		else {
-			self.player_standing_on_rect = 0;
-		}
         return None;
     }
 

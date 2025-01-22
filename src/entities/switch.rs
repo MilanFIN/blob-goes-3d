@@ -197,9 +197,9 @@ impl Entity for Switch {
         //not implemented
     }
 
-    fn render(&mut self, camera: &Camera, page: u16) -> Option<Vec<Polygon, InternalAllocator>> {
+    fn render(&mut self, camera: &Camera, polygons: &mut Vec<Polygon, InternalAllocator>) {
         let (x_add, z_add) = self.position_offset_from_state();
-        return Some(renderer::draw_rect(
+        renderer::draw_rect(
             &self.model_rotated_points,
             self.x + x_add,
             self.y,
@@ -207,8 +207,8 @@ impl Entity for Switch {
             self.y_rotation,
             camera,
             self.color,
-            page,
-        ));
+            polygons,
+        );
     }
 
     fn distance_from_camera(&self, camera: &Camera) -> Fixed {

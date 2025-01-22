@@ -218,19 +218,20 @@ impl EntityEnum {
             EntityEnum::Empty(_a) => {}
         }
     }
-    pub fn render(&mut self, camera: &Camera, page: u16) -> Option<Vec<Polygon, InternalAllocator>> {
+    pub fn render(&mut self, camera: &Camera, polygons: &mut Vec<Polygon, InternalAllocator>) {
         match self {
-            EntityEnum::Cube(a) => a.render(camera, page),
-            EntityEnum::Rectangle(a) => a.render(camera, page),
-            EntityEnum::Mover(a) => a.render(camera, page),
-            EntityEnum::Crumbling(a) => a.render(camera, page),
-            EntityEnum::Empty(_a) => {None}
-            EntityEnum::Finish(a) => a.render(camera, page),
-            EntityEnum::Switch(a) => a.render(camera, page),
-            EntityEnum::Wireframe(a) => a.render(camera, page),
-            EntityEnum::Body(a) => a.render(camera, page),
+            EntityEnum::Cube(a) => a.render(camera, polygons),
+            EntityEnum::Rectangle(a) => a.render(camera, polygons),
+            EntityEnum::Mover(a) => a.render(camera, polygons),
+            EntityEnum::Crumbling(a) => a.render(camera, polygons),
+            EntityEnum::Empty(_a) => {}
+            EntityEnum::Finish(a) => a.render(camera, polygons),
+            EntityEnum::Switch(a) => a.render(camera, polygons),
+            EntityEnum::Wireframe(a) => a.render(camera, polygons),
+            EntityEnum::Body(a) => a.render(camera, polygons),
         }
     }
+    #[allow(dead_code)]
     pub fn distance_from_camera(&self, camera: &Camera) -> Fixed {
         match self {
             EntityEnum::Cube(a) => a.distance_from_camera(camera),
@@ -270,6 +271,7 @@ impl EntityEnum {
             EntityEnum::Empty(_a) => BoundingCylinder::default(),
         }
     }
+    #[allow(dead_code)]
     pub fn get_y(&self) -> Fixed {
         match self {
             EntityEnum::Cube(a) => a.get_y(),

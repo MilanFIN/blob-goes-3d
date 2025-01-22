@@ -110,9 +110,8 @@ pub fn draw_face_outline(
     p2: usize,
     p3: usize,
     p4: usize,
-    page: u16,
     color: u16,
-    polygons: &mut Vec<Polygon, InternalAllocator>
+    polygons: &mut Vec<Polygon, InternalAllocator>,
 ) {
     let near = Fixed::from_raw(16);
 
@@ -400,10 +399,8 @@ pub fn draw_rect(
     _y_rotation: Fixed,
     camera_ptr: &Camera,
     color: u16,
-    page: u16,
-) -> Vec<Polygon, InternalAllocator> {
-    let mut polygons: Vec<Polygon, InternalAllocator> = Vec::new_in(InternalAllocator);
-
+    polygons: &mut Vec<Polygon, InternalAllocator>,
+) {
     let mut screen_points: [[Fixed; 2]; 8] = [[Fixed::const_new(0), Fixed::const_new(0)]; 8];
     let mut translated_points: [[Fixed; 3]; 8] = [[
         Fixed::const_new(0),
@@ -607,7 +604,6 @@ pub fn draw_rect(
             page,
         );*/
     }
-    return polygons;
 }
 
 #[inline(always)]
@@ -619,8 +615,8 @@ pub fn draw_wireframe_rect(
     _y_rotation: Fixed,
     camera_ptr: &Camera,
     color: u16,
-    page: u16,
-) -> Vec<Polygon, InternalAllocator> {
+    polygons: &mut Vec<Polygon, InternalAllocator>,
+) {
     let mut screen_points: [[Fixed; 2]; 8] = [[Fixed::const_new(0); 2]; 8];
     let mut translated_points: [[Fixed; 3]; 8] = [[Fixed::const_new(0); 3]; 8];
 
@@ -633,10 +629,6 @@ pub fn draw_wireframe_rect(
 
     let wire_color = color * 8 + 7;
 
-    let mut polygons: Vec<Polygon, InternalAllocator> = Vec::new_in(InternalAllocator);
-
-    
-
     draw_face_outline(
         &screen_points,
         &translated_points,
@@ -644,9 +636,8 @@ pub fn draw_wireframe_rect(
         1,
         2,
         3,
-        page,
         wire_color,
-        &mut polygons
+        polygons,
     );
     draw_face_outline(
         &screen_points,
@@ -655,9 +646,8 @@ pub fn draw_wireframe_rect(
         5,
         6,
         7,
-        page,
         wire_color,
-        &mut polygons
+        polygons,
     );
     draw_face_outline(
         &screen_points,
@@ -666,9 +656,8 @@ pub fn draw_wireframe_rect(
         2,
         6,
         7,
-        page,
         wire_color,
-        &mut polygons
+        polygons,
     );
     draw_face_outline(
         &screen_points,
@@ -677,12 +666,9 @@ pub fn draw_wireframe_rect(
         1,
         5,
         4,
-        page,
         wire_color,
-        &mut polygons
+        polygons,
     );
-
-    return polygons;
 }
 
 pub fn translate_point(

@@ -13,8 +13,11 @@ use fixed::*;
 #[derive(Copy, Clone, Deserialize, Debug)]
 pub struct Empty {}
 impl Entity for Empty {
-    fn render(&mut self, _camera: &Camera, _page: u16) -> Option<Vec<Polygon, InternalAllocator>> {
-        None
+    fn render(
+        &mut self,
+        _camera: &Camera,
+        _polygons: &mut Vec<Polygon, InternalAllocator>,
+    ) {
     }
     fn set_x_offset(&mut self, _x_offset: Fixed) {}
     fn set_y_offset(&mut self, _y_offset: Fixed) {}
