@@ -39,22 +39,20 @@ mod camera;
 
 mod math;
 mod renderer;
-
 mod utils;
 use levels::levelstore::LEVELSIZE;
 use utils::*;
-
 mod player;
 use player::*;
-
 mod input;
-
 mod fixed;
 use fixed::*;
-
 mod levels;
-
 mod effects;
+
+const DRAWDISTANCE: Fixed = Fixed::const_new(35);
+const POLYGON_LIMIT: i16 = 50;
+
 
 /*
 The main function must take 1 arguments and never return. The agb::entry decorator
@@ -85,7 +83,7 @@ fn main(mut gba: agb::Gba) -> ! {
 
     let mut entity_render_order: [usize; LEVELSIZE + 2] = [0; LEVELSIZE + 2];
 
-    let levelsize = levels::load_level(1, &mut entity_array);
+    let levelsize = levels::load_level(2, &mut entity_array);
 
     let mut player1: Player = Player::default();
 
@@ -213,7 +211,7 @@ fn main(mut gba: agb::Gba) -> ! {
             if let EntityEnum::Empty(_) = entity_array[i] {
                 break;
             }
-            entity_array[entity_render_order[i]].render(&player1.camera, &mut polygons);
+            entity_array[entity_render_order[i]].render(&player1.camera, &mut polygons, DRAWDISTANCE);
         }
         for i in 0..polygons.len() {
             polygon_indices.push(i);
@@ -223,7 +221,14 @@ fn main(mut gba: agb::Gba) -> ! {
                 .distance_from_camera
                 .cmp(&polygons[a].distance_from_camera)
         });
-        for p in 0..polygon_indices.len() {
+
+
+        let mut start:i16 = polygon_indices.len() as i16 - POLYGON_LIMIT ;
+        if start < 0 {
+            start = 0;
+        }
+
+        for p in start as usize..polygon_indices.len() {
             let polygon = &polygons[polygon_indices[p]];
             if let Some(vertices) = polygon.as_triangle() {
                 renderer::draw_triangle(vertices[0], vertices[1], vertices[2], polygon.color, page);

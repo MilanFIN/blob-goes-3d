@@ -201,7 +201,12 @@ impl Entity for Crumbling {
         //not implemented
     }
 
-    fn render(&mut self, camera: &Camera, polygons: &mut Vec<Polygon, InternalAllocator>) {
+    fn render(&mut self, camera: &Camera, polygons: &mut Vec<Polygon, InternalAllocator>, render_distance: Fixed) {
+
+        if self.distance_from_camera(camera) > render_distance {
+            return;
+        }
+
         if self.lifetime > 0 {
             let shaking_points: [[Fixed; 3]; 8];
 

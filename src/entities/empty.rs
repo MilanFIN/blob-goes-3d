@@ -17,6 +17,7 @@ impl Entity for Empty {
         &mut self,
         _camera: &Camera,
         _polygons: &mut Vec<Polygon, InternalAllocator>,
+        _render_distance: Fixed,
     ) {
     }
     fn set_x_offset(&mut self, _x_offset: Fixed) {}

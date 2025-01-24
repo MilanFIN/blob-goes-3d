@@ -197,7 +197,11 @@ impl Entity for Switch {
         //not implemented
     }
 
-    fn render(&mut self, camera: &Camera, polygons: &mut Vec<Polygon, InternalAllocator>) {
+    fn render(&mut self, camera: &Camera, polygons: &mut Vec<Polygon, InternalAllocator>, render_distance: Fixed) {
+        if self.distance_from_camera(camera) > render_distance {
+            return;
+        }
+
         let (x_add, z_add) = self.position_offset_from_state();
         renderer::draw_rect(
             &self.model_rotated_points,

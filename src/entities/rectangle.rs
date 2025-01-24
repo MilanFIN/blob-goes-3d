@@ -188,7 +188,12 @@ impl Entity for Rectangle {
         //not implemented
     }
 
-    fn render(&mut self, camera: &Camera, polygons: &mut Vec<Polygon, InternalAllocator>) {
+    fn render(&mut self, camera: &Camera, polygons: &mut Vec<Polygon, InternalAllocator>, render_distance: Fixed) {
+
+        if self.distance_from_camera(camera) > render_distance {
+            return;
+        }
+
         renderer::draw_rect(
             &self.model_rotated_points,
             self.x,

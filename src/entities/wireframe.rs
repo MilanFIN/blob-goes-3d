@@ -196,7 +196,12 @@ impl Entity for Wireframe {
         //not implemented
     }
 
-    fn render(&mut self, camera: &Camera, polygons: &mut Vec<Polygon, InternalAllocator>) {
+    fn render(&mut self, camera: &Camera, polygons: &mut Vec<Polygon, InternalAllocator>, render_distance: Fixed) {
+
+        if self.distance_from_camera(camera) > render_distance {
+            return;
+        }
+
         if self.solid {
             renderer::draw_rect(
                 &self.model_rotated_points,

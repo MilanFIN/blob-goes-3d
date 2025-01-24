@@ -239,7 +239,12 @@ impl Entity for Finish {
         //not implemented
     }
 
-    fn render(&mut self, camera: &Camera, polygons: &mut Vec<Polygon, InternalAllocator>) {
+    fn render(&mut self, camera: &Camera, polygons: &mut Vec<Polygon, InternalAllocator>, render_distance: Fixed) {
+
+        if self.distance_from_camera(camera) > render_distance {
+            return;
+        }
+
         let mut screen_points: [[Fixed; 2]; 14] = [[Fixed::const_new(0), Fixed::const_new(0)]; 14];
         let mut translated_points: [[Fixed; 3]; 14] = [[
             Fixed::const_new(0),
