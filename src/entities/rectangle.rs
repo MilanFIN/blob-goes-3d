@@ -1,3 +1,5 @@
+use agb::InternalAllocator;
+use alloc::vec::Vec;
 use serde::Deserialize;
 
 use super::math;
@@ -7,6 +9,7 @@ use super::Camera;
 use super::Entity;
 use crate::effects;
 use crate::renderer;
+use crate::renderer::polygon::Polygon;
 use math::*;
 
 use crate::fixed;
@@ -185,8 +188,13 @@ impl Entity for Rectangle {
         //not implemented
     }
 
-    fn render(&mut self, camera: &Camera, page: u16) {
-        renderer::draw_rect(
+    fn render(&mut self, camera: &Camera, polygons: &mut Vec<Polygon, InternalAllocator>, render_distance: Fixed) {
+
+        if self.distance_from_camera(camera) > render_distance {
+            return;
+        }
+
+        renderer::render::render_rect(
             &self.model_rotated_points,
             self.x,
             self.y,
@@ -194,7 +202,7 @@ impl Entity for Rectangle {
             self.y_rotation,
             camera,
             self.color,
-            page,
+            polygons,
         );
     }
 

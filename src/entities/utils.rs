@@ -36,6 +36,7 @@ fn partition(
     (i + 1) as usize
 }
 
+#[allow(dead_code)]
 pub fn quick_sort(
     entity_render_order: &mut [usize],
     entity_array: &[EntityEnum],

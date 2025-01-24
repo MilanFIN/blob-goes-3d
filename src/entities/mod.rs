@@ -1,4 +1,6 @@
 pub mod entity;
+use agb::InternalAllocator;
+use alloc::vec::Vec;
 use entity::*;
 
 pub mod cube;
@@ -42,6 +44,7 @@ use camera::*;
 
 use crate::effects;
 use crate::fixed;
+use crate::renderer::polygon::Polygon;
 use fixed::*;
 
 #[derive(Copy, Clone, Deserialize, Debug)]
@@ -215,19 +218,20 @@ impl EntityEnum {
             EntityEnum::Empty(_a) => {}
         }
     }
-    pub fn render(&mut self, camera: &Camera, page: u16) {
+    pub fn render(&mut self, camera: &Camera, polygons: &mut Vec<Polygon, InternalAllocator>, render_distance: Fixed) {
         match self {
-            EntityEnum::Cube(a) => a.render(camera, page),
-            EntityEnum::Rectangle(a) => a.render(camera, page),
-            EntityEnum::Mover(a) => a.render(camera, page),
-            EntityEnum::Crumbling(a) => a.render(camera, page),
+            EntityEnum::Cube(a) => a.render(camera, polygons, render_distance),
+            EntityEnum::Rectangle(a) => a.render(camera, polygons, render_distance),
+            EntityEnum::Mover(a) => a.render(camera, polygons, render_distance),
+            EntityEnum::Crumbling(a) => a.render(camera, polygons, render_distance),
             EntityEnum::Empty(_a) => {}
-            EntityEnum::Finish(a) => a.render(camera, page),
-            EntityEnum::Switch(a) => a.render(camera, page),
-            EntityEnum::Wireframe(a) => a.render(camera, page),
-            EntityEnum::Body(a) => a.render(camera, page),
+            EntityEnum::Finish(a) => a.render(camera, polygons, render_distance),
+            EntityEnum::Switch(a) => a.render(camera, polygons, render_distance),
+            EntityEnum::Wireframe(a) => a.render(camera, polygons, render_distance),
+            EntityEnum::Body(a) => a.render(camera, polygons, render_distance),
         }
     }
+    #[allow(dead_code)]
     pub fn distance_from_camera(&self, camera: &Camera) -> Fixed {
         match self {
             EntityEnum::Cube(a) => a.distance_from_camera(camera),
@@ -267,6 +271,7 @@ impl EntityEnum {
             EntityEnum::Empty(_a) => BoundingCylinder::default(),
         }
     }
+    #[allow(dead_code)]
     pub fn get_y(&self) -> Fixed {
         match self {
             EntityEnum::Cube(a) => a.get_y(),
