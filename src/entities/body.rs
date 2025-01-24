@@ -213,7 +213,7 @@ impl Entity for Body {
         if self.distance_from_camera(camera) > render_distance {
             return;
         }
-        renderer::draw_rect(
+        renderer::render::render_rect(
             &self.model_rotated_points,
             self.x,
             self.y,

@@ -194,7 +194,7 @@ impl Entity for Rectangle {
             return;
         }
 
-        renderer::draw_rect(
+        renderer::render::render_rect(
             &self.model_rotated_points,
             self.x,
             self.y,

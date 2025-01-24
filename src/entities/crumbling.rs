@@ -228,7 +228,7 @@ impl Entity for Crumbling {
                 shaking_points = self.model_rotated_points;
             }
 
-            renderer::draw_rect(
+            renderer::render::render_rect(
                 &shaking_points,
                 self.x,
                 self.y,

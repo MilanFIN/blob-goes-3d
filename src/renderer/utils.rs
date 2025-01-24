@@ -83,3 +83,12 @@ pub fn polygon_avg_z_2(points: &[[Fixed; 3]], a: usize, b: usize) -> Fixed {
     // return math::vector_square_len([x,y,z]);
     return (points[a][2] + points[b][2]) / Fixed::const_new(2);
 }
+
+
+#[inline(always)]
+pub fn safe_fraction_fixed(numerator: Fixed, denominator: Fixed) -> Fixed {
+    if denominator == 0 {
+        return Fixed::const_new(0);
+    }
+    return numerator / denominator;
+}

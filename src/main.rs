@@ -231,10 +231,10 @@ fn main(mut gba: agb::Gba) -> ! {
         for p in start as usize..polygon_indices.len() {
             let polygon = &polygons[polygon_indices[p]];
             if let Some(vertices) = polygon.as_triangle() {
-                renderer::draw_triangle(vertices[0], vertices[1], vertices[2], polygon.color, page);
+                renderer::draw::draw_triangle(vertices[0], vertices[1], vertices[2], polygon.color, page);
             }
             if let Some(vertices) = polygon.as_line() {
-                renderer::draw_line_fixed(
+                renderer::draw::draw_line_fixed(
                     vertices[0][0],
                     vertices[0][1],
                     vertices[1][0],

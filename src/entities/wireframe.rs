@@ -203,7 +203,7 @@ impl Entity for Wireframe {
         }
 
         if self.solid {
-            renderer::draw_rect(
+            renderer::render::render_rect(
                 &self.model_rotated_points,
                 self.x,
                 self.y,
@@ -214,7 +214,7 @@ impl Entity for Wireframe {
                 polygons,
             );
         } else {
-            renderer::draw_wireframe_rect(
+            renderer::render::render_wireframe_rect(
                 &self.model_rotated_points,
                 self.x,
                 self.y,

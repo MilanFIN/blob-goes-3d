@@ -12,7 +12,7 @@ use super::Camera;
 use super::Entity;
 use crate::effects;
 use crate::renderer;
-use crate::renderer::back_face_culling;
+use crate::renderer::render::back_face_culling;
 use crate::renderer::polygon::Polygon;
 use math::*;
 
@@ -253,7 +253,7 @@ impl Entity for Finish {
         ]; 14];
 
         for i in 0..(self.model_rotated_points).len() {
-            (translated_points[i], screen_points[i]) = renderer::translate_point(
+            (translated_points[i], screen_points[i]) = renderer::render::translate_point(
                 &self.model_rotated_points[i],
                 &camera,
                 self.x,

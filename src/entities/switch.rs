@@ -203,7 +203,7 @@ impl Entity for Switch {
         }
 
         let (x_add, z_add) = self.position_offset_from_state();
-        renderer::draw_rect(
+        renderer::render::render_rect(
             &self.model_rotated_points,
             self.x + x_add,
             self.y,
