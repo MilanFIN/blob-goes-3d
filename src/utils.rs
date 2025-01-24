@@ -42,3 +42,21 @@ pub fn rectangle_model_points(xsize: Fixed, ysize: Fixed, zsize: Fixed) -> [[Fix
     ]
 }
 
+// let angle_diff = utils::angle_diff(player1.camera.y_angle, player1.angle);
+pub fn angle_diff(a: Fixed, b: Fixed) -> (i16, Fixed) {
+
+    let b = (b - Fixed::from_raw(64)) % Fixed::const_new(1);
+
+    // Normalize angles to [0, 360)
+
+    // Calculate the clockwise and counterclockwise distances
+    let clockwise_distance = (b - a + Fixed::const_new(1)) % Fixed::const_new(1);
+    let counterclockwise_distance = (a - b + Fixed::const_new(1)) % Fixed::const_new(1);
+
+    // Determine the shorter direction
+    if clockwise_distance <= counterclockwise_distance {
+        return (1, clockwise_distance);
+    } else {
+        return (-1, counterclockwise_distance);
+    }
+}

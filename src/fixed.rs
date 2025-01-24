@@ -1,7 +1,7 @@
 use agb::fixnum::Num;
 use core::cmp::Ordering;
 use core::ops::Neg;
-use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
+use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign, Rem};
 use serde::Deserialize;
 use serde::Deserializer;
 
@@ -230,5 +230,12 @@ impl PartialEq<i32> for Fixed {
 impl PartialOrd<i32> for Fixed {
     fn partial_cmp(&self, other: &i32) -> Option<Ordering> {
         self.0.partial_cmp(&Num::new(*other)) // Convert `i32` to `Num` and compare
+    }
+}
+
+impl Rem for Fixed {
+    type Output = Self;
+    fn rem(self, other: Self) -> Self {
+        Fixed(self.0 % other.0)
     }
 }

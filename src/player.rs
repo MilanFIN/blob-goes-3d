@@ -1,6 +1,6 @@
 use lut::CAMERALOCATIONS;
 
-use crate::camera;
+use crate::{camera, utils};
 use camera::*;
 
 use crate::fixed;
@@ -20,6 +20,7 @@ pub struct Player {
     pub angle: Fixed,
     camera_angle: usize,
     pub camera: Camera,
+    pub autorotate_camera: bool,
 }
 
 impl Player {
@@ -33,12 +34,24 @@ impl Player {
             camera_angle: 0,
             camera: Camera::default(),
             action: false,
+            autorotate_camera: true,
         }
     }
 
     pub fn move_to(&mut self, x: Fixed, z: Fixed) {
         self.x = self.x + x;
         self.z = self.z + z;
+
+        if self.autorotate_camera {
+            let (dir, diff) = utils::angle_diff(self.camera.y_angle, self.angle);
+            if diff > Fixed::from_raw(16) {
+                if dir > 0 {
+                    self.camera_right(3);
+                } else if dir < 0 {
+                    self.camera_left(3);
+                }
+            }
+        }
     }
 
     pub fn forward(&mut self) -> (Fixed, Fixed) {
@@ -195,4 +208,3 @@ impl Player {
         }
     }
 }
-

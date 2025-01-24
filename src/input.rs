@@ -132,9 +132,14 @@ pub fn handle_input(
         }
     }
 
+    if input.is_just_pressed(Button::SELECT) {
+        player.autorotate_camera = !player.autorotate_camera;
+    }
+
     if input.is_just_pressed(Button::B) {
         player.action = true;
     }
+
 
     if input.is_pressed(Button::UP) && input.is_pressed(Button::LEFT) {
         let (x, z) = player.forward_left();
