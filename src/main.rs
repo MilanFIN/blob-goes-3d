@@ -32,29 +32,27 @@ mod entities;
 use cube::Cube;
 use effects::OutputEvents;
 use empty::Empty;
-use entities::utils::{check_block_above, check_support_below, quick_sort};
+use entities::utils::{check_block_above, check_support_below};
 use entities::*;
 
 mod camera;
 
 mod math;
 mod renderer;
-
 mod utils;
 use levels::levelstore::LEVELSIZE;
 use utils::*;
-
 mod player;
 use player::*;
-
 mod input;
-
 mod fixed;
 use fixed::*;
-
 mod levels;
-
 mod effects;
+
+const DRAWDISTANCE: Fixed = Fixed::const_new(35);
+const POLYGON_LIMIT: i16 = 50;
+
 
 /*
 The main function must take 1 arguments and never return. The agb::entry decorator
@@ -64,6 +62,7 @@ and interrupt handlers correctly. It will also handle creating the `Gba` struct 
 #[agb::entry]
 fn main(mut gba: agb::Gba) -> ! {
     use body::Body;
+    use renderer::polygon::Polygon;
 
     let mut input = ButtonController::new();
 
@@ -84,7 +83,7 @@ fn main(mut gba: agb::Gba) -> ! {
 
     let mut entity_render_order: [usize; LEVELSIZE + 2] = [0; LEVELSIZE + 2];
 
-    let levelsize = levels::load_level(1, &mut entity_array);
+    let levelsize = levels::load_level(2, &mut entity_array);
 
     let mut player1: Player = Player::default();
 
@@ -107,7 +106,6 @@ fn main(mut gba: agb::Gba) -> ! {
     entity_array[0].recalculate_points();
     entity_array[0].refresh_model_matrix();
 
-
     entity_array[1] = EntityEnum::Cube(Cube::default());
     entity_array[1].set_x_rotation(new_num(0));
     entity_array[1].set_y_rotation(new_num(0));
@@ -121,8 +119,10 @@ fn main(mut gba: agb::Gba) -> ! {
         entity_render_order[i] = i;
     }
 
-
     let mut event_loop: Vec<OutputEvents, InternalAllocator> = Vec::new_in(InternalAllocator);
+    let mut polygons: Vec<Polygon, InternalAllocator> = Vec::new_in(InternalAllocator);
+    let mut polygon_indices: Vec<usize, InternalAllocator> = Vec::new_in(InternalAllocator);
+
     loop {
         input.update();
 
@@ -146,14 +146,14 @@ fn main(mut gba: agb::Gba) -> ! {
         }
 
         player1.update_camera_position();
-
+        /*
         quick_sort(
             &mut entity_render_order,
             &entity_array,
             0,
             levelsize + 1,
             &player1.camera,
-        );
+        );*/
 
         let game_state: effects::InputGameState = effects::InputGameState {
             support_below_id: bottom_support_id,
@@ -193,7 +193,7 @@ fn main(mut gba: agb::Gba) -> ! {
         //update player position on screen
         entity_array[0].set_y_offset(player1.y + entity_array[0].get_height() / 2);
         entity_array[1].set_y_offset(
-            player1.y + entity_array[0].get_height()  + entity_array[1].get_height() / 2,
+            player1.y + entity_array[0].get_height() + entity_array[1].get_height() / 2,
         );
         /*entity_array[0]
         .set_y_offset(player1.y + Fixed::from_raw(128) + Fixed::from_raw(192) * i);*/
@@ -211,9 +211,41 @@ fn main(mut gba: agb::Gba) -> ! {
             if let EntityEnum::Empty(_) = entity_array[i] {
                 break;
             }
-
-            entity_array[entity_render_order[i]].render(&player1.camera, page);
+            entity_array[entity_render_order[i]].render(&player1.camera, &mut polygons, DRAWDISTANCE);
         }
+        for i in 0..polygons.len() {
+            polygon_indices.push(i);
+        }
+        polygon_indices.sort_by(|&a, &b| {
+            polygons[b]
+                .distance_from_camera
+                .cmp(&polygons[a].distance_from_camera)
+        });
+
+
+        let mut start:i16 = polygon_indices.len() as i16 - POLYGON_LIMIT ;
+        if start < 0 {
+            start = 0;
+        }
+
+        for p in start as usize..polygon_indices.len() {
+            let polygon = &polygons[polygon_indices[p]];
+            if let Some(vertices) = polygon.as_triangle() {
+                renderer::draw::draw_triangle(vertices[0], vertices[1], vertices[2], polygon.color, page);
+            }
+            if let Some(vertices) = polygon.as_line() {
+                renderer::draw::draw_line_fixed(
+                    vertices[0][0],
+                    vertices[0][1],
+                    vertices[1][0],
+                    vertices[1][1],
+                    polygon.color,
+                    page,
+                );
+            }
+        }
+        polygons.clear();
+        polygon_indices.clear();
 
         renderer::hw::flip(&mut page);
     }

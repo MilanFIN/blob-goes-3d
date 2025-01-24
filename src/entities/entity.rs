@@ -1,10 +1,12 @@
-use crate::{camera, effects, Fixed};
+use crate::{camera, effects, renderer::polygon::Polygon, Fixed};
+use agb::InternalAllocator;
+use alloc::vec::Vec;
 use camera::*;
 
 use super::{BoundingBox, BoundingCylinder};
 
 pub trait Entity {
-    fn render(&mut self, camera: &Camera, page: u16);
+    fn render(&mut self, camera: &Camera, polygons: &mut Vec<Polygon, InternalAllocator>, render_distance: Fixed);
 
     fn set_x_offset(&mut self, x_offset: Fixed);
     fn set_y_offset(&mut self, y_offset: Fixed);

@@ -114,9 +114,15 @@ pub fn vector_len_2d(v: [Fixed; 2]) -> Fixed {
 
 #[allow(dead_code)]
 pub fn fast_vector_len(v: [Fixed; 3]) -> Fixed {
-    return fast_sqrt(v[0] * v[0] + v[1] * v[1]);
+    return fast_sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
 }
 
 pub fn vector_len(v: [Fixed; 3]) -> Fixed {
-    return (v[0] * v[0] + v[1] * v[1]).sqrt();
+    return (v[0] * v[0] + v[1] * v[1] + v[2]*v[2]).sqrt();
+}
+
+#[allow(dead_code)]
+pub fn vector_square_len(v: [Fixed; 3]) -> Fixed {
+    v[0]+v[1]+v[2]
+    //return v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
 }
