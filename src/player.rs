@@ -6,8 +6,10 @@ use camera::*;
 use crate::fixed;
 use fixed::*;
 
-const GRAVITY: Fixed = Fixed::from_raw(32);
 const MOVEAMOUNT: Fixed = Fixed::from_raw(64);
+//slows the player down after they let go of Button::A
+const FLOATGRAVITY: Fixed = Fixed::from_raw(128);
+const BASEGRAVITY: Fixed = Fixed::from_raw(32);
 pub const JUMPPOWER: Fixed = Fixed::from_raw(256);
 
 pub struct Player {
@@ -21,6 +23,7 @@ pub struct Player {
     camera_angle: usize,
     pub camera: Camera,
     pub autorotate_camera: bool,
+    jumping: bool,
 }
 
 impl Player {
@@ -35,6 +38,7 @@ impl Player {
             camera: Camera::default(),
             action: false,
             autorotate_camera: true,
+            jumping: false,
         }
     }
 
@@ -189,7 +193,7 @@ impl Player {
                 self.y = ylimit;
                 self.land();
             }
-            self.yspeed -= GRAVITY;
+            self.yspeed -= BASEGRAVITY;
         } else {
             self.land();
         }
@@ -204,7 +208,22 @@ impl Player {
                 self.y = ylimit - Fixed::from_raw(192);
                 self.land();
             }
-            self.yspeed -= GRAVITY;
+            if self.jumping {
+                self.yspeed -= BASEGRAVITY;
+            } else {
+                self.yspeed -= FLOATGRAVITY;
+            }
         }
+        self.jumping = false;
+    }
+
+    pub fn jump(&mut self) {
+        if self.yspeed == Fixed::const_new(0) {
+            self.yspeed = JUMPPOWER;
+        }
+    }
+
+    pub fn keep_jumping(&mut self) {
+        self.jumping = true;
     }
 }

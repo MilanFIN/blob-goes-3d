@@ -95,6 +95,102 @@ const LEVEL6: &str = r#"
 ]
 "#;
 
+
+const LEVEL7: &str = r#"
+[
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 0, "color": 2, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 0.1, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 3, "color": 2, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 0.1, "ysize": 1, "zsize": 3, "x": 1, "y": 0, "z": 6, "color": 2, "rotation": 0.1 } },
+    { "type": "rectangle", "data": { "xsize": 0.1, "ysize": 1, "zsize": 3, "x": 2, "y": 0, "z": 9, "color": 2, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 0.1, "ysize": 1, "zsize": 3, "x": 1, "y": 0, "z": 12, "color": 2, "rotation": -0.1 } },
+    { "type": "rectangle", "data": { "xsize": 0.1, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 15, "color": 2, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 0.1, "ysize": 1, "zsize": 3, "x": 1, "y": 0, "z": 18, "color": 2, "rotation": 0.1 } },
+    { "type": "rectangle", "data": { "xsize": 0.1, "ysize": 1, "zsize": 3, "x": 2, "y": 0, "z": 21, "color": 2, "rotation": 0.25 } },
+    { "type": "rectangle", "data": { "xsize": 0.1, "ysize": 1, "zsize": 3, "x": 2, "y": 0, "z": 24, "color": 2, "rotation": 0.25 } },
+    { "type": "rectangle", "data": { "xsize": 0.1, "ysize": 1, "zsize": 3, "x": 2, "y": 0, "z": 27, "color": 2, "rotation": 0.25 } },
+    { "type": "rectangle", "data": { "xsize": 0.1, "ysize": 1, "zsize": 3, "x": 2, "y": 0, "z": 30, "color": 2, "rotation": 0.25 } },
+    { "type": "rectangle", "data": { "xsize": 0.1, "ysize": 1, "zsize": 3, "x": 2, "y": 0, "z": 33, "color": 2, "rotation": 0.25 } },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 2, "y": 0, "z": 38, "color": 2, "rotation": 0.0 } },
+    { "type": "finish", "data": {"size": 3, "x": 2, "y": 3, "z": 38, "color": 2, "rotation": 0 } }
+]
+"#;
+
+const LEVEL8: &str = r#"
+[
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 0, "color": 2, "rotation": 0.0 } },
+    {"type": "mover",
+        "data": { 
+            "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 5,
+            "pos_a_x": -5, "pos_a_y": 0, "pos_a_z": 5,
+            "pos_b_x": 5, "pos_b_y": 0, "pos_b_z": 5,
+            "speed": 0.7, "wait": 3
+        }
+    },
+    {"type": "mover",
+        "data": { 
+            "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 10,
+            "pos_a_x": 5, "pos_a_y": 0, "pos_a_z": 10,
+            "pos_b_x": -5, "pos_b_y": 0, "pos_b_z": 10,
+            "speed": 0.7, "wait": 3
+        }
+    },
+    {"type": "mover",
+        "data": { 
+            "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 15,
+            "pos_a_x": -5, "pos_a_y": 0, "pos_a_z": 15,
+            "pos_b_x": 5, "pos_b_y": 0, "pos_b_z": 15,
+            "speed": 0.7, "wait": 3
+        }
+    },
+    {"type": "mover",
+        "data": { 
+            "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 20,
+            "pos_a_x": 5, "pos_a_y": 0, "pos_a_z": 20,
+            "pos_b_x": -5, "pos_b_y": 0, "pos_b_z": 20,
+            "speed": 0.7, "wait": 3
+        }
+    },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 25, "color": 2, "rotation": 0.0 } },
+       {"type": "mover",
+        "data": { 
+            "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 35,
+            "pos_a_x": 0, "pos_a_y": 0, "pos_a_z": 30,
+            "pos_b_x": 0, "pos_b_y": 0, "pos_b_z": 40,
+            "speed": 0.7, "wait": 5
+        }
+    },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 25, "color": 2, "rotation": 0.0 } },
+       {"type": "mover",
+        "data": { 
+            "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 50,
+            "pos_a_x": 0, "pos_a_y": 0, "pos_a_z": 55,
+            "pos_b_x": 0, "pos_b_y": 0, "pos_b_z": 45,
+            "speed": 0.7, "wait": 5
+        }
+    },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 60, "color": 2, "rotation": 0.0 } },
+
+    {"type": "mover",
+        "data": { 
+            "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 65,
+            "pos_a_x": 0, "pos_a_y": 10, "pos_a_z": 65,
+            "pos_b_x": 0, "pos_b_y": -10, "pos_b_z": 65,
+            "speed": 0.7, "wait": 3
+        }
+    },
+    {"type": "mover",
+        "data": { 
+            "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 70,
+            "pos_a_x": 0, "pos_a_y": -10, "pos_a_z": 70,
+            "pos_b_x": 0, "pos_b_y": 10, "pos_b_z": 70,
+            "speed": 0.7, "wait": 3
+        }
+    },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 75, "color": 2, "rotation": 0.0 } },
+    { "type": "finish", "data": {"size": 3, "x": 0, "y": 3, "z": 75, "color": 2, "rotation": 0 } }
+]
+"#;
+
 /*
 
 (0.00,0.00)
@@ -122,4 +218,4 @@ const LEVEL6: &str = r#"
 //    { "type": "cube", "data": { "size": 1.0, "x": 4.2, "y": 0, "z": 0 } }
 
 // The result is a constant array of string slices.
-pub const LEVELS: [&'static str; 6] = [LEVEL1, LEVEL2, LEVEL3, LEVEL4, LEVEL5, LEVEL6];
+pub const LEVELS: [&'static str; 8] = [LEVEL1, LEVEL2, LEVEL3, LEVEL4, LEVEL5, LEVEL6, LEVEL7, LEVEL8];

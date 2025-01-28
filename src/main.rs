@@ -51,7 +51,7 @@ mod levels;
 mod effects;
 
 const DRAWDISTANCE: Fixed = Fixed::const_new(35);
-const POLYGON_LIMIT: i16 = 50;
+const POLYGON_LIMIT: i16 = 60;
 
 
 /*
@@ -83,7 +83,7 @@ fn main(mut gba: agb::Gba) -> ! {
 
     let mut entity_render_order: [usize; LEVELSIZE + 2] = [0; LEVELSIZE + 2];
 
-    let levelsize = levels::load_level(5, &mut entity_array);
+    let levelsize = levels::load_level(7, &mut entity_array);
 
     let mut player1: Player = Player::default();
 

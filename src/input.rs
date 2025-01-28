@@ -127,9 +127,10 @@ pub fn handle_input(
     }
 
     if input.is_just_pressed(Button::A) {
-        if player.yspeed == Fixed::const_new(0) {
-            player.yspeed = JUMPPOWER;
-        }
+        player.jump();
+    }
+    if input.is_pressed(Button::A) {
+        player.keep_jumping();
     }
 
     if input.is_just_pressed(Button::SELECT) {
