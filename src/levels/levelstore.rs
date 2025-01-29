@@ -191,6 +191,14 @@ const LEVEL8: &str = r#"
 ]
 "#;
 
+const LEVEL9: &str = r#"
+[
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 0, "color": 2, "rotation": 0.0 } },
+    { "type": "bounce", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 5, "color": 3, "power": 1.5, "rotation": 0.0 } },
+    { "type": "finish", "data": {"size": 3, "x": 28, "y": 28.5, "z": 7, "color": 2, "rotation": -0.22 } }
+]
+"#;
+
 /*
 
 (0.00,0.00)
@@ -218,4 +226,4 @@ const LEVEL8: &str = r#"
 //    { "type": "cube", "data": { "size": 1.0, "x": 4.2, "y": 0, "z": 0 } }
 
 // The result is a constant array of string slices.
-pub const LEVELS: [&'static str; 8] = [LEVEL1, LEVEL2, LEVEL3, LEVEL4, LEVEL5, LEVEL6, LEVEL7, LEVEL8];
+pub const LEVELS: [&'static str; 9] = [LEVEL1, LEVEL2, LEVEL3, LEVEL4, LEVEL5, LEVEL6, LEVEL7, LEVEL8, LEVEL9];

@@ -83,7 +83,7 @@ fn main(mut gba: agb::Gba) -> ! {
 
     let mut entity_render_order: [usize; LEVELSIZE + 2] = [0; LEVELSIZE + 2];
 
-    let levelsize = levels::load_level(7, &mut entity_array);
+    let levelsize = levels::load_level(8, &mut entity_array);
 
     let mut player1: Player = Player::default();
 
@@ -185,6 +185,9 @@ fn main(mut gba: agb::Gba) -> ! {
                         w.toggle();
                     }
                 }
+            }
+            else if let OutputEvents::BounceEvent(event) = event {
+                player1.bounce(event.power, input.is_pressed(Button::A));
             }
         }
         event_loop.clear();

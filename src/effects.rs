@@ -14,6 +14,7 @@ pub enum OutputEvents {
 	PlayerEvent(MoveXYZ),
 	GameFinish(Finished),
 	SwitchAction(SwitchFlip),
+	BounceEvent(Bounce),
 }
 
 pub struct MoveXYZ {
@@ -30,13 +31,7 @@ pub struct SwitchFlip {
 	//pub switch_flip: bool,
 }
 
-
-/*
-pub struct OutputEvents {
-	pub move_x: Fixed,
-	pub move_y: Fixed,
-	pub move_z: Fixed,
-	pub finished: bool,
-	pub switch_flip: bool,
+pub struct Bounce {
+	pub power: Fixed,
 }
-*/
+

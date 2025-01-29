@@ -24,6 +24,7 @@ pub struct Player {
     pub camera: Camera,
     pub autorotate_camera: bool,
     jumping: bool,
+    forced_jump: bool,
 }
 
 impl Player {
@@ -39,6 +40,7 @@ impl Player {
             action: false,
             autorotate_camera: true,
             jumping: false,
+            forced_jump: false,
         }
     }
 
@@ -208,7 +210,7 @@ impl Player {
                 self.y = ylimit - Fixed::from_raw(192);
                 self.land();
             }
-            if self.jumping {
+            if self.jumping || self.forced_jump {
                 self.yspeed -= BASEGRAVITY;
             } else {
                 self.yspeed -= FLOATGRAVITY;
@@ -220,10 +222,17 @@ impl Player {
     pub fn jump(&mut self) {
         if self.yspeed == Fixed::const_new(0) {
             self.yspeed = JUMPPOWER;
+            self.forced_jump = false;
         }
     }
 
     pub fn keep_jumping(&mut self) {
         self.jumping = true;
+    }
+
+    //set active to true, when player also jumps when contacting the platform
+    pub fn bounce(&mut self, power: Fixed, active_bounce: bool) {
+        self.yspeed = power;
+        self.forced_jump = active_bounce;
     }
 }
