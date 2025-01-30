@@ -108,65 +108,17 @@ impl Entity for Switch {
 
     fn set_x_rotation(&mut self, x_rotation: Fixed) {
         self.x_rotation = x_rotation;
-        self.x_rotation_matrix = [
-            [
-                Fixed::const_new(1),
-                Fixed::const_new(0),
-                Fixed::const_new(0),
-            ],
-            [
-                Fixed::const_new(0),
-                self.x_rotation.cos(),
-                -self.x_rotation.sin(),
-            ],
-            [
-                Fixed::const_new(0),
-                self.x_rotation.sin(),
-                self.x_rotation.cos(),
-            ],
-        ];
+        self.x_rotation_matrix = utils::x_rotation_matrix(x_rotation);
     }
 
     fn set_y_rotation(&mut self, y_rotation: Fixed) {
         self.y_rotation = y_rotation;
-        self.y_rotation_matrix = [
-            [
-                self.y_rotation.cos(),
-                Fixed::const_new(0),
-                self.y_rotation.sin(),
-            ],
-            [
-                Fixed::const_new(0),
-                Fixed::const_new(1),
-                Fixed::const_new(0),
-            ],
-            [
-                -self.y_rotation.sin(),
-                Fixed::const_new(0),
-                self.y_rotation.cos(),
-            ],
-        ];
+        self.y_rotation_matrix = utils::y_rotation_matrix(y_rotation);
     }
 
     fn set_z_rotation(&mut self, z_rotation: Fixed) {
         self.z_rotation = z_rotation;
-        self.z_rotation_matrix = [
-            [
-                self.z_rotation.cos(),
-                -self.z_rotation.sin(),
-                Fixed::const_new(0),
-            ],
-            [
-                self.z_rotation.sin(),
-                self.z_rotation.cos(),
-                Fixed::const_new(0),
-            ],
-            [
-                Fixed::const_new(0),
-                Fixed::const_new(0),
-                Fixed::const_new(1),
-            ],
-        ];
+        self.z_rotation_matrix = utils::z_rotation_matrix(z_rotation);
     }
 
     fn reload_rotation_matrices(&mut self) {

@@ -60,3 +60,40 @@ pub fn angle_diff(a: Fixed, b: Fixed) -> (i16, Fixed) {
         return (-1, counterclockwise_distance);
     }
 }
+
+pub fn x_rotation_matrix(angle: Fixed) -> [[Fixed; 3]; 3] {
+
+    
+    let cos = angle.cos();
+    let sin = angle.sin();
+
+    [
+        [Fixed::const_new(1), Fixed::const_new(0), Fixed::const_new(0)],
+        [Fixed::const_new(0), cos, -sin],
+        [Fixed::const_new(0), sin, cos],
+    ]
+}
+
+pub fn y_rotation_matrix(angle: Fixed) -> [[Fixed; 3]; 3] {
+
+    let cos = angle.cos();
+    let sin = angle.sin();
+
+    [
+        [cos, Fixed::const_new(0), sin],
+        [Fixed::const_new(0), Fixed::const_new(1), Fixed::const_new(0)],
+        [-sin, Fixed::const_new(0), cos],
+    ]
+}
+
+pub fn z_rotation_matrix(angle: Fixed) -> [[Fixed; 3]; 3] {
+
+    let cos = angle.cos();
+    let sin = angle.sin();
+
+    [
+        [cos, -sin, Fixed::const_new(0)],
+        [sin, cos, Fixed::const_new(0)],
+        [Fixed::const_new(0), Fixed::const_new(0), Fixed::const_new(1)],
+    ]
+}
