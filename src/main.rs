@@ -49,6 +49,7 @@ mod fixed;
 use fixed::*;
 mod levels;
 mod effects;
+mod moveutils;
 
 const DRAWDISTANCE: Fixed = Fixed::const_new(35);
 const POLYGON_LIMIT: i16 = 60;
@@ -83,7 +84,7 @@ fn main(mut gba: agb::Gba) -> ! {
 
     let mut entity_render_order: [usize; LEVELSIZE + 2] = [0; LEVELSIZE + 2];
 
-    let levelsize = levels::load_level(8, &mut entity_array);
+    let levelsize = levels::load_level(0, &mut entity_array);
 
     let mut player1: Player = Player::default();
 
@@ -129,9 +130,10 @@ fn main(mut gba: agb::Gba) -> ! {
         input::handle_input(
             &mut player1,
             &input,
-            &entity_array,
-            &entity_array[0].bounding_cylinder(),
         );
+
+        moveutils::attempt_move(&mut player1, &entity_array, &entity_array[0].bounding_cylinder());
+
 
         renderer::hw::fill(page, 128);
 
@@ -192,6 +194,8 @@ fn main(mut gba: agb::Gba) -> ! {
         }
         event_loop.clear();
         player1.action = false;
+
+
 
         //update player position on screen
         entity_array[0].set_y_offset(player1.y + entity_array[0].get_height() / 2);

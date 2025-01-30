@@ -15,6 +15,7 @@ pub enum OutputEvents {
 	GameFinish(Finished),
 	SwitchAction(SwitchFlip),
 	BounceEvent(Bounce),
+	Sliding(Sliding),
 }
 
 pub struct MoveXYZ {
@@ -35,3 +36,5 @@ pub struct Bounce {
 	pub power: Fixed,
 }
 
+pub struct Sliding {
+}

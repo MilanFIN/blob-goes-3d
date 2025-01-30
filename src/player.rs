@@ -1,12 +1,14 @@
 use lut::CAMERALOCATIONS;
 
-use crate::{camera, utils};
+use crate::{camera, math::vector_len_2d, utils};
 use camera::*;
 
 use crate::fixed;
 use fixed::*;
 
-const MOVEAMOUNT: Fixed = Fixed::from_raw(64);
+const MOVECAP: Fixed = Fixed::from_raw(64); //64
+const GROUNDACCEL: Fixed = Fixed::from_raw(32);
+const AIRACCEL: Fixed = Fixed::from_raw(8);
 //slows the player down after they let go of Button::A
 const FLOATGRAVITY: Fixed = Fixed::from_raw(128);
 const BASEGRAVITY: Fixed = Fixed::from_raw(32);
@@ -25,6 +27,10 @@ pub struct Player {
     pub autorotate_camera: bool,
     jumping: bool,
     forced_jump: bool,
+
+    pub move_x: Fixed,
+    pub move_z: Fixed,
+    pub activeaccel: Fixed,
 }
 
 impl Player {
@@ -41,12 +47,18 @@ impl Player {
             autorotate_camera: true,
             jumping: false,
             forced_jump: false,
+            move_x: Fixed::const_new(0),
+            move_z: Fixed::const_new(0),
+            activeaccel: Fixed::const_new(0),
         }
     }
 
     pub fn move_to(&mut self, x: Fixed, z: Fixed) {
         self.x = self.x + x;
         self.z = self.z + z;
+
+        //self.move_x = self.x - x;
+        //self.move_z = self.z - z;
 
         if self.autorotate_camera {
             let (dir, diff) = utils::angle_diff(self.camera.y_angle, self.angle);
@@ -66,8 +78,8 @@ impl Player {
             view_dir -= 255;
         }
         self.angle = CAMERALOCATIONS[view_dir][2];
-        let x: Fixed = self.angle.cos() * MOVEAMOUNT;
-        let z: Fixed = self.angle.sin() * MOVEAMOUNT;
+        let x: Fixed = self.angle.cos();
+        let z: Fixed = self.angle.sin();
         return (x, z);
     }
 
@@ -77,8 +89,8 @@ impl Player {
             view_dir -= 255;
         }
         self.angle = CAMERALOCATIONS[view_dir][2];
-        let x = self.angle.cos() * MOVEAMOUNT;
-        let z = self.angle.sin() * MOVEAMOUNT;
+        let x = self.angle.cos();
+        let z = self.angle.sin();
         return (x, z);
     }
 
@@ -88,8 +100,8 @@ impl Player {
             view_dir -= 255;
         }
         self.angle = CAMERALOCATIONS[view_dir][2];
-        let x = self.angle.cos() * MOVEAMOUNT;
-        let z = self.angle.sin() * MOVEAMOUNT;
+        let x = self.angle.cos();
+        let z = self.angle.sin();
         return (x, z);
     }
 
@@ -99,8 +111,8 @@ impl Player {
             view_dir -= 255;
         }
         self.angle = CAMERALOCATIONS[view_dir][2];
-        let x = self.angle.cos() * MOVEAMOUNT;
-        let z = self.angle.sin() * MOVEAMOUNT;
+        let x = self.angle.cos();
+        let z = self.angle.sin();
         return (x, z);
     }
 
@@ -110,8 +122,8 @@ impl Player {
             view_dir -= 255;
         }
         self.angle = CAMERALOCATIONS[view_dir][2];
-        let x = self.angle.cos() * MOVEAMOUNT;
-        let z = self.angle.sin() * MOVEAMOUNT;
+        let x = self.angle.cos();
+        let z = self.angle.sin();
         return (x, z);
     }
 
@@ -121,8 +133,8 @@ impl Player {
             view_dir -= 255;
         }
         self.angle = CAMERALOCATIONS[view_dir][2];
-        let x = self.angle.cos() * MOVEAMOUNT;
-        let z = self.angle.sin() * MOVEAMOUNT;
+        let x = self.angle.cos();
+        let z = self.angle.sin();
         return (x, z);
     }
 
@@ -132,8 +144,8 @@ impl Player {
             view_dir -= 255;
         }
         self.angle = CAMERALOCATIONS[view_dir][2];
-        let x = self.angle.cos() * MOVEAMOUNT;
-        let z = self.angle.sin() * MOVEAMOUNT;
+        let x = self.angle.cos();
+        let z = self.angle.sin();
         return (x, z);
     }
     pub fn right(&mut self) -> (Fixed, Fixed) {
@@ -142,8 +154,8 @@ impl Player {
             view_dir -= 255;
         }
         self.angle = CAMERALOCATIONS[view_dir][2];
-        let x = self.angle.cos() * MOVEAMOUNT;
-        let z = self.angle.sin() * MOVEAMOUNT;
+        let x = self.angle.cos();
+        let z = self.angle.sin();
         return (x, z);
     }
     pub fn camera_left(&mut self, mut amount: usize) {
@@ -185,6 +197,7 @@ impl Player {
     }
 
     pub fn land(&mut self) {
+        self.activeaccel = GROUNDACCEL;
         self.yspeed = Fixed::const_new(0);
     }
 
@@ -223,6 +236,7 @@ impl Player {
         if self.yspeed == Fixed::const_new(0) {
             self.yspeed = JUMPPOWER;
             self.forced_jump = false;
+            self.activeaccel = AIRACCEL;
         }
     }
 
@@ -234,5 +248,43 @@ impl Player {
     pub fn bounce(&mut self, power: Fixed, active_bounce: bool) {
         self.yspeed = power;
         self.forced_jump = active_bounce;
+        self.activeaccel = AIRACCEL;
+    }
+
+    pub fn move_toward(&mut self, x: Fixed, z: Fixed) {
+        let x_cap = x * MOVECAP;
+        let z_cap = z * MOVECAP;
+
+
+        if self.move_x > x_cap {
+            self.move_x -= self.activeaccel;
+            if self.move_x < x_cap {
+                self.move_x = x_cap;
+            }
+        } else if self.move_x < x_cap {
+            self.move_x += self.activeaccel;
+            if self.move_x > x_cap {
+                self.move_x = x_cap;
+            }
+        }
+
+        if self.move_z > z_cap {
+            self.move_z -= self.activeaccel;
+            if self.move_z < z_cap {
+                self.move_z = z_cap;
+            }
+        } else if self.move_z < z_cap {
+            self.move_z += self.activeaccel;
+            if self.move_z > z_cap {
+                self.move_z = z_cap;
+            }
+        }
+
+        let len = vector_len_2d([self.move_x, self.move_z]);
+        if len > MOVECAP {
+            let scale = MOVECAP / len;
+            self.move_x *= scale;
+            self.move_z *= scale;
+        }
     }
 }
