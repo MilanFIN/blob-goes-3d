@@ -59,6 +59,9 @@ pub struct Ice {
 
     #[serde(default = "default_u16")]
     color: u16,
+
+    #[serde(default = "default_fixed")]
+    acceleration: Fixed,
 }
 
 impl Ice {
@@ -81,6 +84,7 @@ impl Ice {
             y_rotation_matrix: [[Fixed::const_new(0); 3]; 3],
             z_rotation_matrix: [[Fixed::const_new(0); 3]; 3],
             color: 0,
+            acceleration: Fixed::const_new(0),
         }
     }
 }
@@ -225,7 +229,7 @@ impl Entity for Ice {
     }
     fn tick(&mut self, effects: &effects::InputGameState) -> Option<effects::OutputEvents> {
         if effects.support_below_id == self.id {
-            return Some(effects::OutputEvents::Sliding(effects::Sliding {}));
+            return Some(effects::OutputEvents::Sliding(effects::Sliding {acceleration: self.acceleration}));
         } else {
             return None;
         }

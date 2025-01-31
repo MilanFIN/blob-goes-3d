@@ -4,8 +4,7 @@ const LEVEL1: &str = r#"
 [
     { "type": "cube", "data": { "size": 3, "x": 10, "y": 0, "z": 0 } },
     { "type": "rectangle", "data": { "xsize": 5, "ysize": 1, "zsize": 5, "x": 0.0, "y": 0, "z": 0, "color": 2, "rotation": 0.0 } },
-    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 3, "y": 1, "z": 0, "color": 2, "rotation": 0.0 } }
-
+    { "type": "ice", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 3, "y": 1, "z": 0, "color": 2, "acceleration": 0.004, "rotation": 0.0 } }
 ]
 "#;
 

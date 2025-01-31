@@ -27,6 +27,8 @@ pub struct Player {
     pub autorotate_camera: bool,
     jumping: bool,
     forced_jump: bool,
+    in_air: bool,
+    sliding: bool,
 
     pub move_x: Fixed,
     pub move_z: Fixed,
@@ -50,6 +52,8 @@ impl Player {
             move_x: Fixed::const_new(0),
             move_z: Fixed::const_new(0),
             activeaccel: Fixed::const_new(0),
+            in_air: false,
+            sliding: false,
         }
     }
 
@@ -197,8 +201,8 @@ impl Player {
     }
 
     pub fn land(&mut self) {
-        self.activeaccel = GROUNDACCEL;
         self.yspeed = Fixed::const_new(0);
+        self.in_air = false;
     }
 
     pub fn fall(&mut self, ylimit: Fixed) {
@@ -209,6 +213,7 @@ impl Player {
                 self.land();
             }
             self.yspeed -= BASEGRAVITY;
+            self.in_air = true;
         } else {
             self.land();
         }
@@ -219,6 +224,7 @@ impl Player {
         let y = self.y + Fixed::from_raw(192);
         if y < ylimit {
             self.y += self.yspeed;
+            self.in_air = true;
             if self.y + Fixed::from_raw(192) > ylimit {
                 self.y = ylimit - Fixed::from_raw(192);
                 self.land();
@@ -252,6 +258,7 @@ impl Player {
     }
 
     pub fn move_toward(&mut self, x: Fixed, z: Fixed) {
+
         let x_cap = x * MOVECAP;
         let z_cap = z * MOVECAP;
 
@@ -286,5 +293,18 @@ impl Player {
             self.move_x *= scale;
             self.move_z *= scale;
         }
+    }
+
+    pub fn sliding(&mut self, accel: Fixed) {
+        self.activeaccel = accel;
+        self.sliding = true;
+    }
+
+    pub fn tick(&mut self) {
+        self.action = false;
+        if !self.in_air && !self.sliding {
+            self.activeaccel = GROUNDACCEL;
+        }
+        self.sliding = false;
     }
 }

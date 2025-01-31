@@ -191,10 +191,12 @@ fn main(mut gba: agb::Gba) -> ! {
             else if let OutputEvents::BounceEvent(event) = event {
                 player1.bounce(event.power, input.is_pressed(Button::A));
             }
+            else if let OutputEvents::Sliding(event) = event {
+                player1.sliding(event.acceleration);
+            }
         }
         event_loop.clear();
-        player1.action = false;
-
+        player1.tick();
 
 
         //update player position on screen

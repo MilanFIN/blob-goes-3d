@@ -37,4 +37,5 @@ pub struct Bounce {
 }
 
 pub struct Sliding {
+	pub acceleration: Fixed,
 }
