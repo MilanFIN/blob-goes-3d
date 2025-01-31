@@ -1,6 +1,13 @@
 use crate::fixed;
 use fixed::*;
 
+pub enum BoundingShape {
+	BoundingBox(BoundingBox),
+	BoundingCylinder(BoundingCylinder),
+
+}
+
+#[derive(Clone)]
 pub struct BoundingBox {
     pub data: [[Fixed; 2]; 4],
     //[x, z]

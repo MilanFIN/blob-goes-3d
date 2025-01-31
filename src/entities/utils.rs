@@ -1,6 +1,8 @@
 use crate::math::cross_product;
 
-use super::{BoundingBox, BoundingCylinder, Camera, EntityEnum, Fixed};
+use super::{
+    boundingshapes::BoundingShape, BoundingBox, BoundingCylinder, Camera, EntityEnum, Fixed,
+};
 
 fn partition(
     entity_render_order: &mut [usize],
@@ -132,7 +134,7 @@ pub fn rect_overlap(first: &BoundingBox, second: &BoundingBox) -> bool {
     return false;
 }
 
-pub fn vertical_room_check(
+pub fn vertical_room_for_box(
     first: &BoundingBox,
     second: &BoundingBox,
     first_fallback: &BoundingCylinder,
@@ -167,14 +169,36 @@ pub fn vertical_room_check(
         }
     }
 
-
     return limit;
 }
 
+fn vertical_room_for_cylinder(
+    first: &BoundingCylinder,
+    second: &BoundingBox,
+    limit: Fixed,
+) -> Fixed {
+    if (limit < 0 && first.y_top > second.y_bottom) || (limit > 0 && first.y_bottom < second.y_top)
+    {
+        return limit;
+    }
+
+    if cylinder_and_rotated_rect_h_overlap(first, second) {
+        if limit < 0 {
+            return second.y_top;
+        } else {
+            return second.y_bottom;
+        }
+    } else {
+        return limit;
+    }
+}
+
 //determine if the element in the entiry array is below us and how far
-pub fn check_support_below(entity_array: &[EntityEnum], element: usize) -> (Fixed, i16) {
-    let bottom: BoundingBox = entity_array[element].bounding_box();
-    let fallback: BoundingCylinder = entity_array[element].bounding_cylinder();
+pub fn check_support_below(
+    entity_array: &[EntityEnum],
+    bottom: &BoundingBox,
+    fallback: &BoundingCylinder,
+) -> (Fixed, i16) {
     let mut height: Fixed = Fixed::const_new(-999);
     let mut collider_id: i16 = -1;
     for (i, e) in entity_array.iter().enumerate() {
@@ -182,12 +206,27 @@ pub fn check_support_below(entity_array: &[EntityEnum], element: usize) -> (Fixe
             break;
         }
         if i != 0 && i != 1 {
-            let top: BoundingBox = e.bounding_box();
-            let d: Fixed = vertical_room_check(&top, &bottom, &fallback, Fixed::const_new(-999));
-            if d > height {
-                height = d;
-                if height == bottom.y_bottom {
-                    collider_id = e.get_id();
+            //let top: BoundingBox = e.bounding_box();
+            let top_shape = e.bounding_shape();
+            if let Some(top_shape) = top_shape {
+                if let BoundingShape::BoundingBox(top) = top_shape {
+                    let d: Fixed =
+                        vertical_room_for_box(&top, &bottom, &fallback, Fixed::const_new(-999));
+                    if d > height {
+                        height = d;
+                        if height == bottom.y_bottom {
+                            collider_id = e.get_id();
+                        }
+                    }
+                } else if let BoundingShape::BoundingCylinder(top) = top_shape {
+                    let d: Fixed =
+                        vertical_room_for_cylinder(&top, &bottom, Fixed::const_new(-999));
+                    if d > height {
+                        height = d;
+                        if height == bottom.y_bottom {
+                            collider_id = e.get_id();
+                        }
+                    }
                 }
             }
         }
@@ -195,24 +234,34 @@ pub fn check_support_below(entity_array: &[EntityEnum], element: usize) -> (Fixe
     return (height, collider_id);
 }
 
-//todo also check for the top of the "head" of the player.
-//can run checks as a duplicate rect_overlap call, but for the head instead
-//if that - head height > max_height -> override
-pub fn check_block_above(entity_array: &[EntityEnum], element: usize) -> Fixed {
-    let top: BoundingBox = entity_array[element].bounding_box();
-    let fallback: BoundingCylinder = entity_array[element].bounding_cylinder();
-
+pub fn check_block_above(
+    entity_array: &[EntityEnum],
+    top: &BoundingBox,
+    fallback: &BoundingCylinder,
+) -> Fixed {
     let mut max_height: Fixed = Fixed::const_new(999);
     for (i, e) in entity_array.iter().enumerate() {
         if let EntityEnum::Empty(_) = e {
             break;
         }
         if i != 0 && i != 1 {
-            let bottom = e.bounding_box();
-            let overlap_height: Fixed =
-                vertical_room_check(&bottom, &top, &fallback, Fixed::const_new(999));
-            if overlap_height < max_height {
-                max_height = overlap_height;
+            let bottom_shape = e.bounding_shape();
+
+            if let Some(bottom_shape) = bottom_shape {
+                if let BoundingShape::BoundingBox(bottom) = bottom_shape {
+                    let d: Fixed =
+                        vertical_room_for_box(&bottom, &top, &fallback, Fixed::const_new(999));
+
+                    if d < max_height {
+                        max_height = d;
+                    }
+                } else if let BoundingShape::BoundingCylinder(bottom) = bottom_shape {
+                    let d: Fixed =
+                        vertical_room_for_cylinder(&bottom, &top, Fixed::const_new(-999));
+                    if d < max_height {
+                        max_height = d;
+                    }
+                }
             }
         }
     }
@@ -323,25 +372,112 @@ pub fn cylinder_and_rotated_rect_collision(
     return (Fixed::default(), false);
 }
 
+pub fn cylinder_and_rotated_rect_h_overlap(cyl1: &BoundingCylinder, box2: &BoundingBox) -> bool {
+    // Step 1: Transform the cylinder's center into the rectangle's local space
+    let (cos_theta, sin_theta) = (box2.rotation.cos(), box2.rotation.sin());
+    let tx = cyl1.x - box2.center[0];
+    let tz = cyl1.z - box2.center[1];
+    let local_x = tx * cos_theta + tz * sin_theta;
+    let local_z = -tx * sin_theta + tz * cos_theta;
+
+    // Step 2: Deduce rectangle bounds in local space
+    let half_width = box2.width / Fixed::const_new(2);
+    let half_height = box2.height / Fixed::const_new(2);
+    let min_x = -half_width;
+    let max_x = half_width;
+    let min_z = -half_height;
+    let max_z = half_height;
+
+    // Step 3: Clamp the cylinder's center to the rectangle's bounds in local space
+    let clamped_x = if local_x < min_x {
+        min_x
+    } else if local_x > max_x {
+        max_x
+    } else {
+        local_x
+    };
+    let clamped_z = if local_z < min_z {
+        min_z
+    } else if local_z > max_z {
+        max_z
+    } else {
+        local_z
+    };
+
+    // Step 4: Transform the clamped point back to world space (not necessary for distance calc)
+    let dx = local_x - clamped_x;
+    let dz = local_z - clamped_z;
+    let distance_squared = dx * dx + dz * dz;
+
+    // True if there is a collision
+    if distance_squared <= cyl1.radius * cyl1.radius {
+        return true;
+    }
+    return false;
+}
+
+//TODO: do a check for the angle of the cylinder
+//don't have
 pub fn horizontal_collision_check(
     entity_array: &[EntityEnum],
     cyl1: BoundingCylinder,
 ) -> (Fixed, bool) {
     for (i, e) in entity_array.iter().enumerate() {
         if i != 0 && i != 1 {
-            let box2: BoundingBox = e.bounding_box();
+            let shape2: Option<BoundingShape> = e.bounding_shape();
 
-            if box2.rotation == Fixed::const_new(0) {
-                if cylinder_and_rect_collision(&cyl1, &box2) {
-                    return (Fixed::const_new(0), true);
+            if let Some(BoundingShape::BoundingBox(box2)) = shape2 {
+                if box2.rotation == Fixed::const_new(0) {
+                    if cylinder_and_rect_collision(&cyl1, &box2) {
+                        return (Fixed::const_new(0), true);
+                    }
+                } else {
+                    let (wallangle, ok) = cylinder_and_rotated_rect_collision(&cyl1, &box2);
+                    if ok {
+                        return (wallangle, true);
+                    }
                 }
-            } else {
-                let (wallangle, ok) = cylinder_and_rotated_rect_collision(&cyl1, &box2);
-                if ok {
-                    return (wallangle, true);
+            } else if let Some(BoundingShape::BoundingCylinder(cyl2)) = shape2 {
+                if cyl1.y_top < cyl2.y_bottom || cyl2.y_top < cyl1.y_bottom {
+                    continue;
+                }
+
+                let dx = cyl1.x - cyl2.x;
+                let dz = cyl1.z - cyl2.z;
+                let distance_squared = dx * dx + dz * dz;
+                let sum_radius = cyl1.radius + cyl2.radius;
+                if distance_squared <= sum_radius * sum_radius {
+                    //TODO: estimate the angle for the vector here
+                    return (vector_angle(dx, dz), true);
                 }
             }
         }
     }
     return (Fixed::default(), false);
 }
+
+
+//TODO: convert this to rust, and implement a lut for asin
+fn vector_angle(dx: Fixed, dz: Fixed) -> Fixed {
+    Fixed::const_new(0)
+/*
+
+import math
+
+def angle_using_sin(x: float, y: float) -> float:
+    magnitude = math.sqrt(x**2 + y**2)  # Compute vector length (hypotenuse)
+    
+    if magnitude == 0:
+        raise ValueError("Zero vector has no defined angle.")
+    
+    theta = math.asin(y / magnitude)  # Calculate angle in radians
+    
+    # Adjust for quadrants
+    if x < 0:  # Quadrants II and III
+        theta = math.pi - theta  # Reflect across y-axis
+    
+    # Convert to degrees
+    return math.degrees(theta)
+*/
+}
+

@@ -285,19 +285,19 @@ impl EntityEnum {
             EntityEnum::Empty(_a) => Fixed::const_new(999),
         }
     }
-    pub fn bounding_box(&self) -> BoundingBox {
+    pub fn bounding_shape(&self) -> Option<BoundingShape> {
         match self {
-            EntityEnum::Cube(a) => a.bounding_box(),
-            EntityEnum::Rectangle(a) => a.bounding_box(),
-            EntityEnum::Mover(a) => a.bounding_box(),
-            EntityEnum::Crumbling(a) => a.bounding_box(),
-            EntityEnum::Finish(a) => a.bounding_box(),
-            EntityEnum::Switch(a) => a.bounding_box(),
-            EntityEnum::Wireframe(a) => a.bounding_box(),
-            EntityEnum::Body(a) => a.bounding_box(),
-            EntityEnum::Bounce(a) => a.bounding_box(),
-            EntityEnum::Ice(a) => a.bounding_box(),
-            EntityEnum::Empty(_a) => BoundingBox::default(),
+            EntityEnum::Cube(a) => a.bounding_shape(),
+            EntityEnum::Rectangle(a) => a.bounding_shape(),
+            EntityEnum::Mover(a) => a.bounding_shape(),
+            EntityEnum::Crumbling(a) => a.bounding_shape(),
+            EntityEnum::Finish(a) => a.bounding_shape(),
+            EntityEnum::Switch(a) => a.bounding_shape(),
+            EntityEnum::Wireframe(a) => a.bounding_shape(),
+            EntityEnum::Body(a) => a.bounding_shape(),
+            EntityEnum::Bounce(a) => a.bounding_shape(),
+            EntityEnum::Ice(a) => a.bounding_shape(),
+            EntityEnum::Empty(_a) => None,
         }
     }
     pub fn bounding_cylinder(&self) -> BoundingCylinder {
