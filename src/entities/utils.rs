@@ -173,8 +173,8 @@ pub fn vertical_room_for_box(
 }
 
 fn vertical_room_for_cylinder(
-    first: &BoundingCylinder,
-    second: &BoundingBox,
+    first: &BoundingCylinder,  //platform
+    second: &BoundingCylinder, //player
     limit: Fixed,
 ) -> Fixed {
     if (limit < 0 && first.y_top > second.y_bottom) || (limit > 0 && first.y_bottom < second.y_top)
@@ -182,15 +182,28 @@ fn vertical_room_for_cylinder(
         return limit;
     }
 
-    if cylinder_and_rotated_rect_h_overlap(first, second) {
+    let dx = first.x - second.x;
+    let dz = first.z - second.z;
+    let distance_squared = dx * dx + dz * dz;
+    let sum_radius = first.radius + second.radius;
+    if sum_radius * sum_radius > distance_squared {
         if limit < 0 {
-            return second.y_top;
+            return first.y_top;
         } else {
-            return second.y_bottom;
+            return first.y_bottom;
         }
-    } else {
-        return limit;
     }
+    return limit;
+
+    // if cylinder_and_rotated_rect_h_overlap(first, second) {
+    //     if limit < 0 {
+    //         return first.y_top;
+    //     } else {
+    //         return first.y_bottom;
+    //     }
+    // } else {
+    //     return limit;
+    // }
 }
 
 //determine if the element in the entiry array is below us and how far
@@ -219,8 +232,9 @@ pub fn check_support_below(
                         }
                     }
                 } else if let BoundingShape::BoundingCylinder(top) = top_shape {
+                    //using player cylinder as fallback, as the box-cylinder check seems borked if it's small as the player is
                     let d: Fixed =
-                        vertical_room_for_cylinder(&top, &bottom, Fixed::const_new(-999));
+                        vertical_room_for_cylinder(&top, &fallback, Fixed::const_new(-999));
                     if d > height {
                         height = d;
                         if height == bottom.y_bottom {
@@ -251,13 +265,12 @@ pub fn check_block_above(
                 if let BoundingShape::BoundingBox(bottom) = bottom_shape {
                     let d: Fixed =
                         vertical_room_for_box(&bottom, &top, &fallback, Fixed::const_new(999));
-
                     if d < max_height {
                         max_height = d;
                     }
                 } else if let BoundingShape::BoundingCylinder(bottom) = bottom_shape {
                     let d: Fixed =
-                        vertical_room_for_cylinder(&bottom, &top, Fixed::const_new(-999));
+                        vertical_room_for_cylinder(&bottom, &fallback, Fixed::const_new(999));
                     if d < max_height {
                         max_height = d;
                     }
@@ -372,49 +385,7 @@ pub fn cylinder_and_rotated_rect_collision(
     return (Fixed::default(), false);
 }
 
-pub fn cylinder_and_rotated_rect_h_overlap(cyl1: &BoundingCylinder, box2: &BoundingBox) -> bool {
-    // Step 1: Transform the cylinder's center into the rectangle's local space
-    let (cos_theta, sin_theta) = (box2.rotation.cos(), box2.rotation.sin());
-    let tx = cyl1.x - box2.center[0];
-    let tz = cyl1.z - box2.center[1];
-    let local_x = tx * cos_theta + tz * sin_theta;
-    let local_z = -tx * sin_theta + tz * cos_theta;
 
-    // Step 2: Deduce rectangle bounds in local space
-    let half_width = box2.width / Fixed::const_new(2);
-    let half_height = box2.height / Fixed::const_new(2);
-    let min_x = -half_width;
-    let max_x = half_width;
-    let min_z = -half_height;
-    let max_z = half_height;
-
-    // Step 3: Clamp the cylinder's center to the rectangle's bounds in local space
-    let clamped_x = if local_x < min_x {
-        min_x
-    } else if local_x > max_x {
-        max_x
-    } else {
-        local_x
-    };
-    let clamped_z = if local_z < min_z {
-        min_z
-    } else if local_z > max_z {
-        max_z
-    } else {
-        local_z
-    };
-
-    // Step 4: Transform the clamped point back to world space (not necessary for distance calc)
-    let dx = local_x - clamped_x;
-    let dz = local_z - clamped_z;
-    let distance_squared = dx * dx + dz * dz;
-
-    // True if there is a collision
-    if distance_squared <= cyl1.radius * cyl1.radius {
-        return true;
-    }
-    return false;
-}
 
 //TODO: do a check for the angle of the cylinder
 //don't have
@@ -446,7 +417,7 @@ pub fn horizontal_collision_check(
                 let dz = cyl1.z - cyl2.z;
                 let distance_squared = dx * dx + dz * dz;
                 let sum_radius = cyl1.radius + cyl2.radius;
-                if distance_squared <= sum_radius * sum_radius {
+                if distance_squared < sum_radius * sum_radius {
                     //TODO: estimate the angle for the vector here
                     return (vector_angle(dx, dz), true);
                 }
@@ -456,28 +427,29 @@ pub fn horizontal_collision_check(
     return (Fixed::default(), false);
 }
 
-
 //TODO: convert this to rust, and implement a lut for asin
-fn vector_angle(dx: Fixed, dz: Fixed) -> Fixed {
+// lookup could be implemented as a binary search from a SIN LUT
+//check middle, and shift left or right depending on the value
+//until found the right index. That is the normalized index between 0 and 256
+fn vector_angle(_dx: Fixed, _dz: Fixed) -> Fixed {
     Fixed::const_new(0)
-/*
+    /*
 
-import math
+    import math
 
-def angle_using_sin(x: float, y: float) -> float:
-    magnitude = math.sqrt(x**2 + y**2)  # Compute vector length (hypotenuse)
-    
-    if magnitude == 0:
-        raise ValueError("Zero vector has no defined angle.")
-    
-    theta = math.asin(y / magnitude)  # Calculate angle in radians
-    
-    # Adjust for quadrants
-    if x < 0:  # Quadrants II and III
-        theta = math.pi - theta  # Reflect across y-axis
-    
-    # Convert to degrees
-    return math.degrees(theta)
-*/
+    def angle_using_sin(x: float, y: float) -> float:
+        magnitude = math.sqrt(x**2 + y**2)  # Compute vector length (hypotenuse)
+
+        if magnitude == 0:
+            raise ValueError("Zero vector has no defined angle.")
+
+        theta = math.asin(y / magnitude)  # Calculate angle in radians
+
+        # Adjust for quadrants
+        if x < 0:  # Quadrants II and III
+            theta = math.pi - theta  # Reflect across y-axis
+
+        # Convert to degrees
+        return math.degrees(theta)
+    */
 }
-

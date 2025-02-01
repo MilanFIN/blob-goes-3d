@@ -4,14 +4,13 @@ use serde::Deserialize;
 
 use super::boundingshapes::BoundingShape;
 use super::math;
-use super::BoundingBox;
 use super::BoundingCylinder;
 use super::Camera;
 use super::Entity;
 use crate::effects;
-use crate::rectangle_model_points;
 use crate::renderer;
 use crate::renderer::polygon::Polygon;
+use crate::renderer::render::back_face_culling;
 use math::*;
 
 use crate::fixed;
@@ -30,11 +29,9 @@ pub struct Bounce {
     z: Fixed,
 
     #[serde(default = "default_fixed")]
-    xsize: Fixed,
+    size: Fixed,
     #[serde(default = "default_fixed")]
-    ysize: Fixed,
-    #[serde(default = "default_fixed")]
-    zsize: Fixed,
+    height: Fixed,
 
     #[serde(default = "default_fixed")]
     x_rotation: Fixed,
@@ -43,10 +40,10 @@ pub struct Bounce {
     #[serde(default = "default_fixed")]
     z_rotation: Fixed,
 
-    #[serde(default = "default_fixed_3_8")]
-    points: [[Fixed; 3]; 8],
-    #[serde(default = "default_fixed_3_8")]
-    model_rotated_points: [[Fixed; 3]; 8],
+    #[serde(default = "default_fixed_3_11")]
+    points: [[Fixed; 3]; 11],
+    #[serde(default = "default_fixed_3_11")]
+    model_rotated_points: [[Fixed; 3]; 11],
 
     #[serde(default = "default_fixed_3_3")]
     x_rotation_matrix: [[Fixed; 3]; 3],
@@ -70,14 +67,13 @@ impl Bounce {
             x: Fixed::const_new(0),
             y: Fixed::const_new(0),
             z: Fixed::const_new(0),
-            xsize: Fixed::const_new(0),
-            ysize: Fixed::const_new(0),
-            zsize: Fixed::const_new(0),
+            size: Fixed::const_new(0),
+            height: Fixed::const_new(0),
             x_rotation: Fixed::const_new(0),
             y_rotation: Fixed::const_new(0),
             z_rotation: Fixed::const_new(0),
-            points: [[Fixed::const_new(0); 3]; 8],
-            model_rotated_points: [[Fixed::const_new(0); 3]; 8],
+            points: [[Fixed::const_new(0); 3]; 11],
+            model_rotated_points: [[Fixed::const_new(0); 3]; 11],
             x_rotation_matrix: [[Fixed::const_new(0); 3]; 3],
             y_rotation_matrix: [[Fixed::const_new(0); 3]; 3],
             z_rotation_matrix: [[Fixed::const_new(0); 3]; 3],
@@ -101,13 +97,24 @@ impl Entity for Bounce {
     }
 
     fn set_size(&mut self, size: Fixed) {
-        self.xsize = size;
-        self.ysize = size;
-        self.zsize = size;
+        self.size = size;
     }
 
     fn recalculate_points(&mut self) {
-        self.points = rectangle_model_points(self.xsize, self.ysize, self.zsize);
+        //self.points = rectangle_model_points(self.xsize, self.ysize, self.zsize);
+
+        let radius = self.size / 2;
+        let v_offset = self.height / 2;
+        let angle_increment = Fixed::const_new(1) / Fixed::const_new(5);
+        for i in 0..5 {
+            let angle = angle_increment * i as i32;
+            let x = -radius * angle.cos();
+            let z = radius * angle.sin();
+            //self.points[i] = [x, v_offset, z];
+            self.points[i+1] = [x, v_offset, z];
+            self.points[i+6] = [x, -v_offset, z];
+
+        }
     }
 
     fn set_x_rotation(&mut self, x_rotation: Fixed) {
@@ -156,6 +163,136 @@ impl Entity for Bounce {
             return;
         }
 
+        let mut screen_points: [[Fixed; 2]; 11] = [[Fixed::const_new(0), Fixed::const_new(0)]; 11];
+        let mut translated_points: [[Fixed; 3]; 11] = [[
+            Fixed::const_new(0),
+            Fixed::const_new(0),
+            Fixed::const_new(0),
+        ]; 11];
+
+        for i in 0..(self.model_rotated_points).len() {
+            (translated_points[i], screen_points[i]) = renderer::render::translate_point(
+                &self.model_rotated_points[i],
+                &camera,
+                self.x,
+                self.y,
+                self.z,
+            );
+        }
+
+
+        let visible: bool = back_face_culling(&translated_points, 0, 1, 2);
+        if visible {
+            let color: u16 = renderer::utils::get_color(self.color, 0);
+            let distance0 = renderer::utils::polygon_avg_z(&translated_points, 0, 1, 2);
+            polygons.push(Polygon {
+                distance_from_camera: distance0,
+                shape: renderer::polygon::Shape::Triangle([
+                    screen_points[0],
+                    screen_points[1],
+                    screen_points[2],
+                ]),
+                color,
+            });
+            let distance0 = renderer::utils::polygon_avg_z(&translated_points, 0, 2, 3);
+            polygons.push(Polygon {
+                distance_from_camera: distance0,
+                shape: renderer::polygon::Shape::Triangle([
+                    screen_points[0],
+                    screen_points[2],
+                    screen_points[3],
+                ]),
+                color,
+            });
+            let distance0 = renderer::utils::polygon_avg_z(&translated_points, 0, 3, 4);
+            polygons.push(Polygon {
+                distance_from_camera: distance0,
+                shape: renderer::polygon::Shape::Triangle([
+                    screen_points[0],
+                    screen_points[3],
+                    screen_points[4],
+                ]),
+                color,
+            });
+            let distance0 = renderer::utils::polygon_avg_z(&translated_points, 0, 4, 5);
+            polygons.push(Polygon {
+                distance_from_camera: distance0,
+                shape: renderer::polygon::Shape::Triangle([
+                    screen_points[0],
+                    screen_points[4],
+                    screen_points[5],
+                ]),
+                color,
+            });
+            let distance0 = renderer::utils::polygon_avg_z(&translated_points, 0, 5, 1);
+            polygons.push(Polygon {
+                distance_from_camera: distance0,
+                shape: renderer::polygon::Shape::Triangle([
+                    screen_points[0],
+                    screen_points[5],
+                    screen_points[1],
+                ]),
+                color,
+            });
+        
+        }
+
+        for i in 1..5 {
+            let visible: bool = back_face_culling(&translated_points, i, i + 5, i + 1);
+            if visible {
+                let color: u16 = renderer::utils::get_color(self.color, (i % 3 + 1) as i16);
+                let distance0 = renderer::utils::polygon_avg_z(&translated_points, i, i + 5, i + 1);
+                polygons.push(Polygon {
+                    distance_from_camera: distance0,
+                    shape: renderer::polygon::Shape::Triangle([
+                        screen_points[i],
+                        screen_points[i + 5],
+                        screen_points[i + 1],
+                    ]),
+                    color,
+                });
+                let distance0 = renderer::utils::polygon_avg_z(&translated_points, i+1, i + 5, i + 6);
+                polygons.push(Polygon {
+                    distance_from_camera: distance0,
+                    shape: renderer::polygon::Shape::Triangle([
+                        screen_points[i+1],
+                        screen_points[i + 5],
+                        screen_points[i + 6],
+                    ]),
+                    color,
+                });
+            }
+        }
+        
+        let visible: bool = back_face_culling(&translated_points, 5, 10, 6);
+        if visible {
+            let color: u16 = renderer::utils::get_color(self.color, (5 % 3 + 1) as i16);
+            
+            let distance0 = renderer::utils::polygon_avg_z(&translated_points, 5,10,6);
+            polygons.push(Polygon {
+                distance_from_camera: distance0,
+                shape: renderer::polygon::Shape::Triangle([
+                    screen_points[5],
+                    screen_points[10],
+                    screen_points[6],
+                ]),
+                color,
+            });
+            
+            let distance0 = renderer::utils::polygon_avg_z(&translated_points, 5,6,1);
+            polygons.push(Polygon {
+                distance_from_camera: distance0,
+                shape: renderer::polygon::Shape::Triangle([
+                    screen_points[5],
+                    screen_points[6],
+                    screen_points[1],
+                ]),
+                color,
+            });
+        }
+
+
+        /*
         renderer::render::render_rect(
             &self.model_rotated_points,
             self.x,
@@ -165,7 +302,7 @@ impl Entity for Bounce {
             camera,
             self.color,
             polygons,
-        );
+        );*/
     }
 
     fn distance_from_camera(&self, camera: &Camera) -> Fixed {
@@ -173,6 +310,7 @@ impl Entity for Bounce {
     }
 
     fn bounding_shape(&self) -> Option<BoundingShape> {
+        /*
         let points: [[Fixed; 2]; 4] = [
             [
                 self.model_rotated_points[0][0] + self.x,
@@ -204,14 +342,22 @@ impl Entity for Bounce {
             y_top: self.model_rotated_points[0][1] + self.y,
             y_bottom: self.model_rotated_points[2][1] + self.y,
             rotation: -self.y_rotation,
+        }))*/
+        Some(BoundingShape::BoundingCylinder(BoundingCylinder {
+            x: self.x,
+            z: self.z,
+            radius: self.size/2,
+            y_top: self.model_rotated_points[0][1] + self.y,
+            y_bottom: self.model_rotated_points[2][1] + self.y,
         }))
+
     }
 
     fn bounding_cylinder(&self) -> BoundingCylinder {
         BoundingCylinder {
             x: self.x,
             z: self.z,
-            radius: self.xsize / 2,
+            radius: self.size / 2,
             y_top: self.model_rotated_points[0][1] + self.y,
             y_bottom: self.model_rotated_points[2][1] + self.y,
         }
@@ -220,7 +366,7 @@ impl Entity for Bounce {
         return self.y;
     }
     fn get_height(&self) -> Fixed {
-        return self.ysize;
+        return self.height;
     }
     fn set_color(&mut self, color: u16) {
         self.color = color;

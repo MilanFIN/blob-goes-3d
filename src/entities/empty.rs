@@ -2,7 +2,7 @@ use agb::InternalAllocator;
 use alloc::vec::Vec;
 use serde::Deserialize;
 
-use super::{boundingshapes::BoundingShape, entity, BoundingBox, BoundingCylinder};
+use super::{boundingshapes::BoundingShape, entity, BoundingCylinder};
 use entity::*;
 
 use super::Camera;

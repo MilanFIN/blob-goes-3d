@@ -365,7 +365,7 @@ impl Entity for Finish {
                     shape: renderer::polygon::Shape::Triangle([
                         screen_points[i],
                         screen_points[i + 8],
-                        screen_points[i + 1],
+                        screen_points[i + 7],
                     ]),
                     color,
                 });
