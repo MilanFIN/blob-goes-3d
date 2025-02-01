@@ -430,7 +430,11 @@ pub fn horizontal_collision_check(
 }
 
 fn vector_angle(dx: Fixed, dz: Fixed) -> Fixed {
-    let mut target = dx / vector_len_2d([dx, dz]);
+    let hyp = vector_len_2d([dx, dz]);
+    if hyp == Fixed::const_new(0) {
+        return Fixed::const_new(0);
+    }
+    let mut target = dx / hyp;
     if target < 0 {
         target = target + Fixed::from_raw(64);
     }
