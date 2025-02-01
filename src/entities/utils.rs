@@ -1,4 +1,8 @@
-use crate::math::cross_product;
+use crate::{
+    math::{cross_product, vector_len_2d},
+    mathlut::PARTIAL_SINE_LUT,
+    utils::fixed_array_binary_search,
+};
 
 use super::{
     boundingshapes::BoundingShape, BoundingBox, BoundingCylinder, Camera, EntityEnum, Fixed,
@@ -385,8 +389,6 @@ pub fn cylinder_and_rotated_rect_collision(
     return (Fixed::default(), false);
 }
 
-
-
 //TODO: do a check for the angle of the cylinder
 //don't have
 pub fn horizontal_collision_check(
@@ -427,29 +429,20 @@ pub fn horizontal_collision_check(
     return (Fixed::default(), false);
 }
 
-//TODO: convert this to rust, and implement a lut for asin
-// lookup could be implemented as a binary search from a SIN LUT
-//check middle, and shift left or right depending on the value
-//until found the right index. That is the normalized index between 0 and 256
-fn vector_angle(_dx: Fixed, _dz: Fixed) -> Fixed {
-    Fixed::const_new(0)
-    /*
+fn vector_angle(dx: Fixed, dz: Fixed) -> Fixed {
+    let mut target = dx / vector_len_2d([dx, dz]);
+    if target < 0 {
+        target = target + Fixed::from_raw(64);
+    }
+    if target == Fixed::const_new(0) {
+        return Fixed::const_new(0);
+    }
+    else if target > Fixed::const_new(255) {
+        return Fixed::const_new(64);
+    }
+    let angle = fixed_array_binary_search(target, &PARTIAL_SINE_LUT, 90);
+    //normalize to fixed between 0 and 1
+    let angle: Fixed = Fixed::new(angle) / Fixed::const_new(360);
 
-    import math
-
-    def angle_using_sin(x: float, y: float) -> float:
-        magnitude = math.sqrt(x**2 + y**2)  # Compute vector length (hypotenuse)
-
-        if magnitude == 0:
-            raise ValueError("Zero vector has no defined angle.")
-
-        theta = math.asin(y / magnitude)  # Calculate angle in radians
-
-        # Adjust for quadrants
-        if x < 0:  # Quadrants II and III
-            theta = math.pi - theta  # Reflect across y-axis
-
-        # Convert to degrees
-        return math.degrees(theta)
-    */
+    angle
 }
