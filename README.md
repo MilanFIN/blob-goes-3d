@@ -28,8 +28,8 @@ agb-gbafix target/thumbv4t-none-eabi/release/<binary name> -o <game name>.gba
 ## Features
 
 - [x] A flat shaded software 3d renderer (MODE4)
-- [x] Bundling game levels from json at build time and loading them with serde
-- [x] Various level building blocks
+- [x] Bundling game levels from json files at build time and loading them with serde
+- [x] Various common platformer game features (moving blocks etc.)
 - [x] Collision detection
 
 
