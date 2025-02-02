@@ -2,6 +2,7 @@ use agb::InternalAllocator;
 use alloc::vec::Vec;
 use serde::Deserialize;
 
+use super::boundingshapes::BoundingShape;
 use super::math;
 use super::utils::cylinder_and_rotated_rect_collision;
 use super::utils::rect_overlap;
@@ -364,7 +365,7 @@ impl Entity for Finish {
                     shape: renderer::polygon::Shape::Triangle([
                         screen_points[i],
                         screen_points[i + 8],
-                        screen_points[i + 1],
+                        screen_points[i + 7],
                     ]),
                     color,
                 });
@@ -401,9 +402,9 @@ impl Entity for Finish {
         return (self.x - camera.x).abs() + (self.y - camera.y).abs() + (self.z - camera.z).abs();
     }
 
-    fn bounding_box(&self) -> BoundingBox {
+    fn bounding_shape(&self) -> Option<BoundingShape> {
         //the finish has no collision with the player
-        BoundingBox::empty()
+       None
     }
 
     fn bounding_cylinder(&self) -> BoundingCylinder {

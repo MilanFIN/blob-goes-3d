@@ -2,7 +2,7 @@ use agb::InternalAllocator;
 use alloc::vec::Vec;
 use serde::Deserialize;
 
-use super::{entity, BoundingBox, BoundingCylinder};
+use super::{boundingshapes::BoundingShape, entity, BoundingCylinder};
 use entity::*;
 
 use super::Camera;
@@ -34,8 +34,8 @@ impl Entity for Empty {
     fn distance_from_camera(&self, _camera: &Camera) -> Fixed {
         return Fixed::const_new(999);
     }
-    fn bounding_box(&self) -> BoundingBox {
-        BoundingBox::default()
+    fn bounding_shape(&self) -> Option<BoundingShape> {
+        None
     }
     fn bounding_cylinder(&self) -> BoundingCylinder {
         BoundingCylinder::default()

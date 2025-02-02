@@ -50,6 +50,7 @@ use fixed::*;
 mod levels;
 mod effects;
 mod moveutils;
+mod mathlut;
 
 const DRAWDISTANCE: Fixed = Fixed::const_new(35);
 const POLYGON_LIMIT: i16 = 60;
@@ -63,6 +64,7 @@ and interrupt handlers correctly. It will also handle creating the `Gba` struct 
 #[agb::entry]
 fn main(mut gba: agb::Gba) -> ! {
     use body::Body;
+    use entities::boundingshapes::{BoundingBox, BoundingShape};
     use renderer::polygon::Polygon;
 
     let mut input = ButtonController::new();
@@ -137,29 +139,33 @@ fn main(mut gba: agb::Gba) -> ! {
 
         renderer::hw::fill(page, 128);
 
+
+        let mut player_box = BoundingBox::default();
+        let shape: &Option<boundingshapes::BoundingShape> = &entity_array[0].bounding_shape();
+        if let BoundingShape::BoundingBox(shape) = shape.as_ref().unwrap() {
+            player_box = (*shape).clone();
+        }
+
+        let player_cylinder = entity_array[0].bounding_cylinder();
+
         let mut bottom_support_id: i16 = -1;
         if player1.yspeed <= Fixed::const_new(0) {
-            let (groundlevel, collider_entity) = check_support_below(&entity_array, 0);
+            let (groundlevel, collider_entity) = check_support_below(&entity_array, &player_box, &player_cylinder);
             bottom_support_id = collider_entity;
             player1.fall(groundlevel);
         } else if player1.yspeed > Fixed::const_new(0) {
-            let rooflevel: Fixed = check_block_above(&entity_array, 0);
+            let rooflevel: Fixed = check_block_above(&entity_array, &player_box, &player_cylinder);
             player1.float(rooflevel);
         }
 
         player1.update_camera_position();
-        /*
-        quick_sort(
-            &mut entity_render_order,
-            &entity_array,
-            0,
-            levelsize + 1,
-            &player1.camera,
-        );*/
+
+
+
 
         let game_state: effects::InputGameState = effects::InputGameState {
             support_below_id: bottom_support_id,
-            bounding_box: &entity_array[0].bounding_box(),
+            bounding_box: &player_box,
             bounding_cylinder: &entity_array[0].bounding_cylinder(),
             action_requested: player1.action,
             yspeed: player1.yspeed,

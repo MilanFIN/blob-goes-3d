@@ -2,6 +2,7 @@ use agb::InternalAllocator;
 use alloc::vec::Vec;
 use serde::Deserialize;
 
+use super::boundingshapes::BoundingShape;
 use super::math;
 use super::BoundingBox;
 use super::BoundingCylinder;
@@ -199,7 +200,7 @@ impl Entity for Mover {
         return (self.x - camera.x).abs() + (self.y - camera.y).abs() + (self.z - camera.z).abs();
     }
 
-    fn bounding_box(&self) -> BoundingBox {
+    fn bounding_shape(&self) -> Option<BoundingShape> {
         let points: [[Fixed; 2]; 4] = [
             [
                 self.model_rotated_points[0][0] + self.x,
@@ -219,7 +220,7 @@ impl Entity for Mover {
             ],
         ];
 
-        BoundingBox {
+        Some(BoundingShape::BoundingBox(BoundingBox {
             data: points,
             center: utils::calculate_center(&points),
             width: (self.model_rotated_points[0][0] + self.x
@@ -231,7 +232,7 @@ impl Entity for Mover {
             y_top: self.model_rotated_points[0][1] + self.y,
             y_bottom: self.model_rotated_points[2][1] + self.y,
             rotation: -self.y_rotation,
-        }
+        }))
     }
 
     fn bounding_cylinder(&self) -> BoundingCylinder {

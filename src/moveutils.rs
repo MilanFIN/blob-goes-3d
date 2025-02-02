@@ -32,32 +32,35 @@ pub fn attempt_move(
 
     let movement_mount: Fixed = vector_len_2d([x, z]);
 
-    let (mut possible_directions, speeds) = get_dirs_by_wall_angle(player.angle, wallangle);
-    possible_directions[0][0] *= movement_mount * speeds[0];
-    possible_directions[0][1] *= movement_mount * speeds[0];
-    possible_directions[1][0] *= movement_mount * speeds[1];
-    possible_directions[1][1] *= movement_mount * speeds[1];
+    let wallangles = [wallangle - Fixed::from_raw(10), wallangle, wallangle + Fixed::from_raw(10)];
+    for &wallangle in wallangles.iter() {
 
-    let potential_position: BoundingCylinder = BoundingCylinder::new_with_offset(
-        body,
-        possible_directions[0][0],
-        possible_directions[0][1],
-    );
-    if !horizontal_collision_check(entities, potential_position).1 {
-        player.move_to(possible_directions[0][0], possible_directions[0][1]);
-        return true;
-    }
+        let (mut possible_directions, speeds) = get_dirs_by_wall_angle(player.angle, wallangle);
+        possible_directions[0][0] *= movement_mount * speeds[0];
+        possible_directions[0][1] *= movement_mount * speeds[0];
+        possible_directions[1][0] *= movement_mount * speeds[1];
+        possible_directions[1][1] *= movement_mount * speeds[1];
 
-    let potential_position: BoundingCylinder = BoundingCylinder::new_with_offset(
-        body,
-        possible_directions[1][0],
-        possible_directions[1][1],
-    );
-    if !horizontal_collision_check(entities, potential_position).1 {
-        player.move_to(possible_directions[1][0], possible_directions[1][1]);
-        return true;
+        let potential_position: BoundingCylinder = BoundingCylinder::new_with_offset(
+            body,
+            possible_directions[0][0],
+            possible_directions[0][1],
+        );
+        if !horizontal_collision_check(entities, potential_position).1 {
+            player.move_to(possible_directions[0][0], possible_directions[0][1]);
+            return true;
+        }
+
+        let potential_position: BoundingCylinder = BoundingCylinder::new_with_offset(
+            body,
+            possible_directions[1][0],
+            possible_directions[1][1],
+        );
+        if !horizontal_collision_check(entities, potential_position).1 {
+            player.move_to(possible_directions[1][0], possible_directions[1][1]);
+            return true;
+        }
     }
-	
 
 
     return false;

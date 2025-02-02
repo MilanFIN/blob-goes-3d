@@ -49,11 +49,12 @@ fn init_palette_slice(
 
 pub fn init_palette(bitmap4: &mut agb::display::bitmap4::Bitmap4) {
     // Set  palette entries
-    //bitmap4.set_palette_entry(1, 0b0000000000011111);
     init_palette_slice(bitmap4, 31, 0, 0, 1, 2);
     init_palette_slice(bitmap4, 0, 31, 0, 2, 2);
     init_palette_slice(bitmap4, 0, 0, 31, 3, 2);
     init_palette_slice(bitmap4, 15, 10, 7, 4, 2);
+    init_palette_slice(bitmap4, 31, 31, 0, 5, 2);
+
 }
 
 pub fn get_color(index: u16, shade: i16) -> u16 {

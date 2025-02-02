@@ -97,3 +97,22 @@ pub fn z_rotation_matrix(angle: Fixed) -> [[Fixed; 3]; 3] {
         [Fixed::const_new(0), Fixed::const_new(0), Fixed::const_new(1)],
     ]
 }
+
+pub fn fixed_array_binary_search(target: Fixed, array: &[Fixed], len: i32) -> i32 {
+    let mut low: i32 = 0;
+    let mut high: i32 = len - 1;
+    while low < high {
+        let mid: i32 = (low + high) / 2;
+        let mid_val: Fixed = array[mid as usize];
+
+        if mid_val < target {
+            low = mid + 1;
+        } else if mid_val > target {
+            high = mid - 1;
+        } else {
+            return mid;
+        }
+    }
+    return high;
+}
+

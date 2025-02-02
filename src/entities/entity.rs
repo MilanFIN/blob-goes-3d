@@ -3,7 +3,7 @@ use agb::InternalAllocator;
 use alloc::vec::Vec;
 use camera::*;
 
-use super::{BoundingBox, BoundingCylinder};
+use super::{boundingshapes::BoundingShape, BoundingCylinder};
 
 pub trait Entity {
     fn render(&mut self, camera: &Camera, polygons: &mut Vec<Polygon, InternalAllocator>, render_distance: Fixed);
@@ -23,7 +23,7 @@ pub trait Entity {
     fn set_size(&mut self, size: Fixed);
     fn set_vertex(&mut self, point: [Fixed; 3], index: i32);
     fn distance_from_camera(&self, camera: &Camera) -> Fixed;
-    fn bounding_box(&self) -> BoundingBox;
+    fn bounding_shape(&self) -> Option<BoundingShape>;
     fn bounding_cylinder(&self) -> BoundingCylinder;
     fn get_y(&self) -> Fixed;
     fn get_height(&self) -> Fixed;
