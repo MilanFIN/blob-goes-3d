@@ -1,0 +1,20 @@
+[
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0.0, "y": 0, "z": 0, "color": 2, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 4.0, "y": 3.5, "z": 0, "color": 2, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0.0, "y": 7, "z": 0, "color": 2, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 4.0, "y": 10.5, "z": 0, "color": 2, "rotation": 0.0 } },
+    {"type": "mover",
+        "data": { 
+            "xsize": 4, "ysize": 1, "zsize": 4, "x": 8, "y": 10.5, "z": 0,
+            "pos_a_x": 8, "pos_a_y": 10.5, "pos_a_z": 0,
+            "pos_b_x": 28, "pos_b_y": 15, "pos_b_z": 7,
+            "speed": 2, "wait": 20
+        }
+    },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 32, "y": 15, "z": 7, "color": 2, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 28, "y": 18.5, "z": 7, "color": 2, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 32, "y": 22, "z": 7, "color": 2, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 28, "y": 25.5, "z": 7, "color": 2, "rotation": 0.0 } },
+    { "type": "finish", "data": {"size": 3, "x": 28, "y": 28.5, "z": 7, "color": 2, "rotation": -0.22 } }
+
+]

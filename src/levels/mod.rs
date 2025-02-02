@@ -6,6 +6,8 @@ extern crate alloc;
 use alloc::vec::Vec;
 use serde_json_core::from_slice;
 
+pub const LEVELSIZE: usize = 30;
+
 #[inline(never)]
 pub fn load_level(level: usize, entity_array: &mut [EntityEnum]) -> usize{
     let message_bytes = levelstore::LEVELS[level].trim().as_bytes();

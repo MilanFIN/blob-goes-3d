@@ -1,0 +1,12 @@
+[
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 0, "color": 2, "rotation": 0.0 } },
+    { "type": "crumbling", "data": { "xsize": 3, "ysize": 0.5, "zsize": 3, "x": 0, "y": 0, "z": 5, "rotation": 0, "lifetime": 25 } },
+    { "type": "crumbling", "data": { "xsize": 3, "ysize": 0.5, "zsize": 3, "x": 0, "y": 0, "z": 10, "rotation": 0, "lifetime": 25 } },
+    { "type": "crumbling", "data": { "xsize": 3, "ysize": 0.5, "zsize": 3, "x": 0, "y": 0, "z": 15, "rotation": 0, "lifetime": 25 } },
+    { "type": "crumbling", "data": { "xsize": 3, "ysize": 0.5, "zsize": 3, "x": 0, "y": 0, "z": 20, "rotation": 0, "lifetime": 25 } },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 25, "color": 2, "rotation": 0.0 } },
+    { "type": "switch", "data": {"size": 2, "x": 0, "y": 1, "z": 25.5, "color": 3, "rotation": 0.125 } },
+    { "type": "wireframe", "data": {"xsize": 2, "ysize": 1, "zsize": 2, "x": -5, "y": 0, "z": 0, "color": 0 } },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": -10, "y": 0, "z": 0, "color": 2, "rotation": 0.0 } },
+    { "type": "finish", "data": {"size": 3, "x": -10, "y": 3, "z": 0, "color": 2, "rotation": 0.25 } }
+]

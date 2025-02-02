@@ -1,0 +1,16 @@
+[
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 0, "color": 2, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 0.1, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 3, "color": 2, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 0.1, "ysize": 1, "zsize": 3, "x": 1, "y": 0, "z": 6, "color": 2, "rotation": 0.1 } },
+    { "type": "rectangle", "data": { "xsize": 0.1, "ysize": 1, "zsize": 3, "x": 2, "y": 0, "z": 9, "color": 2, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 0.1, "ysize": 1, "zsize": 3, "x": 1, "y": 0, "z": 12, "color": 2, "rotation": -0.1 } },
+    { "type": "rectangle", "data": { "xsize": 0.1, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 15, "color": 2, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 0.1, "ysize": 1, "zsize": 3, "x": 1, "y": 0, "z": 18, "color": 2, "rotation": 0.1 } },
+    { "type": "rectangle", "data": { "xsize": 0.1, "ysize": 1, "zsize": 3, "x": 2, "y": 0, "z": 21, "color": 2, "rotation": 0.25 } },
+    { "type": "rectangle", "data": { "xsize": 0.1, "ysize": 1, "zsize": 3, "x": 2, "y": 0, "z": 24, "color": 2, "rotation": 0.25 } },
+    { "type": "rectangle", "data": { "xsize": 0.1, "ysize": 1, "zsize": 3, "x": 2, "y": 0, "z": 27, "color": 2, "rotation": 0.25 } },
+    { "type": "rectangle", "data": { "xsize": 0.1, "ysize": 1, "zsize": 3, "x": 2, "y": 0, "z": 30, "color": 2, "rotation": 0.25 } },
+    { "type": "rectangle", "data": { "xsize": 0.1, "ysize": 1, "zsize": 3, "x": 2, "y": 0, "z": 33, "color": 2, "rotation": 0.25 } },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 2, "y": 0, "z": 38, "color": 2, "rotation": 0.0 } },
+    { "type": "finish", "data": {"size": 3, "x": 2, "y": 3, "z": 38, "color": 2, "rotation": 0 } }
+]

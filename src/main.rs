@@ -40,7 +40,7 @@ mod camera;
 mod math;
 mod renderer;
 mod utils;
-use levels::levelstore::LEVELSIZE;
+use levels::LEVELSIZE;
 use utils::*;
 mod player;
 use player::*;
