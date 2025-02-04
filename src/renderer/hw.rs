@@ -6,12 +6,33 @@ const DCNT_PAGE: u32 = 0x0010;
 pub fn draw_wide_point(x: i32, y: i32, color: u16, page: u16) {
     let index = (y * 240 + x) >> 1;
     let value = ((color as u16) << 8) | (color as u16);
-
     unsafe {
         if page == 1 {
             *MODE_4_PAGE_1.add(index as usize) = value;
         } else {
             *MODE_4_PAGE_2.add(index as usize) = value;
+        }
+    }
+}
+
+pub fn draw_point(x: i32, y: i32, color: u16, page: u16) {
+    let index = (y * 240 + x) >> 1;
+    let even = x & 1 == 0;
+    //let value: u16 = ((color as u16) << 8) | (color as u16);
+    unsafe {
+        let active_page = if page == 1 {
+            MODE_4_PAGE_1
+        } else {
+            MODE_4_PAGE_2
+        };
+
+        let prev_value = *active_page.add(index as usize);
+
+        if even {
+            *active_page.add(index as usize) = (prev_value & 0xFF00) | color;
+        } else {
+            *active_page.add(index as usize) = (prev_value & 0x00FF) | (color << 8);
+
         }
     }
 }

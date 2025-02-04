@@ -51,6 +51,7 @@ mod levels;
 mod effects;
 mod moveutils;
 mod mathlut;
+mod textengine;
 
 const DRAWDISTANCE: Fixed = Fixed::const_new(35);
 const POLYGON_LIMIT: i16 = 60;
@@ -262,7 +263,8 @@ fn main(mut gba: agb::Gba) -> ! {
         polygons.clear();
         polygon_indices.clear();
 
-        //utils::angle_diff(player1.camera.y_angle, player1.angle);
+   
+        textengine::draw::write_line(0,1, "testi 1234", 40, page);
 
         renderer::hw::flip(&mut page);
     }
