@@ -181,14 +181,14 @@ const LEVEL8: &str = r#"[
 
 const LEVEL9: &str = r#"[
     { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 0, "color": 2, "rotation": 0.0 } },
-    { "type": "bounce", "data": { "size": 3, "height": 1, "x": 0, "y": 0, "z": 5, "color": 4, "power": 1.5, "rotation": 0.0 } },
-    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 12, "color": 2, "rotation": 0.0 } },
-    { "type": "bounce", "data": { "size": 3, "height": 1, "x": 2, "y": 0, "z": 17, "color": 4, "power": 1.5, "rotation": 0.0 } },
-    { "type": "bounce", "data": { "size": 3, "height": 1, "x": -2, "y": 0, "z": 22, "color": 4, "power": 1.5, "rotation": 0.0 } },
-    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 28, "color": 2, "rotation": 0.0 } },
-    { "type": "bounce", "data": { "size": 3, "height": 1, "x": 5, "y": 0, "z": 28, "color": 4, "power": 2, "rotation": 0.0 } },
-    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 10, "y": 15, "z": 28, "color": 2, "rotation": 0.0 } },
     { "type": "finish", "data": {"size": 3, "x": 10, "y": 18, "z": 28, "color": 2, "rotation": 0.25 } }
 ]"#;
 
-pub const LEVELS: [&'static str; 9] = [LEVEL1, LEVEL2, LEVEL3, LEVEL4, LEVEL5, LEVEL6, LEVEL7, LEVEL8, LEVEL9];
+const LEVEL10: &str = r#"[
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 0, "color": 2, "rotation": 0.0 } },
+    { "type": "finish", "data": {"size": 3, "x": 10, "y": 18, "z": 28, "color": 2, "rotation": 0.25 } }
+]"#;
+
+pub const LEVELS: [&'static str; 10] = [LEVEL1, LEVEL2, LEVEL3, LEVEL4, LEVEL5, LEVEL6, LEVEL7, LEVEL8, LEVEL9, LEVEL10];
+
+pub static mut COMPLETED_LEVELS: [bool; 10] = [false; 10];

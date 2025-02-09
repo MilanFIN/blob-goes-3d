@@ -1,6 +1,6 @@
 use crate::renderer;
 
-use super::chartoindex::convert;
+use super::chartoindex::convert_to_tiles;
 use super::letters::LETTERTILES;
 
 pub fn write_line(
@@ -10,9 +10,9 @@ pub fn write_line(
 	color: u16,
 	page: u16,
 ) {
-	let indices: alloc::vec::Vec<u8> = convert(text);
+	let indices: alloc::vec::Vec<u8> = convert_to_tiles(text);
 	for i in 0..indices.len() {
-		write_tile(x + i as u16 * 16, y, indices[i] as usize, color, page);
+		write_tile(x + i as u16 * 12, y, indices[i] as usize, color, page);
 	}
 }
 
@@ -35,3 +35,4 @@ pub fn write_tile(
 		}
 	}
 }
+

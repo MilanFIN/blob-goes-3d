@@ -1,18 +1,24 @@
 
 use crate::Fixed;
 
-pub const fn new_num(m:i32) -> Fixed {
-    return Fixed::from_raw(m << 8);
-}
 
 #[allow(dead_code)]
+pub fn clamp<T: PartialOrd + Copy>(n: &mut T, min: T, max: T) {
+    if *n < min {
+        *n = min;
+    } else if *n > max {
+        *n = max;
+    }
+}
+
+/*
 pub fn clamp(n: &mut Fixed, min: &Fixed, max: &Fixed) {
     if *n < *min {
         *n = *min;
     } else if *n > *max {
         *n = *max;
     }
-}
+}*/
 
 pub fn calculate_center(points: &[[Fixed; 2]; 4]) -> [Fixed; 2] {
     let p1: [Fixed; 2] = points[0]; // First point

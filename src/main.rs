@@ -44,18 +44,18 @@ use levels::LEVELSIZE;
 use utils::*;
 mod player;
 use player::*;
-mod input;
 mod fixed;
+mod input;
 use fixed::*;
-mod levels;
 mod effects;
-mod moveutils;
+mod levels;
 mod mathlut;
+mod menu;
+mod moveutils;
 mod textengine;
 
 const DRAWDISTANCE: Fixed = Fixed::const_new(35);
 const POLYGON_LIMIT: i16 = 60;
-
 
 /*
 The main function must take 1 arguments and never return. The agb::entry decorator
@@ -74,198 +74,202 @@ fn main(mut gba: agb::Gba) -> ! {
     let mut page: u16 = 0;
 
     renderer::utils::init_palette(&mut bitmap4);
-
-    let mut entity_array: [EntityEnum; LEVELSIZE + 2] =
-        [EntityEnum::Empty(Empty::default()); LEVELSIZE + 2];
-
-    //todo: if stack runs out of space, use this instead
-    /*
-    let mut entity_array: Vec<EntityEnum, ExternalAllocator> = Vec::new_in(ExternalAllocator);
-    for i in 0..LEVELSIZE + 2 {
-        entity_array.push(EntityEnum::Empty(Empty::default()));
-    }*/
-
-    let mut entity_render_order: [usize; LEVELSIZE + 2] = [0; LEVELSIZE + 2];
-
-    let levelsize = levels::load_level(0, &mut entity_array);
-
-    let mut player1: Player = Player::default();
-
-    player1.camera.set_x_rotation(Fixed::from_raw(0));
-    player1.camera.set_y_rotation(Fixed::from_raw(0));
-    player1.camera.set_z_rotation(Fixed::from_raw(0));
-    player1.camera.local_y = new_num(3);
-
-    player1.y = new_num(3);
-    player1.z = new_num(0);
-    player1.camera_left(0);
-
-    //player body
-    entity_array[0] = EntityEnum::Body(Body::default());
-    entity_array[0].set_x_rotation(new_num(0));
-    entity_array[0].set_y_rotation(new_num(0));
-    entity_array[0].set_z_rotation(new_num(0));
-    entity_array[0].set_color(1);
-    entity_array[0].set_size(new_num(1));
-    entity_array[0].recalculate_points();
-    entity_array[0].refresh_model_matrix();
-
-    entity_array[1] = EntityEnum::Cube(Cube::default());
-    entity_array[1].set_x_rotation(new_num(0));
-    entity_array[1].set_y_rotation(new_num(0));
-    entity_array[1].set_z_rotation(new_num(0));
-    entity_array[1].set_color(1);
-    entity_array[1].set_size(Fixed::from_raw(160));
-    entity_array[1].recalculate_points();
-    entity_array[1].refresh_model_matrix();
-
-    for i in 0..entity_render_order.len() {
-        entity_render_order[i] = i;
-    }
-
-    let mut event_loop: Vec<OutputEvents, InternalAllocator> = Vec::new_in(InternalAllocator);
-    let mut polygons: Vec<Polygon, InternalAllocator> = Vec::new_in(InternalAllocator);
-    let mut polygon_indices: Vec<usize, InternalAllocator> = Vec::new_in(InternalAllocator);
-
+    let mut selected_level = 0;
     loop {
-        input.update();
+        //textengine::draw::write_line(0,1, "testi 1234", 40, page);
+        selected_level = menu::levelselection::levelmenu(selected_level, &mut input, &mut page);
 
-        input::handle_input(
-            &mut player1,
-            &input,
-        );
+        let mut entity_array: [EntityEnum; LEVELSIZE + 2] =
+            [EntityEnum::Empty(Empty::default()); LEVELSIZE + 2];
 
-        moveutils::attempt_move(&mut player1, &entity_array, &entity_array[0].bounding_cylinder());
+        let mut entity_render_order: [usize; LEVELSIZE + 2] = [0; LEVELSIZE + 2];
 
+        let levelsize = levels::load_level(selected_level, &mut entity_array);
 
-        renderer::hw::fill(page, 128);
+        let mut player1: Player = Player::default();
 
+        player1.camera.set_x_rotation(Fixed::from_raw(0));
+        player1.camera.set_y_rotation(Fixed::from_raw(0));
+        player1.camera.set_z_rotation(Fixed::from_raw(0));
+        player1.camera.local_y = Fixed::const_new(3);
 
-        let mut player_box = BoundingBox::default();
-        let shape: &Option<boundingshapes::BoundingShape> = &entity_array[0].bounding_shape();
-        if let BoundingShape::BoundingBox(shape) = shape.as_ref().unwrap() {
-            player_box = (*shape).clone();
+        player1.y = Fixed::const_new(3);
+        player1.z = Fixed::const_new(0);
+        player1.camera_left(0);
+
+        //player body
+        entity_array[0] = EntityEnum::Body(Body::default());
+        entity_array[0].set_x_rotation(Fixed::const_new(0));
+        entity_array[0].set_y_rotation(Fixed::const_new(0));
+        entity_array[0].set_z_rotation(Fixed::const_new(0));
+        entity_array[0].set_color(1);
+        entity_array[0].set_size(Fixed::const_new(1));
+        entity_array[0].recalculate_points();
+        entity_array[0].refresh_model_matrix();
+
+        entity_array[1] = EntityEnum::Cube(Cube::default());
+        entity_array[1].set_x_rotation(Fixed::const_new(0));
+        entity_array[1].set_y_rotation(Fixed::const_new(0));
+        entity_array[1].set_z_rotation(Fixed::const_new(0));
+        entity_array[1].set_color(1);
+        entity_array[1].set_size(Fixed::from_raw(160));
+        entity_array[1].recalculate_points();
+        entity_array[1].refresh_model_matrix();
+
+        for i in 0..entity_render_order.len() {
+            entity_render_order[i] = i;
         }
 
-        let player_cylinder = entity_array[0].bounding_cylinder();
+        let mut event_loop: Vec<OutputEvents, InternalAllocator> = Vec::new_in(InternalAllocator);
+        let mut polygons: Vec<Polygon, InternalAllocator> = Vec::new_in(InternalAllocator);
+        let mut polygon_indices: Vec<usize, InternalAllocator> = Vec::new_in(InternalAllocator);
+        let mut finished = false;
 
-        let mut bottom_support_id: i16 = -1;
-        if player1.yspeed <= Fixed::const_new(0) {
-            let (groundlevel, collider_entity) = check_support_below(&entity_array, &player_box, &player_cylinder);
-            bottom_support_id = collider_entity;
-            player1.fall(groundlevel);
-        } else if player1.yspeed > Fixed::const_new(0) {
-            let rooflevel: Fixed = check_block_above(&entity_array, &player_box, &player_cylinder);
-            player1.float(rooflevel);
-        }
+        while !finished {
+            input.update();
 
-        player1.update_camera_position();
+            input::handle_input(&mut player1, &input);
 
+            moveutils::attempt_move(
+                &mut player1,
+                &entity_array,
+                &entity_array[0].bounding_cylinder(),
+            );
 
+            renderer::hw::fill(page, 128);
 
-
-        let game_state: effects::InputGameState = effects::InputGameState {
-            support_below_id: bottom_support_id,
-            bounding_box: &player_box,
-            bounding_cylinder: &entity_array[0].bounding_cylinder(),
-            action_requested: player1.action,
-            yspeed: player1.yspeed,
-        };
-        for i in 0..levelsize + 2 {
-            if let EntityEnum::Empty(_) = entity_array[i] {
-                break;
+            let mut player_box = BoundingBox::default();
+            let shape: &Option<boundingshapes::BoundingShape> = &entity_array[0].bounding_shape();
+            if let BoundingShape::BoundingBox(shape) = shape.as_ref().unwrap() {
+                player_box = (*shape).clone();
             }
-            if let Some(event) = entity_array[i].tick(&game_state) {
-                event_loop.push(event);
-            }
-        }
 
-        for event in event_loop.iter() {
-            if let OutputEvents::PlayerEvent(event) = event {
-                player1.x += event.move_x;
-                player1.y += event.move_y;
-                player1.z += event.move_z;
-            } else if let OutputEvents::GameFinish(_event) = event {
-                //TODO: actually implement level finishes at some point
-                agb::println!("finished");
-            } else if let OutputEvents::SwitchAction(_event) = event {
-                for i in 2..levelsize + 2 {
-                    if let EntityEnum::Wireframe(w) = &mut entity_array[i] {
-                        w.toggle();
-                    }
+            let player_cylinder = entity_array[0].bounding_cylinder();
+
+            let mut bottom_support_id: i16 = -1;
+            if player1.yspeed <= Fixed::const_new(0) {
+                let (groundlevel, collider_entity) =
+                    check_support_below(&entity_array, &player_box, &player_cylinder);
+                bottom_support_id = collider_entity;
+                player1.fall(groundlevel);
+            } else if player1.yspeed > Fixed::const_new(0) {
+                let rooflevel: Fixed =
+                    check_block_above(&entity_array, &player_box, &player_cylinder);
+                player1.float(rooflevel);
+            }
+
+            player1.update_camera_position();
+
+            let game_state: effects::InputGameState = effects::InputGameState {
+                support_below_id: bottom_support_id,
+                bounding_box: &player_box,
+                bounding_cylinder: &entity_array[0].bounding_cylinder(),
+                action_requested: player1.action,
+                yspeed: player1.yspeed,
+            };
+            for i in 0..levelsize + 2 {
+                if let EntityEnum::Empty(_) = entity_array[i] {
+                    break;
+                }
+                if let Some(event) = entity_array[i].tick(&game_state) {
+                    event_loop.push(event);
                 }
             }
-            else if let OutputEvents::BounceEvent(event) = event {
-                player1.bounce(event.power, input.is_pressed(Button::A));
+
+            for event in event_loop.iter() {
+                if let OutputEvents::PlayerEvent(event) = event {
+                    player1.x += event.move_x;
+                    player1.y += event.move_y;
+                    player1.z += event.move_z;
+                } else if let OutputEvents::GameFinish(_event) = event {
+                    //TODO: actually implement level finishes at some point
+                    agb::println!("finished");
+                    finished = true;
+                    unsafe {
+                        levels::levelstore::COMPLETED_LEVELS[selected_level] = true;
+                    }
+                } else if let OutputEvents::SwitchAction(_event) = event {
+                    for i in 2..levelsize + 2 {
+                        if let EntityEnum::Wireframe(w) = &mut entity_array[i] {
+                            w.toggle();
+                        }
+                    }
+                } else if let OutputEvents::BounceEvent(event) = event {
+                    player1.bounce(event.power, input.is_pressed(Button::A));
+                } else if let OutputEvents::Sliding(event) = event {
+                    player1.sliding(event.acceleration);
+                }
             }
-            else if let OutputEvents::Sliding(event) = event {
-                player1.sliding(event.acceleration);
+            event_loop.clear();
+            player1.tick();
+
+            //update player position on screen
+            entity_array[0].set_y_offset(player1.y + entity_array[0].get_height() / 2);
+            entity_array[1].set_y_offset(
+                player1.y + entity_array[0].get_height() + entity_array[1].get_height() / 2,
+            );
+            /*entity_array[0]
+            .set_y_offset(player1.y + Fixed::from_raw(128) + Fixed::from_raw(192) * i);*/
+
+            //rotate player body blocks and move them where the player is
+            for i in 0..2 {
+                entity_array[i].set_x_offset(player1.x);
+                entity_array[i].set_z_offset(player1.z);
+
+                entity_array[i].set_y_rotation(-player1.angle);
+                entity_array[i].refresh_model_matrix();
             }
-        }
-        event_loop.clear();
-        player1.tick();
 
-
-        //update player position on screen
-        entity_array[0].set_y_offset(player1.y + entity_array[0].get_height() / 2);
-        entity_array[1].set_y_offset(
-            player1.y + entity_array[0].get_height() + entity_array[1].get_height() / 2,
-        );
-        /*entity_array[0]
-        .set_y_offset(player1.y + Fixed::from_raw(128) + Fixed::from_raw(192) * i);*/
-
-        //rotate player body blocks and move them where the player is
-        for i in 0..2 {
-            entity_array[i].set_x_offset(player1.x);
-            entity_array[i].set_z_offset(player1.z);
-
-            entity_array[i].set_y_rotation(-player1.angle);
-            entity_array[i].refresh_model_matrix();
-        }
-
-        for i in 0..levelsize + 2 {
-            if let EntityEnum::Empty(_) = entity_array[i] {
-                break;
-            }
-            entity_array[entity_render_order[i]].render(&player1.camera, &mut polygons, DRAWDISTANCE);
-        }
-        for i in 0..polygons.len() {
-            polygon_indices.push(i);
-        }
-        polygon_indices.sort_by(|&a, &b| {
-            polygons[b]
-                .distance_from_camera
-                .cmp(&polygons[a].distance_from_camera)
-        });
-
-
-        let mut start:i16 = polygon_indices.len() as i16 - POLYGON_LIMIT ;
-        if start < 0 {
-            start = 0;
-        }
-
-        for p in start as usize..polygon_indices.len() {
-            let polygon = &polygons[polygon_indices[p]];
-            if let Some(vertices) = polygon.as_triangle() {
-                renderer::draw::draw_triangle(vertices[0], vertices[1], vertices[2], polygon.color, page);
-            }
-            if let Some(vertices) = polygon.as_line() {
-                renderer::draw::draw_line_fixed(
-                    vertices[0][0],
-                    vertices[0][1],
-                    vertices[1][0],
-                    vertices[1][1],
-                    polygon.color,
-                    page,
+            for i in 0..levelsize + 2 {
+                if let EntityEnum::Empty(_) = entity_array[i] {
+                    break;
+                }
+                entity_array[entity_render_order[i]].render(
+                    &player1.camera,
+                    &mut polygons,
+                    DRAWDISTANCE,
                 );
             }
+            for i in 0..polygons.len() {
+                polygon_indices.push(i);
+            }
+            polygon_indices.sort_by(|&a, &b| {
+                polygons[b]
+                    .distance_from_camera
+                    .cmp(&polygons[a].distance_from_camera)
+            });
+
+            let mut start: i16 = polygon_indices.len() as i16 - POLYGON_LIMIT;
+            if start < 0 {
+                start = 0;
+            }
+
+            for p in start as usize..polygon_indices.len() {
+                let polygon = &polygons[polygon_indices[p]];
+                if let Some(vertices) = polygon.as_triangle() {
+                    renderer::draw::draw_triangle(
+                        vertices[0],
+                        vertices[1],
+                        vertices[2],
+                        polygon.color,
+                        page,
+                    );
+                }
+                if let Some(vertices) = polygon.as_line() {
+                    renderer::draw::draw_line_fixed(
+                        vertices[0][0],
+                        vertices[0][1],
+                        vertices[1][0],
+                        vertices[1][1],
+                        polygon.color,
+                        page,
+                    );
+                }
+            }
+            polygons.clear();
+            polygon_indices.clear();
+
+            renderer::hw::flip(&mut page);
         }
-        polygons.clear();
-        polygon_indices.clear();
-
-   
-        textengine::draw::write_line(0,1, "testi 1234", 40, page);
-
-        renderer::hw::flip(&mut page);
     }
 }
