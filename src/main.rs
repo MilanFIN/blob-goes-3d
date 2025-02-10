@@ -64,20 +64,32 @@ and interrupt handlers correctly. It will also handle creating the `Gba` struct 
 */
 #[agb::entry]
 fn main(mut gba: agb::Gba) -> ! {
-    use body::Body;
-    use entities::boundingshapes::{BoundingBox, BoundingShape};
-    use renderer::polygon::Polygon;
-
     let mut input = ButtonController::new();
 
     let mut bitmap4: agb::display::bitmap4::Bitmap4 = gba.display.video.bitmap4();
     let mut page: u16 = 0;
-
     renderer::utils::init_palette(&mut bitmap4);
-    let mut selected_level = 0;
+
+    menu::presstart(&mut input, &mut page);
+
+    use body::Body;
+    use entities::boundingshapes::{BoundingBox, BoundingShape};
+    use renderer::polygon::Polygon;
+
+    let mut selected_level: usize = 0;
+    let mut canceled: bool;
     loop {
-        //textengine::draw::write_line(0,1, "testi 1234", 40, page);
-        selected_level = menu::levelselection::levelmenu(selected_level, &mut input, &mut page);
+        let option = menu::mainmenu(&mut input, &mut page);
+        if option == 1 {
+            menu::info(&mut input, &mut page);
+            continue;
+        } else {
+            //pass
+        }
+        (selected_level, canceled) = menu::levelmenu(selected_level, &mut input, &mut page);
+        if canceled {
+            continue;
+        }
 
         let mut entity_array: [EntityEnum; LEVELSIZE + 2] =
             [EntityEnum::Empty(Empty::default()); LEVELSIZE + 2];
