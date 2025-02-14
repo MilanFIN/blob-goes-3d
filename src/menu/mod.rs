@@ -1,6 +1,7 @@
 use alloc::format;
 use alloc::string::ToString;
 
+use crate::audio;
 use crate::levels;
 use crate::renderer;
 use crate::textengine;
@@ -12,6 +13,8 @@ pub fn levelmenu(
     selected_level: usize,
     input: &mut agb::input::ButtonController,
     page: &mut u16,
+    vblank: &agb::interrupt::VBlank,
+    sound: &agb::sound::dmg::Sound,
 ) -> (usize, bool) {
     let levelcount: usize = levels::levelstore::LEVELS.len();
 
@@ -41,13 +44,15 @@ pub fn levelmenu(
         }
         if input.is_just_pressed(agb::input::Button::RIGHT) {
             selected_level += 1;
+            audio::play_sound(0, &vblank, &sound);
         }
         if input.is_just_pressed(agb::input::Button::LEFT) {
             selected_level -= 1;
+            audio::play_sound(0, &vblank, &sound);
         }
-		if input.is_just_pressed(agb::input::Button::B) {
-			return (0, true);
-		}
+        if input.is_just_pressed(agb::input::Button::B) {
+            return (0, true);
+        }
 
         utils::clamp(&mut selected_level, 0, (levelcount - 1) as i32);
         let first_visible_level = selected_level - 10;
@@ -118,56 +123,60 @@ pub fn presstart(input: &mut agb::input::ButtonController, page: &mut u16) {
     }
 }
 
-pub fn mainmenu(input: &mut agb::input::ButtonController, page: &mut u16) -> u16 {
+pub fn mainmenu(
+    input: &mut agb::input::ButtonController,
+    page: &mut u16,
+    vblank: &agb::interrupt::VBlank,
+    sound: &agb::sound::dmg::Sound,
+) -> u16 {
     let color = 48;
-	let mut option = 0;
+    let mut option = 0;
 
     loop {
-		renderer::hw::fill(*page, 0);
+        renderer::hw::fill(*page, 0);
 
         textengine::draw::write_line(70, HEADINGHEIGHT, "main menu", color - 2, *page);
 
-        textengine::draw::write_line(50, 80,"select level", color - 2, *page);
-        textengine::draw::write_line(50, 100,"how to play", color - 2, *page);
+        textengine::draw::write_line(50, 80, "select level", color - 2, *page);
+        textengine::draw::write_line(50, 100, "how to play", color - 2, *page);
 
-		textengine::draw::write_line(40, 80 +20*option,"*", color - 2, *page);
-
+        textengine::draw::write_line(40, 80 + 20 * option, "*", color - 2, *page);
 
         renderer::hw::flip(page);
 
         input.update();
 
         if input.is_just_pressed(agb::input::Button::A) {
-			return option;
+            return option;
         }
         if input.is_just_pressed(agb::input::Button::DOWN)
             || input.is_just_pressed(agb::input::Button::UP)
         {
             option = 1 - option;
+            audio::play_sound(0, &vblank, &sound);
         }
     }
 }
 
 pub fn info(input: &mut agb::input::ButtonController, page: &mut u16) {
-	let color = 48;
+    let color = 48;
 
-	renderer::hw::fill(*page, 0);
+    renderer::hw::fill(*page, 0);
 
-	textengine::draw::write_line(94, HEADINGHEIGHT, "keys", color - 2, *page);
+    textengine::draw::write_line(94, HEADINGHEIGHT, "keys", color - 2, *page);
 
-	textengine::draw::write_line(10, 60, "dpad-move", color - 2, *page);
-	textengine::draw::write_line(10, 80, "a-jump", color - 2, *page);
-	textengine::draw::write_line(10, 100,"b-toggle switch", color - 2, *page);
-	textengine::draw::write_line(10, 120,"select-camera mode", color - 2, *page);
+    textengine::draw::write_line(10, 60, "dpad-move", color - 2, *page);
+    textengine::draw::write_line(10, 80, "a-jump", color - 2, *page);
+    textengine::draw::write_line(10, 100, "b-toggle switch", color - 2, *page);
+    textengine::draw::write_line(10, 120, "select-camera mode", color - 2, *page);
 
-	renderer::hw::flip(page);
+    renderer::hw::flip(page);
 
     loop {
-
         input.update();
 
         if input.is_just_pressed(agb::input::Button::B) {
-			return;
+            return;
         }
     }
 }

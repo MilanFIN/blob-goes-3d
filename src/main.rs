@@ -47,6 +47,7 @@ use player::*;
 mod fixed;
 mod input;
 use fixed::*;
+mod audio;
 mod effects;
 mod levels;
 mod mathlut;
@@ -69,8 +70,11 @@ fn main(mut gba: agb::Gba) -> ! {
     let mut bitmap4: agb::display::bitmap4::Bitmap4 = gba.display.video.bitmap4();
     let mut page: u16 = 0;
     renderer::utils::init_palette(&mut bitmap4);
+    gba.sound.enable();
+    let vblank: agb::interrupt::VBlank = agb::interrupt::VBlank::get();
 
     menu::presstart(&mut input, &mut page);
+    audio::play_sound(6, &vblank, &gba.sound);
 
     use body::Body;
     use entities::boundingshapes::{BoundingBox, BoundingShape};
@@ -79,17 +83,24 @@ fn main(mut gba: agb::Gba) -> ! {
     let mut selected_level: usize = 0;
     let mut canceled: bool;
     loop {
-        let option = menu::mainmenu(&mut input, &mut page);
+        let option = menu::mainmenu(&mut input, &mut page, &vblank, &gba.sound);
         if option == 1 {
+            audio::play_sound(6, &vblank, &gba.sound);
             menu::info(&mut input, &mut page);
+            audio::play_sound(4, &vblank, &gba.sound);
             continue;
         } else {
             //pass
+            audio::play_sound(6, &vblank, &gba.sound);
         }
-        (selected_level, canceled) = menu::levelmenu(selected_level, &mut input, &mut page);
+
+        (selected_level, canceled) =
+            menu::levelmenu(selected_level, &mut input, &mut page, &vblank, &gba.sound);
         if canceled {
+            audio::play_sound(4, &vblank, &gba.sound);
             continue;
         }
+        audio::play_sound(6, &vblank, &gba.sound);
 
         let mut entity_array: [EntityEnum; LEVELSIZE + 2] =
             [EntityEnum::Empty(Empty::default()); LEVELSIZE + 2];
@@ -99,6 +110,7 @@ fn main(mut gba: agb::Gba) -> ! {
         let levelsize = levels::load_level(selected_level, &mut entity_array);
 
         let mut player1: Player = Player::default();
+        player1.init(&vblank, &gba.sound);
 
         player1.camera.set_x_rotation(Fixed::from_raw(0));
         player1.camera.set_y_rotation(Fixed::from_raw(0));

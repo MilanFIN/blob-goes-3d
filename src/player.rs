@@ -1,6 +1,6 @@
 use lut::CAMERALOCATIONS;
 
-use crate::{camera, math::vector_len_2d, utils};
+use crate::{audio, camera, math::vector_len_2d, utils};
 use camera::*;
 
 use crate::fixed;
@@ -14,7 +14,7 @@ const FLOATGRAVITY: Fixed = Fixed::from_raw(128);
 const BASEGRAVITY: Fixed = Fixed::from_raw(32);
 pub const JUMPPOWER: Fixed = Fixed::from_raw(256);
 
-pub struct Player {
+pub struct Player<'a> {
     pub x: Fixed,
     pub y: Fixed,
     pub z: Fixed,
@@ -33,9 +33,11 @@ pub struct Player {
     pub move_x: Fixed,
     pub move_z: Fixed,
     pub activeaccel: Fixed,
+    vblank: Option<&'a agb::interrupt::VBlank>,
+    sound: Option<&'a agb::sound::dmg::Sound>,
 }
 
-impl Player {
+impl<'a> Player<'a> {
     pub fn default() -> Self {
         Self {
             x: Fixed::const_new(0),
@@ -54,9 +56,17 @@ impl Player {
             activeaccel: Fixed::const_new(0),
             in_air: false,
             sliding: false,
+            vblank: None,
+            sound: None,
         }
     }
 
+
+    pub fn init(&mut self, vblank: &'a agb::interrupt::VBlank, sound: &'a agb::sound::dmg::Sound) {
+        self.vblank = Some(vblank);
+        self.sound = Some(sound);
+    }
+    
     pub fn move_to(&mut self, x: Fixed, z: Fixed) {
         self.x = self.x + x;
         self.z = self.z + z;
@@ -215,7 +225,11 @@ impl Player {
             self.yspeed -= BASEGRAVITY;
             self.in_air = true;
         } else {
+            if self.in_air {
+                audio::play_sound(3, self.vblank.unwrap(), self.sound.unwrap());
+            }
             self.land();
+            
         }
     }
 
@@ -243,6 +257,8 @@ impl Player {
             self.yspeed = JUMPPOWER;
             self.forced_jump = false;
             self.activeaccel = AIRACCEL;
+            audio::play_sound(2, self.vblank.unwrap(), self.sound.unwrap());
+
         }
     }
 
@@ -255,6 +271,8 @@ impl Player {
         self.yspeed = power;
         self.forced_jump = active_bounce;
         self.activeaccel = AIRACCEL;
+        audio::play_sound(2, self.vblank.unwrap(), self.sound.unwrap());
+
     }
 
     pub fn move_toward(&mut self, x: Fixed, z: Fixed) {
