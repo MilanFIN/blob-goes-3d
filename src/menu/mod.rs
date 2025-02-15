@@ -1,5 +1,7 @@
+use agb::InternalAllocator;
 use alloc::format;
 use alloc::string::ToString;
+use alloc::vec::Vec;
 
 use crate::audio;
 use crate::levels;
@@ -15,6 +17,7 @@ pub fn levelmenu(
     page: &mut u16,
     vblank: &agb::interrupt::VBlank,
     sound: &agb::sound::dmg::Sound,
+    completed_levels: &Vec<bool, InternalAllocator>
 ) -> (usize, bool) {
     let levelcount: usize = levels::levelstore::LEVELS.len();
 
@@ -86,7 +89,7 @@ pub fn levelmenu(
                 let level_str = format!("{:0>width$}", level_str, width = character_count);
                 textengine::draw::write_line(x, y - v_offset, &level_str, shade, *page);
 
-                let completed = unsafe { levels::levelstore::COMPLETED_LEVELS }[i as usize];
+                let completed = completed_levels[i as usize];
                 if completed {
                     textengine::draw::write_tile(
                         (x + total_width as u16 - 2) as u16,

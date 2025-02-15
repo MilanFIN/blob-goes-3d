@@ -66,6 +66,7 @@ impl<'a> Player<'a> {
         self.vblank = Some(vblank);
         self.sound = Some(sound);
     }
+
     
     pub fn move_to(&mut self, x: Fixed, z: Fixed) {
         self.x = self.x + x;

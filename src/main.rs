@@ -20,13 +20,7 @@ use agb::input::*;
 extern crate alloc;
 use alloc::vec::Vec;
 
-// use agb::ExternalAllocator;
 use agb::InternalAllocator;
-// use alloc::vec::Vec;
-
-// use serde_json_core;
-// use serde_json_core::*;
-// use serde::{Deserialize, Serialize};
 
 mod entities;
 use cube::Cube;
@@ -54,9 +48,16 @@ mod mathlut;
 mod menu;
 mod moveutils;
 mod textengine;
+mod save;
+use body::Body;
+use entities::boundingshapes::{BoundingBox, BoundingShape};
+use renderer::polygon::Polygon;
+
 
 const DRAWDISTANCE: Fixed = Fixed::const_new(35);
 const POLYGON_LIMIT: i16 = 60;
+//IMPORTANT: if flashing to real hardware, set save type to match the memory type of the cartridge
+const SAVE_TYPE: save::SaveType = save::SaveType::Sram32K;
 
 /*
 The main function must take 1 arguments and never return. The agb::entry decorator
@@ -65,6 +66,25 @@ and interrupt handlers correctly. It will also handle creating the `Gba` struct 
 */
 #[agb::entry]
 fn main(mut gba: agb::Gba) -> ! {
+    save::init_save(&mut gba, SAVE_TYPE);
+
+    const LEVEL_COUNT: usize = levels::levelstore::LEVELS.len();
+
+    let mut completed_levels: Vec<bool, InternalAllocator> = Vec::with_capacity_in(LEVEL_COUNT, InternalAllocator);
+    completed_levels.resize(LEVEL_COUNT, true);
+    //save::store_save(&mut gba, &mut completed_levels);
+
+    match save::read_save(&mut gba, levels::levelstore::LEVELS.len()) {
+        Ok(saved_data) => {
+            completed_levels = saved_data;
+        }
+        Err(_) => {
+            agb::println!("Failed to read save data");
+        }
+    }
+
+
+
     let mut input = ButtonController::new();
 
     let mut bitmap4: agb::display::bitmap4::Bitmap4 = gba.display.video.bitmap4();
@@ -76,9 +96,6 @@ fn main(mut gba: agb::Gba) -> ! {
     menu::presstart(&mut input, &mut page);
     audio::play_sound(6, &vblank, &gba.sound);
 
-    use body::Body;
-    use entities::boundingshapes::{BoundingBox, BoundingShape};
-    use renderer::polygon::Polygon;
 
     let mut selected_level: usize = 0;
     let mut canceled: bool;
@@ -95,7 +112,7 @@ fn main(mut gba: agb::Gba) -> ! {
         }
 
         (selected_level, canceled) =
-            menu::levelmenu(selected_level, &mut input, &mut page, &vblank, &gba.sound);
+            menu::levelmenu(selected_level, &mut input, &mut page, &vblank, &gba.sound, &completed_levels);
         if canceled {
             audio::play_sound(4, &vblank, &gba.sound);
             continue;
@@ -209,9 +226,7 @@ fn main(mut gba: agb::Gba) -> ! {
                     //TODO: actually implement level finishes at some point
                     agb::println!("finished");
                     finished = true;
-                    unsafe {
-                        levels::levelstore::COMPLETED_LEVELS[selected_level] = true;
-                    }
+                        completed_levels[selected_level] = true;
                 } else if let OutputEvents::SwitchAction(_event) = event {
                     for i in 2..levelsize + 2 {
                         if let EntityEnum::Wireframe(w) = &mut entity_array[i] {
@@ -295,5 +310,7 @@ fn main(mut gba: agb::Gba) -> ! {
 
             renderer::hw::flip(&mut page);
         }
+        let _ = save::store_save(&mut gba, &mut completed_levels);
+
     }
 }
