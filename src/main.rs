@@ -47,17 +47,17 @@ mod levels;
 mod mathlut;
 mod menu;
 mod moveutils;
-mod textengine;
 mod save;
+mod textengine;
 use body::Body;
 use entities::boundingshapes::{BoundingBox, BoundingShape};
 use renderer::polygon::Polygon;
-
 
 const DRAWDISTANCE: Fixed = Fixed::const_new(35);
 const POLYGON_LIMIT: i16 = 60;
 //IMPORTANT: if flashing to real hardware, set save type to match the memory type of the cartridge
 const SAVE_TYPE: save::SaveType = save::SaveType::Sram32K;
+const FLOOR_LEVEL: Fixed = Fixed::const_new(-500);
 
 /*
 The main function must take 1 arguments and never return. The agb::entry decorator
@@ -70,7 +70,8 @@ fn main(mut gba: agb::Gba) -> ! {
 
     const LEVEL_COUNT: usize = levels::levelstore::LEVELS.len();
 
-    let mut completed_levels: Vec<bool, InternalAllocator> = Vec::with_capacity_in(LEVEL_COUNT, InternalAllocator);
+    let mut completed_levels: Vec<bool, InternalAllocator> =
+        Vec::with_capacity_in(LEVEL_COUNT, InternalAllocator);
     completed_levels.resize(LEVEL_COUNT, true);
     //save::store_save(&mut gba, &mut completed_levels);
 
@@ -83,8 +84,6 @@ fn main(mut gba: agb::Gba) -> ! {
         }
     }
 
-
-
     let mut input = ButtonController::new();
 
     let mut bitmap4: agb::display::bitmap4::Bitmap4 = gba.display.video.bitmap4();
@@ -92,37 +91,49 @@ fn main(mut gba: agb::Gba) -> ! {
     renderer::utils::init_palette(&mut bitmap4);
     gba.sound.enable();
     let vblank: agb::interrupt::VBlank = agb::interrupt::VBlank::get();
+    let mut entity_array: [EntityEnum; LEVELSIZE + 2] =
+        [EntityEnum::Empty(Empty::default()); LEVELSIZE + 2];
+    let mut entity_render_order: [usize; LEVELSIZE + 2] = [0; LEVELSIZE + 2];
 
     menu::presstart(&mut input, &mut page);
     audio::play_sound(6, &vblank, &gba.sound);
 
-
     let mut selected_level: usize = 0;
     let mut canceled: bool;
+
+    let mut game_state = GameState::Finished;
+
+    //TODO: implement jump queuing when in air
+    //      that way jumps can be buffered and executed when the player lands
+    //      canceled if the player doesn't hold A upon landing
     loop {
-        let option = menu::mainmenu(&mut input, &mut page, &vblank, &gba.sound);
-        if option == 1 {
-            audio::play_sound(6, &vblank, &gba.sound);
-            menu::info(&mut input, &mut page);
-            audio::play_sound(4, &vblank, &gba.sound);
-            continue;
-        } else {
-            //pass
-            audio::play_sound(6, &vblank, &gba.sound);
-        }
+        // if game_state == GameState::Finished {
+        //     let option = menu::mainmenu(&mut input, &mut page, &vblank, &gba.sound);
+        //     if option == 1 {
+        //         audio::play_sound(6, &vblank, &gba.sound);
+        //         menu::info(&mut input, &mut page);
+        //         audio::play_sound(4, &vblank, &gba.sound);
+        //         continue;
+        //     } else {
+        //         //pass
+        //         audio::play_sound(6, &vblank, &gba.sound);
+        //     }
 
-        (selected_level, canceled) =
-            menu::levelmenu(selected_level, &mut input, &mut page, &vblank, &gba.sound, &completed_levels);
-        if canceled {
-            audio::play_sound(4, &vblank, &gba.sound);
-            continue;
-        }
-        audio::play_sound(6, &vblank, &gba.sound);
-
-        let mut entity_array: [EntityEnum; LEVELSIZE + 2] =
-            [EntityEnum::Empty(Empty::default()); LEVELSIZE + 2];
-
-        let mut entity_render_order: [usize; LEVELSIZE + 2] = [0; LEVELSIZE + 2];
+        //     (selected_level, canceled) = menu::levelmenu(
+        //         selected_level,
+        //         &mut input,
+        //         &mut page,
+        //         &vblank,
+        //         &gba.sound,
+        //         &completed_levels,
+        //     );
+        //     if canceled {
+        //         audio::play_sound(4, &vblank, &gba.sound);
+        //         continue;
+        //     }
+        //     audio::play_sound(6, &vblank, &gba.sound);
+        // }
+        selected_level = 10;
 
         let levelsize = levels::load_level(selected_level, &mut entity_array);
 
@@ -138,7 +149,7 @@ fn main(mut gba: agb::Gba) -> ! {
         player1.z = Fixed::const_new(0);
         player1.camera_left(0);
 
-        //player body
+        //player body consists of entities 0 and 1
         entity_array[0] = EntityEnum::Body(Body::default());
         entity_array[0].set_x_rotation(Fixed::const_new(0));
         entity_array[0].set_y_rotation(Fixed::const_new(0));
@@ -164,9 +175,10 @@ fn main(mut gba: agb::Gba) -> ! {
         let mut event_loop: Vec<OutputEvents, InternalAllocator> = Vec::new_in(InternalAllocator);
         let mut polygons: Vec<Polygon, InternalAllocator> = Vec::new_in(InternalAllocator);
         let mut polygon_indices: Vec<usize, InternalAllocator> = Vec::new_in(InternalAllocator);
-        let mut finished = false;
 
-        while !finished {
+        game_state = GameState::Playing;
+
+        while game_state == GameState::Playing {
             input.update();
 
             input::handle_input(&mut player1, &input);
@@ -201,7 +213,7 @@ fn main(mut gba: agb::Gba) -> ! {
 
             player1.update_camera_position();
 
-            let game_state: effects::InputGameState = effects::InputGameState {
+            let input_game_state: effects::InputGameState = effects::InputGameState {
                 support_below_id: bottom_support_id,
                 bounding_box: &player_box,
                 bounding_cylinder: &entity_array[0].bounding_cylinder(),
@@ -212,7 +224,7 @@ fn main(mut gba: agb::Gba) -> ! {
                 if let EntityEnum::Empty(_) = entity_array[i] {
                     break;
                 }
-                if let Some(event) = entity_array[i].tick(&game_state) {
+                if let Some(event) = entity_array[i].tick(&input_game_state) {
                     event_loop.push(event);
                 }
             }
@@ -224,14 +236,16 @@ fn main(mut gba: agb::Gba) -> ! {
                     player1.z += event.move_z;
                 } else if let OutputEvents::GameFinish(_event) = event {
                     //TODO: actually implement level finishes at some point
-                    agb::println!("finished");
-                    finished = true;
-                        completed_levels[selected_level] = true;
+
+                    audio::play_sound(5, &vblank, &gba.sound);
+                    game_state = GameState::Finished;
+                    completed_levels[selected_level] = true;
                 } else if let OutputEvents::SwitchAction(_event) = event {
                     for i in 2..levelsize + 2 {
                         if let EntityEnum::Wireframe(w) = &mut entity_array[i] {
                             w.toggle();
                         }
+                        audio::play_sound(1, &vblank, &gba.sound);
                     }
                 } else if let OutputEvents::BounceEvent(event) = event {
                     player1.bounce(event.power, input.is_pressed(Button::A));
@@ -239,6 +253,11 @@ fn main(mut gba: agb::Gba) -> ! {
                     player1.sliding(event.acceleration);
                 }
             }
+
+            if player1.y < FLOOR_LEVEL {
+                game_state = GameState::Failed;
+            }
+
             event_loop.clear();
             player1.tick();
 
@@ -247,8 +266,6 @@ fn main(mut gba: agb::Gba) -> ! {
             entity_array[1].set_y_offset(
                 player1.y + entity_array[0].get_height() + entity_array[1].get_height() / 2,
             );
-            /*entity_array[0]
-            .set_y_offset(player1.y + Fixed::from_raw(128) + Fixed::from_raw(192) * i);*/
 
             //rotate player body blocks and move them where the player is
             for i in 0..2 {
@@ -311,6 +328,5 @@ fn main(mut gba: agb::Gba) -> ! {
             renderer::hw::flip(&mut page);
         }
         let _ = save::store_save(&mut gba, &mut completed_levels);
-
     }
 }

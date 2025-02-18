@@ -180,13 +180,384 @@ const LEVEL8: &str = r#"[
 ]"#;
 
 const LEVEL9: &str = r#"[
-    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 0, "color": 2, "rotation": 0.0 } },
-    { "type": "finish", "data": {"size": 3, "x": 10, "y": 18, "z": 28, "color": 2, "rotation": 0.25 } }
-]"#;
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "color": 2,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "ice",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 0,
+            "y": 0,
+            "z": 6,
+            "color": 5
+        }
+    },
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 0,
+            "y": 0,
+            "z": 12,
+            "color": 2
+        }
+    },
+    {
+        "type": "ice",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 3,
+            "y": 0,
+            "z": 17,
+            "color": 5
+        }
+    },
+    {
+        "type": "ice",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": -3,
+            "y": 0,
+            "z": 22,
+            "color": 5
+        }
+    },
+    {
+        "type": "ice",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 3,
+            "y": 0,
+            "z": 27,
+            "color": 5
+        }
+    },
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 0,
+            "y": 0,
+            "z": 32,
+            "color": 2
+        }
+    },
+    {
+        "type": "ice",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 2,
+            "x": 5,
+            "y": 3,
+            "z": 32,
+            "color": 5,
+            "rotation": 0.25
+        }
+    },
+    {
+        "type": "ice",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 2,
+            "x": 10,
+            "y": 6,
+            "z": 32,
+            "color": 5,
+            "rotation": 0.25
+        }
+    },
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 15.5,
+            "y": 9,
+            "z": 32,
+            "color": 2,
+            "rotation": 0.25
+        }
+    },
+    {
+        "type": "finish",
+        "data": {
+            "size": 3,
+            "x": 15.5,
+            "y": 12,
+            "z": 32,
+            "color": 2,
+            "rotation": 0.25
+        }
+    }
+]
+"#;
 
 const LEVEL10: &str = r#"[
-    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 0, "color": 2, "rotation": 0.0 } },
-    { "type": "finish", "data": {"size": 3, "x": 10, "y": 18, "z": 28, "color": 2, "rotation": 0.25 } }
-]"#;
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "color": 2,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "ice",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 0,
+            "y": 3,
+            "z": 6,
+            "color": 5
+        }
+    },
+    {
+        "type": "bounce",
+        "data": {
+            "size": 2,
+            "height": 1,
+            "x": 0,
+            "y": 6,
+            "z": 12,
+            "color": 4,
+            "power": 1.5,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "ice",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 5,
+            "y": 9,
+            "z": 17,
+            "color": 5,
+            "rotation": 0.125
+        }
+    },
+    {
+        "type": "bounce",
+        "data": {
+            "size": 2,
+            "height": 1,
+            "x": 8,
+            "y": 12,
+            "z": 20,
+            "color": 4,
+            "power": 1.5,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "ice",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 14,
+            "y": 15,
+            "z": 22,
+            "color": 5,
+            "rotation": 0.25
+        }
+    },
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 19,
+            "y": 18,
+            "z": 22,
+            "color": 2,
+            "rotation": 0.25
+        }
+    },
+    {
+        "type": "finish",
+        "data": {
+            "size": 3,
+            "x": 19,
+            "y": 21,
+            "z": 22,
+            "color": 2,
+            "rotation": 0.25
+        }
+    }
+]
+"#;
 
-pub const LEVELS: [&'static str; 10] = [LEVEL1, LEVEL2, LEVEL3, LEVEL4, LEVEL5, LEVEL6, LEVEL7, LEVEL8, LEVEL9, LEVEL10];
+const LEVEL11: &str = r#"[
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "color": 2,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "bounce",
+        "data": {
+            "size": 2,
+            "height": 1,
+            "x": 0,
+            "y": 2,
+            "z": 5,
+            "color": 4,
+            "power": 1.5,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 0,
+            "y": 4,
+            "z": 10,
+            "color": 2,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "bounce",
+        "data": {
+            "size": 2,
+            "height": 1,
+            "x": 5,
+            "y": 6,
+            "z": 10,
+            "color": 4,
+            "power": 1.5,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "bounce",
+        "data": {
+            "size": 2,
+            "height": 1,
+            "x": 9,
+            "y": 10,
+            "z": 14,
+            "color": 4,
+            "power": 1.5,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "bounce",
+        "data": {
+            "size": 2,
+            "height": 1,
+            "x": 13,
+            "y": 14,
+            "z": 10,
+            "color": 4,
+            "power": 1.5,
+            "rotation": 0.0
+        }
+    },
+
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 2,
+            "ysize": 1,
+            "zsize": 2,
+            "x": 19,
+            "y": 18,
+            "z": 9,
+            "rotation": 0.125,
+            "lifetime": 10,
+            "color": 2
+
+        }
+    },
+    {
+        "type": "crumbling",
+        "data": {
+            "xsize": 2,
+            "ysize": 1,
+            "zsize": 2,
+            "x": 23,
+            "y": 18,
+            "z": 13,
+            "rotation": 0.125,
+            "lifetime": 10,
+            "color": 0
+        }
+    },
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 2,
+            "ysize": 1,
+            "zsize": 2,
+            "x": 27,
+            "y": 18,
+            "z": 17,
+            "rotation": 0.125,
+            "lifetime": 10,
+            "color": 2
+        }
+    },
+    {
+        "type": "finish",
+        "data": {
+            "size": 3,
+            "x": 27,
+            "y": 21,
+            "z": 17,
+            "color": 2,
+            "rotation": 0.125
+        }
+    }
+]
+"#;
+
+pub const LEVELS: [&'static str; 11] = [LEVEL1, LEVEL2, LEVEL3, LEVEL4, LEVEL5, LEVEL6, LEVEL7, LEVEL8, LEVEL9, LEVEL10, LEVEL11];

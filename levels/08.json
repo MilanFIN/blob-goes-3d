@@ -1,0 +1,137 @@
+[
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "color": 2,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "ice",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 0,
+            "y": 0,
+            "z": 6,
+            "color": 5
+        }
+    },
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 0,
+            "y": 0,
+            "z": 12,
+            "color": 2
+        }
+    },
+    {
+        "type": "ice",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 3,
+            "y": 0,
+            "z": 17,
+            "color": 5
+        }
+    },
+    {
+        "type": "ice",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": -3,
+            "y": 0,
+            "z": 22,
+            "color": 5
+        }
+    },
+    {
+        "type": "ice",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 3,
+            "y": 0,
+            "z": 27,
+            "color": 5
+        }
+    },
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 0,
+            "y": 0,
+            "z": 32,
+            "color": 2
+        }
+    },
+    {
+        "type": "ice",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 2,
+            "x": 5,
+            "y": 3,
+            "z": 32,
+            "color": 5,
+            "rotation": 0.25
+        }
+    },
+    {
+        "type": "ice",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 2,
+            "x": 10,
+            "y": 6,
+            "z": 32,
+            "color": 5,
+            "rotation": 0.25
+        }
+    },
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 15.5,
+            "y": 9,
+            "z": 32,
+            "color": 2,
+            "rotation": 0.25
+        }
+    },
+    {
+        "type": "finish",
+        "data": {
+            "size": 3,
+            "x": 15.5,
+            "y": 12,
+            "z": 32,
+            "color": 2,
+            "rotation": 0.25
+        }
+    }
+]

@@ -25,7 +25,7 @@ pub struct Player<'a> {
     camera_angle: usize,
     pub camera: Camera,
     pub autorotate_camera: bool,
-    jumping: bool,
+    pub jumping: bool,
     forced_jump: bool,
     in_air: bool,
     sliding: bool,

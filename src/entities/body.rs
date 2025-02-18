@@ -240,12 +240,17 @@ impl Entity for Body {
         self.color = color;
     }
     fn tick(&mut self, effects: &effects::InputGameState) -> Option<effects::OutputEvents> {
-        //todo, fix flicker, when reaching top of jump arc
-        //if prev yspeed > 0 and now it's 0, should still do the first branch
-        //only if prev is 0 and now is 0, consider to be on the ground
         if effects.yspeed != 0 {
             self.y_offset = effects.yspeed / 3;
+            let y_offset_min = -Fixed::from_raw(96);
+            let y_offset_max = Fixed::const_new(4);
+
+            self.y_offset = self.y_offset.clamp(y_offset_min, y_offset_max);
             self.width_offset = -effects.yspeed / 3;
+            let width_offset_limit = Fixed::const_new(4);
+            self.width_offset = self
+                .width_offset
+                .clamp(-width_offset_limit, width_offset_limit);
         } else if self.previous_y_direction <= 0 {
             if self.tick == 0 {
                 self.tick = 50;

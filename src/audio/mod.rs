@@ -1,13 +1,8 @@
-/*
-REG_SND1CNT = SSQR_ENV_BUILD(8, 0, 7) | SSQR_DUTY1_2;
-REG_SND1SWEEP = SSW_INC | SSW_TIME(5) | SSW_SHIFT(5);
-REG_SND1FREQ = SFREQ_RESET | SND_RATE(NOTE_C, 2);
 
-*/
 use agb::sound::dmg::{DutyCycle, EnvelopeSettings, SoundDirection, SweepSettings};
 
 pub fn play_sound(track: u16, vblank: &agb::interrupt::VBlank, sound: &agb::sound::dmg::Sound) {
-    //must wait, as on real hardware it wont work consistently otherwise
+    //must wait, as on real hardware channel 1 wont work consistently otherwise
     vblank.wait_for_vblank();
     //menu move
     if track == 0 {
