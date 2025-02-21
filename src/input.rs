@@ -16,11 +16,14 @@ pub fn handle_input(
         player.camera_right(2);
     }
 
-    if input.is_just_pressed(Button::A) {
-        player.jump();
-    }
+    // if input.is_just_pressed(Button::A) {
+    //     player.jump();
+    // }
     if input.is_pressed(Button::A) {
-        player.keep_jumping();
+        player.try_jumping();
+    }
+    else {
+        player.cancel_jump();
     }
 
     if input.is_just_pressed(Button::SELECT) {

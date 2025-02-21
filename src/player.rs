@@ -14,6 +14,20 @@ const FLOATGRAVITY: Fixed = Fixed::from_raw(128);
 const BASEGRAVITY: Fixed = Fixed::from_raw(32);
 pub const JUMPPOWER: Fixed = Fixed::from_raw(256);
 
+#[derive(PartialEq)]
+enum JumpState {
+    Jumping,
+    Falling,
+    Ground,
+}
+
+#[derive(PartialEq)]
+enum JumpGoalState {
+    Queued,
+    Idle,
+    Cleared
+}
+
 pub struct Player<'a> {
     pub x: Fixed,
     pub y: Fixed,
@@ -25,9 +39,14 @@ pub struct Player<'a> {
     camera_angle: usize,
     pub camera: Camera,
     pub autorotate_camera: bool,
+
+    jump_state: JumpState,
+    jump_goal_state: JumpGoalState,
     pub jumping: bool,
     forced_jump: bool,
     in_air: bool,
+
+
     sliding: bool,
 
     pub move_x: Fixed,
@@ -58,6 +77,8 @@ impl<'a> Player<'a> {
             sliding: false,
             vblank: None,
             sound: None,
+            jump_state: JumpState::Jumping,
+            jump_goal_state: JumpGoalState::Cleared,
         }
     }
 
@@ -214,6 +235,7 @@ impl<'a> Player<'a> {
     pub fn land(&mut self) {
         self.yspeed = Fixed::const_new(0);
         self.in_air = false;
+        self.jump_state = JumpState::Ground;
     }
 
     pub fn fall(&mut self, ylimit: Fixed) {
@@ -254,17 +276,36 @@ impl<'a> Player<'a> {
     }
 
     pub fn jump(&mut self) {
-        if self.yspeed == Fixed::const_new(0) {
+        if self.yspeed == Fixed::const_new(0) && !self.in_air {
             self.yspeed = JUMPPOWER;
             self.forced_jump = false;
             self.activeaccel = AIRACCEL;
             audio::play_sound(2, self.vblank.unwrap(), self.sound.unwrap());
-
+            self.jump_state = JumpState::Jumping;
+            self.jump_goal_state = JumpGoalState::Cleared;
         }
     }
 
-    pub fn keep_jumping(&mut self) {
-        self.jumping = true;
+    pub fn try_jumping(&mut self) {
+        if self.jump_goal_state == JumpGoalState::Idle {
+            self.jump_goal_state = JumpGoalState::Queued;
+        }
+        if self.jump_goal_state == JumpGoalState::Queued {
+            self.jump();
+        }
+        if self.jump_state == JumpState::Jumping {
+            self.jumping = true;
+        }
+
+    }
+
+    pub fn cancel_jump(&mut self) {
+        if self.jump_state == JumpState::Jumping {
+            self.jumping = false;
+        }
+        if self.jump_goal_state == JumpGoalState::Cleared || self.jump_goal_state == JumpGoalState::Queued {
+            self.jump_goal_state = JumpGoalState::Idle;
+        }
     }
 
     //set active to true, when player also jumps when contacting the platform

@@ -10,7 +10,7 @@ const LEVEL1: &str = r#"[
 "#;
 
 const LEVEL2: &str = r#"[
-    { "type": "rectangle", "data": { "xsize": 0.1, "ysize": 1, "zsize": 5, "x": 0, "y": -5, "z": 0, "color": 2 } },
+    { "type": "rectangle", "data": { "xsize": 0.1, "ysize": 1, "zsize": 5, "x": 0, "y": -5, "z": 0, "rotation": 1.125, "color": 2 } },
     { "type": "crumbling", "data": { "xsize": 5, "ysize": 1, "zsize": 5, "x": 0, "y": -3.5, "z": 3, "rotation": -0.1, "lifetime": 1 } },
     {
         "type": "mover",
@@ -560,4 +560,207 @@ const LEVEL11: &str = r#"[
 ]
 "#;
 
-pub const LEVELS: [&'static str; 11] = [LEVEL1, LEVEL2, LEVEL3, LEVEL4, LEVEL5, LEVEL6, LEVEL7, LEVEL8, LEVEL9, LEVEL10, LEVEL11];
+const LEVEL12: &str = r#"[
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "color": 2,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "mover",
+        "data": {
+            "xsize": 4,
+            "ysize": 1,
+            "zsize": 4,
+            "x": 0,
+            "y": 0,
+            "z": 5,
+            "pos_a_x": 0,
+            "pos_a_y": 0,
+            "pos_a_z": 5,
+            "pos_b_x": 0,
+            "pos_b_y": 0,
+            "pos_b_z": 10,
+            "speed": 0.5,
+            "wait": 20
+        }
+    },
+	{
+        "type": "ice",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 0,
+            "y": 0,
+            "z": 15,
+            "color": 5,
+            "rotation": 0.0
+        }
+    },
+	{
+        "type": "ice",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 0,
+            "y": 0,
+            "z": 18,
+            "color": 5,
+            "rotation": 0.0
+        }
+    },
+	{
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 0,
+            "y": 3,
+            "z": 23,
+            "color": 2,
+            "rotation": 0.0
+        }
+    },
+	{
+        "type": "bounce",
+        "data": {
+            "size": 2,
+            "height": 1,
+            "x": 4,
+            "y": 4,
+            "z": 23,
+            "color": 4,
+            "power": 1.5,
+            "rotation": 0.0
+        }
+    },
+	{
+        "type": "ice",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 10,
+            "y": 8,
+            "z": 23,
+            "color": 5,
+            "rotation": 0.0
+        }
+    },
+	{
+        "type": "ice",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 16,
+            "y": 8.5,
+            "z": 23,
+            "color": 5,
+            "rotation": 0.0
+        }
+    },
+	{
+        "type": "ice",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 22,
+            "y": 9,
+            "z": 23,
+            "color": 5,
+            "rotation": 0.0
+        }
+    },
+	{
+        "type": "ice",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 28,
+            "y": 9.5,
+            "z": 23,
+            "color": 5,
+            "rotation": 0.0
+        }
+    },
+	{
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 34,
+            "y": 10,
+            "z": 23,
+            "color": 2,
+            "rotation": 0.0
+        }
+    },
+	{
+        "type": "bounce",
+        "data": {
+            "size": 4,
+            "height": 1,
+            "x": 38,
+            "y": 10,
+            "z": 27,
+            "color": 4,
+            "power": 2,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 40,
+            "y": 20,
+            "z": 30,
+            "color": 2,
+            "rotation": 0
+        }
+    },
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 46,
+            "y": 20,
+            "z": 30,
+            "color": 2,
+            "rotation": 0
+        }
+    },
+    {
+        "type": "finish",
+        "data": {
+            "size": 3,
+            "x": 46,
+            "y": 23,
+            "z": 30,
+            "color": 2,
+            "rotation": 0.25
+        }
+    }
+]
+"#;
+
+pub const LEVELS: [&'static str; 12] = [LEVEL1, LEVEL2, LEVEL3, LEVEL4, LEVEL5, LEVEL6, LEVEL7, LEVEL8, LEVEL9, LEVEL10, LEVEL11, LEVEL12];
