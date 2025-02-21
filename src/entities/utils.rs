@@ -141,7 +141,7 @@ pub fn rect_overlap(first: &BoundingBox, second: &BoundingBox) -> bool {
 pub fn vertical_room_for_box(
     first: &BoundingBox,
     second: &BoundingBox,
-    first_fallback: &BoundingCylinder,
+    second_fallback: &BoundingCylinder,
     limit: Fixed,
 ) -> Fixed {
     if (limit < 0 && first.y_top > second.y_bottom) || (limit > 0 && first.y_bottom < second.y_top)
@@ -149,11 +149,12 @@ pub fn vertical_room_for_box(
         return limit;
     }
 
-    //fast check to see if we are even close to each other
-    if !rect_simple_overlap_check(first, second) {
-        return limit;
-    }
+    // // //fast check to see if we are even close to each other
+    // if !rect_simple_overlap_check(first, second) {
+    //     return limit;
+    // }
 
+    
     //more detailed check
     if rect_overlap(first, second) {
         if limit < 0 {
@@ -165,7 +166,7 @@ pub fn vertical_room_for_box(
 
     //if the more detailed check doesn't produce an answer, check with the cylinder to account for a
     //special edge case, where the player is standing on a super narrow platform
-    if cylinder_and_rotated_rect_collision(first_fallback, second).1 {
+    if cylinder_and_rotated_rect_collision(second_fallback, first).1 {
         if limit < 0 {
             return first.y_top;
         } else {
@@ -337,56 +338,60 @@ pub fn cylinder_and_rect_collision(cyl1: &BoundingCylinder, box2: &BoundingBox) 
     distance_squared <= cyl1.radius * cyl1.radius
 }
 
+fn line_circle_intersect(a: [Fixed; 2], b: [Fixed; 2], x: Fixed, z: Fixed, radius: Fixed) -> bool {
+    let ab = ( b[0] - a[0], b[1] - a[1] );
+    let ac = (x - a[0], z - a[1]);
+    let proj = (ac.0 * ab.0 + ac.1 * ab.1) / (ab.0 * ab.0 + ab.1*ab.1);
+    let closest = if proj < Fixed::const_new(0) {
+        a
+    } else if proj > Fixed::const_new(1) {
+        b
+    } else {
+        [a[0] + proj*ab.0, a[1] + proj*ab.1]
+
+    };
+
+    let dx = closest[0] - x;
+    let dz = closest[1] - z;
+    let distance_squared = dx * dx + dz * dz;
+
+    if distance_squared <= radius * radius {
+        return true;
+    }
+
+    return false;
+}
+
 pub fn cylinder_and_rotated_rect_collision(
     cyl1: &BoundingCylinder,
     box2: &BoundingBox,
 ) -> (Fixed, bool) {
-    // Can't overlap if not sharing y coordinates (z here)
-    if cyl1.y_top <= box2.y_bottom || box2.y_top <= cyl1.y_bottom {
-        return (Fixed::default(), false);
+
+    // Check if the circle overlaps any of the corners of the box2 in xz space
+    for point in &box2.data {
+        let dx = cyl1.x - point[0];
+        let dz = cyl1.z - point[1];
+        let distance_squared = dx * dx + dz * dz;
+        if distance_squared <= cyl1.radius * cyl1.radius {
+            return (box2.rotation, true);
+        }
     }
 
-    // Step 1: Transform the cylinder's center into the rectangle's local space
-    let (cos_theta, sin_theta) = (box2.rotation.cos(), box2.rotation.sin());
-    let tx = cyl1.x - box2.center[0];
-    let tz = cyl1.z - box2.center[1];
-    let local_x = tx * cos_theta + tz * sin_theta;
-    let local_z = -tx * sin_theta + tz * cos_theta;
+    //check if the circle rim and any of the rectangles lines overlap
+    for i in 0..4 {
+        let a: [Fixed; 2] = box2.data[i];
+        let b: [Fixed; 2] = box2.data[(i + 1) % 4];
 
-    // Step 2: Deduce rectangle bounds in local space
-    let half_width = box2.width / Fixed::const_new(2);
-    let half_height = box2.height / Fixed::const_new(2);
-    let min_x = -half_width;
-    let max_x = half_width;
-    let min_z = -half_height;
-    let max_z = half_height;
-
-    // Step 3: Clamp the cylinder's center to the rectangle's bounds in local space
-    let clamped_x = if local_x < min_x {
-        min_x
-    } else if local_x > max_x {
-        max_x
-    } else {
-        local_x
-    };
-    let clamped_z = if local_z < min_z {
-        min_z
-    } else if local_z > max_z {
-        max_z
-    } else {
-        local_z
-    };
-
-    // Step 4: Transform the clamped point back to world space (not necessary for distance calc)
-    let dx = local_x - clamped_x;
-    let dz = local_z - clamped_z;
-    let distance_squared = dx * dx + dz * dz;
-
-    // True if there is a collision
-    if distance_squared <= cyl1.radius * cyl1.radius {
-        return (box2.rotation, true);
+        if line_circle_intersect(a, b, cyl1.x, cyl1.z, cyl1.radius) {
+            return (box2.rotation, true);
+        }
     }
+
+    
+
     return (Fixed::default(), false);
+
+
 }
 
 //TODO: do a check for the angle of the cylinder
@@ -405,6 +410,9 @@ pub fn horizontal_collision_check(
                         return (Fixed::const_new(0), true);
                     }
                 } else {
+                    if cyl1.y_top <= box2.y_bottom || box2.y_top <= cyl1.y_bottom {
+                        continue;
+                    }
                     let (wallangle, ok) = cylinder_and_rotated_rect_collision(&cyl1, &box2);
                     if ok {
                         return (wallangle, true);
