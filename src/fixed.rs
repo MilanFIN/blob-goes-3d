@@ -4,6 +4,7 @@ use core::ops::Neg;
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign, Rem};
 use serde::Deserialize;
 use serde::Deserializer;
+use core::fmt;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Fixed(Num<i32, 8>);
@@ -58,6 +59,8 @@ pub fn default_fixed_3_14() -> [[Fixed; 3]; 14] {
 pub const fn i32_to_fixed(m: i32) -> Fixed {
     return Fixed(Num::from_raw(m << 8));
 }
+
+
 
 impl Fixed {
     /// Creates a new `Fixed` with a default precision of 8.
@@ -245,5 +248,11 @@ impl Rem for Fixed {
     type Output = Self;
     fn rem(self, other: Self) -> Self {
         Fixed(self.0 % other.0)
+    }
+}
+
+impl fmt::Display for Fixed {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", (self.0 * (256 as i32)).trunc())
     }
 }

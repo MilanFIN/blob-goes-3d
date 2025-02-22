@@ -3,9 +3,10 @@ use agb::sound::dmg::{DutyCycle, EnvelopeSettings, SoundDirection, SweepSettings
 
 pub fn play_sound(track: u16, vblank: &agb::interrupt::VBlank, sound: &agb::sound::dmg::Sound) {
     //must wait, as on real hardware channel 1 wont work consistently otherwise
-    vblank.wait_for_vblank();
     //menu move
     if track == 0 {
+        vblank.wait_for_vblank();
+
         let sweep_settings = SweepSettings::new(5, SoundDirection::Increase, 2);
         let envelope_settings = EnvelopeSettings::new(2, SoundDirection::Decrease, 3);
         let duty_cycle = DutyCycle::ThreeQuarters;
@@ -21,14 +22,17 @@ pub fn play_sound(track: u16, vblank: &agb::interrupt::VBlank, sound: &agb::soun
     }
     //switch
     else if track == 1 {
+
         let envelope_settings: EnvelopeSettings =
-            EnvelopeSettings::new(2, SoundDirection::Decrease, 8);
+            EnvelopeSettings::new(2, SoundDirection::Decrease, 5);
         sound
             .noise()
             .play_sound(Some(0), &envelope_settings, 4, true, 3);
     }
     //jump
     else if track == 2 {
+        vblank.wait_for_vblank();
+
         let sweep_settings = SweepSettings::new(4, SoundDirection::Increase, 5);
         let envelope_settings = EnvelopeSettings::new(3, SoundDirection::Decrease, 10);
         let duty_cycle = DutyCycle::Half;
@@ -59,6 +63,8 @@ pub fn play_sound(track: u16, vblank: &agb::interrupt::VBlank, sound: &agb::soun
     }
     //finish?
     else if track == 5 {
+        vblank.wait_for_vblank();
+
         let sweep_settings = SweepSettings::new(5, SoundDirection::Increase, 3);
         let envelope_settings = EnvelopeSettings::new(7, SoundDirection::Decrease, 9);
         let duty_cycle = DutyCycle::OneQuarter;
@@ -73,6 +79,8 @@ pub fn play_sound(track: u16, vblank: &agb::interrupt::VBlank, sound: &agb::soun
     }
     //menu ok
     else if track == 6 {
+        vblank.wait_for_vblank();
+
         let sweep_settings = SweepSettings::new(3, SoundDirection::Increase, 6);
         let envelope_settings = EnvelopeSettings::new(7, SoundDirection::Decrease, 9);
         let duty_cycle = DutyCycle::OneQuarter;

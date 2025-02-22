@@ -4,6 +4,7 @@ pub struct InputGameState<'a> {
 	pub support_below_id: i16,
 	pub bounding_box: &'a BoundingBox,
 	pub bounding_cylinder: &'a BoundingCylinder,
+	pub player_distance_from_ground: Fixed,
 	pub action_requested: bool,
 	pub yspeed: Fixed,
 }

@@ -256,6 +256,8 @@ impl Entity for Mover {
     }
 
     fn tick(&mut self, effects: &effects::InputGameState) -> Option<effects::OutputEvents> {
+
+
         if self.wait != 0 {
             if self.waitcounter != 0 {
                 self.waitcounter -= 1;
@@ -308,7 +310,8 @@ impl Entity for Mover {
                 move_y: ymovement,
                 move_z: zmovement,
             }));
-        } else {
+        }
+        else {
             return None;
         }
     }

@@ -133,7 +133,7 @@ fn main(mut gba: agb::Gba) -> ! {
         //     }
         //     audio::play_sound(6, &vblank, &gba.sound);
         // }
-        selected_level = 1;
+        selected_level = 12;
 
         let levelsize = levels::load_level(selected_level, &mut entity_array);
 
@@ -200,11 +200,14 @@ fn main(mut gba: agb::Gba) -> ! {
             let player_cylinder = entity_array[0].bounding_cylinder();
 
             let mut bottom_support_id: i16 = -1;
+            let mut distance_to_ground = Fixed::const_new(-999);
             if player1.yspeed <= Fixed::const_new(0) {
                 let (groundlevel, collider_entity) =
                     check_support_below(&entity_array, &player_box, &player_cylinder);
                 bottom_support_id = collider_entity;
                 player1.fall(groundlevel);
+                distance_to_ground = player1.y - groundlevel;
+
             } else if player1.yspeed > Fixed::const_new(0) {
                 let rooflevel: Fixed =
                     check_block_above(&entity_array, &player_box, &player_cylinder);
@@ -216,7 +219,8 @@ fn main(mut gba: agb::Gba) -> ! {
             let input_game_state: effects::InputGameState = effects::InputGameState {
                 support_below_id: bottom_support_id,
                 bounding_box: &player_box,
-                bounding_cylinder: &entity_array[0].bounding_cylinder(),
+                bounding_cylinder: &player_cylinder,
+                player_distance_from_ground: distance_to_ground,
                 action_requested: player1.action,
                 yspeed: player1.yspeed,
             };
@@ -235,8 +239,6 @@ fn main(mut gba: agb::Gba) -> ! {
                     player1.y += event.move_y;
                     player1.z += event.move_z;
                 } else if let OutputEvents::GameFinish(_event) = event {
-                    //TODO: actually implement level finishes at some point
-
                     audio::play_sound(5, &vblank, &gba.sound);
                     game_state = GameState::Finished;
                     completed_levels[selected_level] = true;
@@ -253,6 +255,7 @@ fn main(mut gba: agb::Gba) -> ! {
                     player1.sliding(event.acceleration);
                 }
             }
+            
 
             if player1.y < FLOOR_LEVEL {
                 game_state = GameState::Failed;

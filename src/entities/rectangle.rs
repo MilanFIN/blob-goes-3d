@@ -182,10 +182,6 @@ impl Entity for Rectangle {
                 self.model_rotated_points[4][2] + self.z,
             ],
         ];
-
-
-        // let point1: i32 = (points[1][0] * Fixed::const_new(256)).trunc();
-        // agb::println!("point1: {}", point1);
     
         Some(BoundingShape::BoundingBox(BoundingBox {
             data: points,

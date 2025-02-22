@@ -219,6 +219,8 @@ pub fn check_support_below(
 ) -> (Fixed, i16) {
     let mut height: Fixed = Fixed::const_new(-999);
     let mut collider_id: i16 = -1;
+    //a hack to detect player on a platform even if they aren't right on it
+    const DISTANCE_NUDGE_FACTOR: Fixed = Fixed::const_new(1);
     for (i, e) in entity_array.iter().enumerate() {
         if let EntityEnum::Empty(_) = e {
             break;
@@ -232,7 +234,7 @@ pub fn check_support_below(
                         vertical_room_for_box(&top, &bottom, &fallback, Fixed::const_new(-999));
                     if d > height {
                         height = d;
-                        if height == bottom.y_bottom {
+                        if (height - bottom.y_bottom).abs() < DISTANCE_NUDGE_FACTOR {
                             collider_id = e.get_id();
                         }
                     }
@@ -242,7 +244,7 @@ pub fn check_support_below(
                         vertical_room_for_cylinder(&top, &fallback, Fixed::const_new(-999));
                     if d > height {
                         height = d;
-                        if height == bottom.y_bottom {
+                        if (height - bottom.y_bottom).abs() < DISTANCE_NUDGE_FACTOR  {
                             collider_id = e.get_id();
                         }
                     }
