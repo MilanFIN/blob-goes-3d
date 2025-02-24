@@ -220,6 +220,8 @@ pub fn check_support_below(
     let mut height: Fixed = Fixed::const_new(-999);
     let mut collider_id: i16 = -1;
     //a hack to detect player on a platform even if they aren't right on it
+    //TODO: instead of a static nudge, take player yspeed as a param, and check if 
+    //      bottom.y_bottom + yspeed <= height, then consider it to collide
     const DISTANCE_NUDGE_FACTOR: Fixed = Fixed::const_new(1);
     for (i, e) in entity_array.iter().enumerate() {
         if let EntityEnum::Empty(_) = e {

@@ -34,7 +34,7 @@ mod camera;
 mod math;
 mod renderer;
 mod utils;
-use levels::LEVELSIZE;
+use levels::levelstore::LEVELSIZE;
 use utils::*;
 mod player;
 use player::*;
@@ -200,14 +200,11 @@ fn main(mut gba: agb::Gba) -> ! {
             let player_cylinder = entity_array[0].bounding_cylinder();
 
             let mut bottom_support_id: i16 = -1;
-            let mut distance_to_ground = Fixed::const_new(-999);
             if player1.yspeed <= Fixed::const_new(0) {
                 let (groundlevel, collider_entity) =
                     check_support_below(&entity_array, &player_box, &player_cylinder);
                 bottom_support_id = collider_entity;
                 player1.fall(groundlevel);
-                distance_to_ground = player1.y - groundlevel;
-
             } else if player1.yspeed > Fixed::const_new(0) {
                 let rooflevel: Fixed =
                     check_block_above(&entity_array, &player_box, &player_cylinder);
@@ -220,7 +217,6 @@ fn main(mut gba: agb::Gba) -> ! {
                 support_below_id: bottom_support_id,
                 bounding_box: &player_box,
                 bounding_cylinder: &player_cylinder,
-                player_distance_from_ground: distance_to_ground,
                 action_requested: player1.action,
                 yspeed: player1.yspeed,
             };

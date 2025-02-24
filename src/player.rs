@@ -17,8 +17,7 @@ pub const JUMPPOWER: Fixed = Fixed::from_raw(256);
 #[derive(PartialEq)]
 enum JumpState {
     Jumping,
-    Falling,
-    Ground,
+    OnGround,
 }
 
 #[derive(PartialEq)]
@@ -235,7 +234,7 @@ impl<'a> Player<'a> {
     pub fn land(&mut self) {
         self.yspeed = Fixed::const_new(0);
         self.in_air = false;
-        self.jump_state = JumpState::Ground;
+        self.jump_state = JumpState::OnGround;
     }
 
     pub fn fall(&mut self, ylimit: Fixed) {
