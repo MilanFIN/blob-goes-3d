@@ -271,3 +271,4 @@ pub fn sort_points(p1: &mut [Fixed; 2], p2: &mut [Fixed; 2], p3: &mut [Fixed; 2]
         }
     }
 }
+

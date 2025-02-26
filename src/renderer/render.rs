@@ -4,6 +4,7 @@ use crate::math;
 use agb::InternalAllocator;
 use fixed::*;
 use math::*;
+use super::draw;
 use super::polygon::Polygon;
 use super::polygon::Shape;
 
@@ -330,4 +331,34 @@ pub fn translate_point(
     ];
 
     return (translated_point, screen_point);
+}
+
+pub fn render_polygons(
+    polygons: &Vec<Polygon, InternalAllocator>,
+    polygon_indices: &[usize],
+    start: usize,
+    page: u16,
+) {
+    for p in start..polygon_indices.len() {
+        let polygon: &Polygon = &polygons[polygon_indices[p]];
+        if let Some(vertices) = polygon.as_triangle() {
+            draw::draw_triangle(
+                vertices[0],
+                vertices[1],
+                vertices[2],
+                polygon.color,
+                page,
+            );
+        }
+        if let Some(vertices) = polygon.as_line() {
+            draw::draw_line_fixed(
+                vertices[0][0],
+                vertices[0][1],
+                vertices[1][0],
+                vertices[1][1],
+                polygon.color,
+                page,
+            );
+        }
+    }
 }

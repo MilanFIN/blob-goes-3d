@@ -8,6 +8,7 @@ use crate::levels;
 use crate::renderer;
 use crate::textengine;
 use crate::utils;
+use crate::utils::GameState;
 
 const HEADINGHEIGHT: u16 = 20;
 
@@ -17,7 +18,7 @@ pub fn levelmenu(
     page: &mut u16,
     vblank: &agb::interrupt::VBlank,
     sound: &agb::sound::dmg::Sound,
-    completed_levels: &Vec<bool, InternalAllocator>
+    completed_levels: &Vec<bool, InternalAllocator>,
 ) -> (usize, bool) {
     let levelcount: usize = levels::levelstore::LEVELS.len();
 
@@ -181,5 +182,53 @@ pub fn info(input: &mut agb::input::ButtonController, page: &mut u16) {
         if input.is_just_pressed(agb::input::Button::B) {
             return;
         }
+    }
+}
+
+pub fn pause(
+    input: &mut agb::input::ButtonController,
+    page: &mut u16,
+    vblank: &agb::interrupt::VBlank,
+    sound: &agb::sound::dmg::Sound,
+) -> GameState {
+    let color = 48;
+
+    let mut choice: u16 = 0;
+    
+
+    loop {
+        input.update();
+
+        if input.is_just_pressed(agb::input::Button::START | agb::input::Button::A) {
+            audio::play_sound(6, &vblank, &sound);
+            if choice == 0 {
+                return GameState::Playing;
+            } else {
+                return GameState::Finished;
+            }
+        }
+        if input.is_just_pressed(agb::input::Button::B) {
+            audio::play_sound(4, &vblank, &sound);
+            return GameState::Playing;
+        }
+
+        if input.is_just_pressed(agb::input::Button::DOWN | agb::input::Button::UP) {
+            choice = 1 - choice;
+            audio::play_sound(0, &vblank, &sound);
+        }
+
+        renderer::hw::fill_area(*page, 42, 50, 190, 50, 98);
+
+
+        textengine::draw::write_line(86, HEADINGHEIGHT, "paused", color - 2, *page);
+    
+        textengine::draw::write_line(70, 60, "continue", color - 2, *page);
+        textengine::draw::write_line(70, 80, "quit", color - 2, *page);
+    
+        textengine::draw::write_line(60, 60 + 20*choice, "*", color - 2, *page);
+    
+    
+        renderer::hw::flip(page);
+    
     }
 }

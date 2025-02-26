@@ -1,5 +1,5 @@
 use crate::{
-    player, Fixed
+    player, utils::GameState, Fixed
 };
 use agb::input::{Button, ButtonController};
 use player::*;
@@ -8,7 +8,9 @@ use player::*;
 pub fn handle_input(
     player: &mut Player,
     input: &ButtonController,
-) {
+    game_state: GameState,
+) -> GameState {
+    let mut new_game_state = game_state;
     if input.is_pressed(Button::L) {
         player.camera_left(2);
     }
@@ -32,6 +34,10 @@ pub fn handle_input(
 
     if input.is_just_pressed(Button::B) {
         player.action = true;
+    }
+
+    if input.is_just_pressed(Button::START) {
+        new_game_state = GameState::Paused;
     }
 
 
@@ -111,4 +117,5 @@ pub fn handle_input(
     else {
         player.move_toward(Fixed::const_new(0), Fixed::const_new(0));
     }
+    return new_game_state
 }

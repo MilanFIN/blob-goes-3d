@@ -10,6 +10,7 @@ pub enum GameState {
     Playing,
     Finished,
     Failed,
+    Paused,
 }
 
 #[allow(dead_code)]

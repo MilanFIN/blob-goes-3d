@@ -52,6 +52,32 @@ pub fn fill(page: u16, color: u16) {
     }
 }
 
+pub fn fill_area(page: u16, color: u16, x1: u16, x2: u16, y1: u16, y2:u16) {
+    let active_page = if page == 1 {
+        MODE_4_PAGE_1
+    } else {
+        MODE_4_PAGE_2
+    };
+
+    unsafe {
+
+        for y in y1..y2 {
+
+            for x in x1..x2 {
+                let index = (y * 240 + x) >> 1;
+                let even = x & 1 == 0;
+                let prev_value = *active_page.add(index as usize);
+
+                if even {
+                    *active_page.add(index as usize) = (prev_value & 0xFF00) | color;
+                } else {
+                    *active_page.add(index as usize) = (prev_value & 0x00FF) | (color << 8);
+                }
+            }
+        }
+    }
+}
+
 pub fn flip(page: &mut u16) {
     *page = 1 - *page;
     unsafe {

@@ -103,37 +103,35 @@ fn main(mut gba: agb::Gba) -> ! {
 
     let mut game_state = GameState::Finished;
 
-    //TODO: implement jump queuing when in air
-    //      that way jumps can be buffered and executed when the player lands
-    //      canceled if the player doesn't hold A upon landing
+    //TODO: enable this when the game is finished
     loop {
-        // if game_state == GameState::Finished {
-        //     let option = menu::mainmenu(&mut input, &mut page, &vblank, &gba.sound);
-        //     if option == 1 {
-        //         audio::play_sound(6, &vblank, &gba.sound);
-        //         menu::info(&mut input, &mut page);
-        //         audio::play_sound(4, &vblank, &gba.sound);
-        //         continue;
-        //     } else {
-        //         //pass
-        //         audio::play_sound(6, &vblank, &gba.sound);
-        //     }
+        if game_state == GameState::Finished {
+            let option = menu::mainmenu(&mut input, &mut page, &vblank, &gba.sound);
+            if option == 1 {
+                audio::play_sound(6, &vblank, &gba.sound);
+                menu::info(&mut input, &mut page);
+                audio::play_sound(4, &vblank, &gba.sound);
+                continue;
+            } else {
+                //pass
+                audio::play_sound(6, &vblank, &gba.sound);
+            }
 
-        //     (selected_level, canceled) = menu::levelmenu(
-        //         selected_level,
-        //         &mut input,
-        //         &mut page,
-        //         &vblank,
-        //         &gba.sound,
-        //         &completed_levels,
-        //     );
-        //     if canceled {
-        //         audio::play_sound(4, &vblank, &gba.sound);
-        //         continue;
-        //     }
-        //     audio::play_sound(6, &vblank, &gba.sound);
-        // }
-        selected_level = 12;
+            (selected_level, canceled) = menu::levelmenu(
+                selected_level,
+                &mut input,
+                &mut page,
+                &vblank,
+                &gba.sound,
+                &completed_levels,
+            );
+            if canceled {
+                audio::play_sound(4, &vblank, &gba.sound);
+                continue;
+            }
+            audio::play_sound(6, &vblank, &gba.sound);
+        }
+        // selected_level = 14;
 
         let levelsize = levels::load_level(selected_level, &mut entity_array);
 
@@ -181,7 +179,7 @@ fn main(mut gba: agb::Gba) -> ! {
         while game_state == GameState::Playing {
             input.update();
 
-            input::handle_input(&mut player1, &input);
+            game_state = input::handle_input(&mut player1, &input, game_state);
 
             moveutils::attempt_move(
                 &mut player1,
@@ -299,28 +297,17 @@ fn main(mut gba: agb::Gba) -> ! {
                 start = 0;
             }
 
-            for p in start as usize..polygon_indices.len() {
-                let polygon = &polygons[polygon_indices[p]];
-                if let Some(vertices) = polygon.as_triangle() {
-                    renderer::draw::draw_triangle(
-                        vertices[0],
-                        vertices[1],
-                        vertices[2],
-                        polygon.color,
-                        page,
-                    );
-                }
-                if let Some(vertices) = polygon.as_line() {
-                    renderer::draw::draw_line_fixed(
-                        vertices[0][0],
-                        vertices[0][1],
-                        vertices[1][0],
-                        vertices[1][1],
-                        polygon.color,
-                        page,
-                    );
-                }
+            renderer::render::render_polygons(&polygons, &polygon_indices, start as usize, page);
+
+
+            if game_state == GameState::Paused {
+                renderer::hw::flip(&mut page);
+                //must draw again to update both screens to match
+                renderer::render::render_polygons(&polygons, &polygon_indices, start as usize, page);
+                renderer::hw::flip(&mut page);
+                game_state = menu::pause(&mut input, &mut page, &vblank, &gba.sound);
             }
+
             polygons.clear();
             polygon_indices.clear();
 
