@@ -1,6 +1,10 @@
 use lut::CAMERALOCATIONS;
 
-use crate::{audio, camera, math::vector_len_2d, utils};
+use crate::{
+    audio, camera,
+    math::vector_len_2d,
+    utils::{self, GameState},
+};
 use camera::*;
 
 use crate::fixed;
@@ -24,7 +28,7 @@ enum JumpState {
 enum JumpGoalState {
     Queued,
     Idle,
-    Cleared
+    Cleared,
 }
 
 pub struct Player<'a> {
@@ -45,7 +49,6 @@ pub struct Player<'a> {
     forced_jump: bool,
     in_air: bool,
 
-
     sliding: bool,
 
     pub move_x: Fixed,
@@ -53,6 +56,7 @@ pub struct Player<'a> {
     pub activeaccel: Fixed,
     vblank: Option<&'a agb::interrupt::VBlank>,
     sound: Option<&'a agb::sound::dmg::Sound>,
+    finish_animation_frames_left: u16,
 }
 
 impl<'a> Player<'a> {
@@ -78,16 +82,15 @@ impl<'a> Player<'a> {
             sound: None,
             jump_state: JumpState::Jumping,
             jump_goal_state: JumpGoalState::Cleared,
+            finish_animation_frames_left: 0,
         }
     }
-
 
     pub fn init(&mut self, vblank: &'a agb::interrupt::VBlank, sound: &'a agb::sound::dmg::Sound) {
         self.vblank = Some(vblank);
         self.sound = Some(sound);
     }
 
-    
     pub fn move_to(&mut self, x: Fixed, z: Fixed) {
         self.x = self.x + x;
         self.z = self.z + z;
@@ -251,7 +254,6 @@ impl<'a> Player<'a> {
                 audio::play_sound(3, self.vblank.unwrap(), self.sound.unwrap());
             }
             self.land();
-            
         }
     }
 
@@ -295,14 +297,15 @@ impl<'a> Player<'a> {
         if self.jump_state == JumpState::Jumping {
             self.jumping = true;
         }
-
     }
 
     pub fn cancel_jump(&mut self) {
         if self.jump_state == JumpState::Jumping {
             self.jumping = false;
         }
-        if self.jump_goal_state == JumpGoalState::Cleared || self.jump_goal_state == JumpGoalState::Queued {
+        if self.jump_goal_state == JumpGoalState::Cleared
+            || self.jump_goal_state == JumpGoalState::Queued
+        {
             self.jump_goal_state = JumpGoalState::Idle;
         }
     }
@@ -313,14 +316,11 @@ impl<'a> Player<'a> {
         self.forced_jump = active_bounce;
         self.activeaccel = AIRACCEL;
         audio::play_sound(2, self.vblank.unwrap(), self.sound.unwrap());
-
     }
 
     pub fn move_toward(&mut self, x: Fixed, z: Fixed) {
-
         let x_cap = x * MOVECAP;
         let z_cap = z * MOVECAP;
-
 
         if self.move_x > x_cap {
             self.move_x -= self.activeaccel;
@@ -365,5 +365,21 @@ impl<'a> Player<'a> {
             self.activeaccel = GROUNDACCEL;
         }
         self.sliding = false;
+    }
+
+    pub fn finish_animation(&mut self) {
+        self.finish_animation_frames_left = 60;
+    }
+
+    pub fn next_animation_frame(&mut self) -> GameState {
+        if self.finish_animation_frames_left > 0 {
+            self.finish_animation_frames_left -= 1;
+            self.angle += Fixed::from_raw(16);
+            self.y += Fixed::from_raw(32);
+
+            return GameState::CompleteAnimation;
+        }
+
+        return GameState::Finished;
     }
 }

@@ -11,6 +11,7 @@ pub enum GameState {
     Finished,
     Failed,
     Paused,
+    CompleteAnimation,
 }
 
 #[allow(dead_code)]

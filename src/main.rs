@@ -176,95 +176,99 @@ fn main(mut gba: agb::Gba) -> ! {
 
         game_state = GameState::Playing;
 
-        while game_state == GameState::Playing {
-            input.update();
+        while game_state == GameState::Playing || game_state == GameState::CompleteAnimation {
+            if game_state == GameState::Playing {
+                input.update();
 
-            game_state = input::handle_input(&mut player1, &input, game_state);
+                game_state = input::handle_input(&mut player1, &input, game_state);
 
-            moveutils::attempt_move(
-                &mut player1,
-                &entity_array,
-                &entity_array[0].bounding_cylinder(),
-            );
+                moveutils::attempt_move(
+                    &mut player1,
+                    &entity_array,
+                    &entity_array[0].bounding_cylinder(),
+                );
 
-            renderer::hw::fill(page, 128);
 
-            let mut player_box = BoundingBox::default();
-            let shape: &Option<boundingshapes::BoundingShape> = &entity_array[0].bounding_shape();
-            if let BoundingShape::BoundingBox(shape) = shape.as_ref().unwrap() {
-                player_box = (*shape).clone();
-            }
-
-            let player_cylinder = entity_array[0].bounding_cylinder();
-
-            let mut bottom_support_id: i16 = -1;
-            if player1.yspeed <= Fixed::const_new(0) {
-                let (groundlevel, collider_entity) =
-                    check_support_below(&entity_array, &player_box, &player_cylinder);
-                bottom_support_id = collider_entity;
-                player1.fall(groundlevel);
-            } else if player1.yspeed > Fixed::const_new(0) {
-                let rooflevel: Fixed =
-                    check_block_above(&entity_array, &player_box, &player_cylinder);
-                player1.float(rooflevel);
-            }
-
-            player1.update_camera_position();
-
-            let input_game_state: effects::InputGameState = effects::InputGameState {
-                support_below_id: bottom_support_id,
-                bounding_box: &player_box,
-                bounding_cylinder: &player_cylinder,
-                action_requested: player1.action,
-                yspeed: player1.yspeed,
-            };
-            for i in 0..levelsize + 2 {
-                if let EntityEnum::Empty(_) = entity_array[i] {
-                    break;
+                let mut player_box = BoundingBox::default();
+                let shape: &Option<boundingshapes::BoundingShape> =
+                    &entity_array[0].bounding_shape();
+                if let BoundingShape::BoundingBox(shape) = shape.as_ref().unwrap() {
+                    player_box = (*shape).clone();
                 }
-                if let Some(event) = entity_array[i].tick(&input_game_state) {
-                    event_loop.push(event);
-                }
-            }
 
-            for event in event_loop.iter() {
-                if let OutputEvents::PlayerEvent(event) = event {
-                    player1.x += event.move_x;
-                    player1.y += event.move_y;
-                    player1.z += event.move_z;
-                } else if let OutputEvents::GameFinish(_event) = event {
-                    audio::play_sound(5, &vblank, &gba.sound);
-                    game_state = GameState::Finished;
-                    completed_levels[selected_level] = true;
-                } else if let OutputEvents::SwitchAction(_event) = event {
-                    for i in 2..levelsize + 2 {
-                        if let EntityEnum::Wireframe(w) = &mut entity_array[i] {
-                            w.toggle();
-                        }
-                        audio::play_sound(1, &vblank, &gba.sound);
+                let player_cylinder = entity_array[0].bounding_cylinder();
+
+                let mut bottom_support_id: i16 = -1;
+                if player1.yspeed <= Fixed::const_new(0) {
+                    let (groundlevel, collider_entity) =
+                        check_support_below(&entity_array, &player_box, &player_cylinder);
+                    bottom_support_id = collider_entity;
+                    player1.fall(groundlevel);
+                } else if player1.yspeed > Fixed::const_new(0) {
+                    let rooflevel: Fixed =
+                        check_block_above(&entity_array, &player_box, &player_cylinder);
+                    player1.float(rooflevel);
+                }
+
+                player1.update_camera_position();
+
+                let input_game_state: effects::InputGameState = effects::InputGameState {
+                    support_below_id: bottom_support_id,
+                    bounding_box: &player_box,
+                    bounding_cylinder: &player_cylinder,
+                    action_requested: player1.action,
+                    yspeed: player1.yspeed,
+                };
+                for i in 0..levelsize + 2 {
+                    if let EntityEnum::Empty(_) = entity_array[i] {
+                        break;
                     }
-                } else if let OutputEvents::BounceEvent(event) = event {
-                    player1.bounce(event.power, input.is_pressed(Button::A));
-                } else if let OutputEvents::Sliding(event) = event {
-                    player1.sliding(event.acceleration);
+                    if let Some(event) = entity_array[i].tick(&input_game_state) {
+                        event_loop.push(event);
+                    }
                 }
+
+                for event in event_loop.iter() {
+                    if let OutputEvents::PlayerEvent(event) = event {
+                        player1.x += event.move_x;
+                        player1.y += event.move_y;
+                        player1.z += event.move_z;
+                    } else if let OutputEvents::GameFinish(_event) = event {
+                        audio::play_sound(5, &vblank, &gba.sound);
+                        game_state = GameState::CompleteAnimation;
+                        player1.finish_animation();
+                        completed_levels[selected_level] = true;
+                    } else if let OutputEvents::SwitchAction(_event) = event {
+                        for i in 2..levelsize + 2 {
+                            if let EntityEnum::Wireframe(w) = &mut entity_array[i] {
+                                w.toggle();
+                            }
+                            audio::play_sound(1, &vblank, &gba.sound);
+                        }
+                    } else if let OutputEvents::BounceEvent(event) = event {
+                        player1.bounce(event.power, input.is_pressed(Button::A));
+                    } else if let OutputEvents::Sliding(event) = event {
+                        player1.sliding(event.acceleration);
+                    }
+                }
+
+                if player1.y < FLOOR_LEVEL {
+                    game_state = GameState::Failed;
+                }
+
+                event_loop.clear();
+                player1.tick();
             }
-            
 
-            if player1.y < FLOOR_LEVEL {
-                game_state = GameState::Failed;
+            else if game_state == GameState::CompleteAnimation {
+                game_state = player1.next_animation_frame();
             }
 
-            event_loop.clear();
-            player1.tick();
-
-            //update player position on screen
+            //update player model position on screen
             entity_array[0].set_y_offset(player1.y + entity_array[0].get_height() / 2);
             entity_array[1].set_y_offset(
                 player1.y + entity_array[0].get_height() + entity_array[1].get_height() / 2,
             );
-
-            //rotate player body blocks and move them where the player is
             for i in 0..2 {
                 entity_array[i].set_x_offset(player1.x);
                 entity_array[i].set_z_offset(player1.z);
@@ -297,13 +301,19 @@ fn main(mut gba: agb::Gba) -> ! {
                 start = 0;
             }
 
-            renderer::render::render_polygons(&polygons, &polygon_indices, start as usize, page);
 
+            renderer::hw::fill(page, 128);
+            renderer::render::render_polygons(&polygons, &polygon_indices, start as usize, page);
 
             if game_state == GameState::Paused {
                 renderer::hw::flip(&mut page);
                 //must draw again to update both screens to match
-                renderer::render::render_polygons(&polygons, &polygon_indices, start as usize, page);
+                renderer::render::render_polygons(
+                    &polygons,
+                    &polygon_indices,
+                    start as usize,
+                    page,
+                );
                 renderer::hw::flip(&mut page);
                 game_state = menu::pause(&mut input, &mut page, &vblank, &gba.sound);
             }
