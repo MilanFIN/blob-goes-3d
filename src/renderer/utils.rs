@@ -55,6 +55,12 @@ pub fn init_palette(bitmap4: &mut agb::display::bitmap4::Bitmap4) {
     init_palette_slice(bitmap4, 15, 10, 7, 4, 2);
     init_palette_slice(bitmap4, 31, 31, 0, 5, 2);
     init_palette_slice(bitmap4, 31, 31, 31, 6, 1);
+    init_palette_slice(bitmap4, 0, 25, 25, 7, 1);
+    init_palette_slice(bitmap4, 25, 20, 15, 8, 2);
+    init_palette_slice(bitmap4, 28, 31, 31, 9, 1);
+    init_palette_slice(bitmap4, 25, 6, 31, 10, 1);
+
+
 
 }
 

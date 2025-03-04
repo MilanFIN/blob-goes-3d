@@ -258,7 +258,6 @@ impl<'a> Player<'a> {
     }
 
     pub fn float(&mut self, ylimit: Fixed) {
-        //todo: replace 192 with the actual player height, when that starts varying
         let y = self.y + Fixed::from_raw(192);
         if y < ylimit {
             self.y += self.yspeed;

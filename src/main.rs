@@ -101,11 +101,18 @@ fn main(mut gba: agb::Gba) -> ! {
     let mut selected_level: usize = 0;
     let mut canceled: bool;
 
-    let mut game_state = GameState::Finished;
+    let mut game_state = GameState::Menu;
+    let mut camera_follow = true;
 
     //TODO: enable this when the game is finished
     loop {
-        if game_state == GameState::Finished {
+
+        if selected_level >= LEVEL_COUNT {
+            selected_level = 0;
+            game_state = GameState::Menu;
+        }
+
+        if game_state == GameState::Menu {
             let option = menu::mainmenu(&mut input, &mut page, &vblank, &gba.sound);
             if option == 1 {
                 audio::play_sound(6, &vblank, &gba.sound);
@@ -136,6 +143,7 @@ fn main(mut gba: agb::Gba) -> ! {
         let levelsize = levels::load_level(selected_level, &mut entity_array);
 
         let mut player1: Player = Player::default();
+        player1.autorotate_camera = camera_follow;
         player1.init(&vblank, &gba.sound);
 
         player1.camera.set_x_rotation(Fixed::from_raw(0));
@@ -177,6 +185,9 @@ fn main(mut gba: agb::Gba) -> ! {
         game_state = GameState::Playing;
 
         while game_state == GameState::Playing || game_state == GameState::CompleteAnimation {
+
+            camera_follow = player1.autorotate_camera;
+            
             if game_state == GameState::Playing {
                 input.update();
 
@@ -238,6 +249,8 @@ fn main(mut gba: agb::Gba) -> ! {
                         game_state = GameState::CompleteAnimation;
                         player1.finish_animation();
                         completed_levels[selected_level] = true;
+                        selected_level += 1;
+                        audio::play_sound(7, &vblank, &gba.sound);
                     } else if let OutputEvents::SwitchAction(_event) = event {
                         for i in 2..levelsize + 2 {
                             if let EntityEnum::Wireframe(w) = &mut entity_array[i] {

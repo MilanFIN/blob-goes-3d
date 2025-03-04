@@ -1,11 +1,11 @@
 [
-    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 0, "color": 2, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 0, "color": 6, "rotation": 0.0 } },
     {"type": "mover",
         "data": { 
             "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 5,
             "pos_a_x": -5, "pos_a_y": 0, "pos_a_z": 5,
             "pos_b_x": 5, "pos_b_y": 0, "pos_b_z": 5,
-            "speed": 0.7, "wait": 3
+            "speed": 0.7, "wait": 3, "color": 9
         }
     },
     {"type": "mover",
@@ -13,7 +13,7 @@
             "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 10,
             "pos_a_x": 5, "pos_a_y": 0, "pos_a_z": 10,
             "pos_b_x": -5, "pos_b_y": 0, "pos_b_z": 10,
-            "speed": 0.7, "wait": 3
+            "speed": 0.7, "wait": 3, "color": 9
         }
     },
     {"type": "mover",
@@ -21,7 +21,7 @@
             "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 15,
             "pos_a_x": -5, "pos_a_y": 0, "pos_a_z": 15,
             "pos_b_x": 5, "pos_b_y": 0, "pos_b_z": 15,
-            "speed": 0.7, "wait": 3
+            "speed": 0.7, "wait": 3, "color": 9
         }
     },
     {"type": "mover",
@@ -29,35 +29,35 @@
             "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 20,
             "pos_a_x": 5, "pos_a_y": 0, "pos_a_z": 20,
             "pos_b_x": -5, "pos_b_y": 0, "pos_b_z": 20,
-            "speed": 0.7, "wait": 3
+            "speed": 0.7, "wait": 3, "color": 9
         }
     },
-    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 25, "color": 2, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 25, "color": 6, "rotation": 0.0 } },
        {"type": "mover",
         "data": { 
             "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 35,
             "pos_a_x": 0, "pos_a_y": 0, "pos_a_z": 30,
             "pos_b_x": 0, "pos_b_y": 0, "pos_b_z": 40,
-            "speed": 0.7, "wait": 5
+            "speed": 0.7, "wait": 5, "color": 9
         }
     },
-    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 25, "color": 2, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 25, "color": 6, "rotation": 0.0 } },
        {"type": "mover",
         "data": { 
             "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 50,
             "pos_a_x": 0, "pos_a_y": 0, "pos_a_z": 55,
             "pos_b_x": 0, "pos_b_y": 0, "pos_b_z": 45,
-            "speed": 0.7, "wait": 5
+            "speed": 0.7, "wait": 5, "color": 9
         }
     },
-    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 60, "color": 2, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 60, "color": 6, "rotation": 0.0 } },
 
     {"type": "mover",
         "data": { 
             "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 65,
             "pos_a_x": 0, "pos_a_y": 10, "pos_a_z": 65,
             "pos_b_x": 0, "pos_b_y": -10, "pos_b_z": 65,
-            "speed": 0.7, "wait": 3
+            "speed": 0.7, "wait": 3, "color": 9
         }
     },
     {"type": "mover",
@@ -65,9 +65,9 @@
             "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 70,
             "pos_a_x": 0, "pos_a_y": -10, "pos_a_z": 70,
             "pos_b_x": 0, "pos_b_y": 10, "pos_b_z": 70,
-            "speed": 0.7, "wait": 3
+            "speed": 0.7, "wait": 3, "color": 9
         }
     },
-    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 75, "color": 2, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 75, "color": 6, "rotation": 0.0 } },
     { "type": "finish", "data": {"size": 3, "x": 0, "y": 3, "z": 75, "color": 2, "rotation": 0 } }
 ]

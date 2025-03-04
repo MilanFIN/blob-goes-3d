@@ -93,4 +93,18 @@ pub fn play_sound(track: u16, vblank: &agb::interrupt::VBlank, sound: &agb::soun
             duty_cycle,
         );
     }
+    else if track == 7 {
+        vblank.wait_for_vblank();
+        let sweep_settings = SweepSettings::new(3, SoundDirection::Increase, 7);
+        let envelope_settings = EnvelopeSettings::new(1, SoundDirection::Increase, 7);
+        let duty_cycle = DutyCycle::Half;
+        let frequency = 900;
+        sound.channel1().play_sound(
+            frequency,
+            Some(0),
+            &sweep_settings,
+            &envelope_settings,
+            duty_cycle,
+        );
+    }
 }

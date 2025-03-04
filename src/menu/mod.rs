@@ -142,7 +142,7 @@ pub fn mainmenu(
         textengine::draw::write_line(70, HEADINGHEIGHT, "main menu", color - 2, *page);
 
         textengine::draw::write_line(50, 80, "select level", color - 2, *page);
-        textengine::draw::write_line(50, 100, "how to play", color - 2, *page);
+        textengine::draw::write_line(50, 100, "keys", color - 2, *page);
 
         textengine::draw::write_line(40, 80 + 20 * option, "*", color - 2, *page);
 
@@ -204,7 +204,7 @@ pub fn pause(
             if choice == 0 {
                 return GameState::Playing;
             } else {
-                return GameState::Finished;
+                return GameState::Menu;
             }
         }
         if input.is_just_pressed(agb::input::Button::B) {

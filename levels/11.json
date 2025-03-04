@@ -8,7 +8,7 @@
             "x": 0,
             "y": 0,
             "z": 0,
-            "color": 2,
+            "color": 6,
             "rotation": 0.0
         }
     },
@@ -28,7 +28,8 @@
             "pos_b_y": 0,
             "pos_b_z": 10,
             "speed": 0.5,
-            "wait": 20
+            "wait": 20,
+            "color": 9
         }
     },
     {
@@ -40,7 +41,7 @@
             "x": 0,
             "y": 0,
             "z": 15,
-            "color": 5,
+            "color": 8,
             "rotation": 0.0,
             "acceleration": 0.004
         }
@@ -54,7 +55,7 @@
             "x": 0,
             "y": 0,
             "z": 18,
-            "color": 5,
+            "color": 8,
             "rotation": 0.0,
             "acceleration": 0.004
         }
@@ -68,7 +69,7 @@
             "x": 0,
             "y": 3,
             "z": 23,
-            "color": 2,
+            "color": 6,
             "rotation": 0.0
         }
     },
@@ -94,7 +95,7 @@
             "x": 10,
             "y": 8,
             "z": 23,
-            "color": 5,
+            "color": 8,
             "rotation": 0.0,
             "acceleration": 0.004
         }
@@ -108,7 +109,7 @@
             "x": 16,
             "y": 8.5,
             "z": 23,
-            "color": 5,
+            "color": 8,
             "rotation": 0.0,
             "acceleration": 0.004
         }
@@ -122,7 +123,7 @@
             "x": 22,
             "y": 9,
             "z": 23,
-            "color": 5,
+            "color": 8,
             "rotation": 0.0,
             "acceleration": 0.004
         }
@@ -136,7 +137,7 @@
             "x": 28,
             "y": 9.5,
             "z": 23,
-            "color": 5,
+            "color": 8,
             "rotation": 0.0,
             "acceleration": 0.004
         }
@@ -150,7 +151,7 @@
             "x": 34,
             "y": 10,
             "z": 23,
-            "color": 2,
+            "color": 6,
             "rotation": 0.0
         }
     },
@@ -176,7 +177,7 @@
             "x": 40,
             "y": 20,
             "z": 30,
-            "color": 2,
+            "color": 6,
             "rotation": 0
         }
     },
@@ -189,7 +190,7 @@
             "x": 46,
             "y": 20,
             "z": 30,
-            "color": 2,
+            "color": 6,
             "rotation": 0
         }
     },
