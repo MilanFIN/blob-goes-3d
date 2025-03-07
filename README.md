@@ -1,6 +1,6 @@
 # WIP GBA 3d platformer
 
-A software renderer and a platformer for the GBA. Very much WIP and not yet playable.
+A 3d platformer / engine for the gameboy advance.
 
 ## Building
 
@@ -12,28 +12,40 @@ A software renderer and a platformer for the GBA. Very much WIP and not yet play
 ### Running in an emulator
 
 ```sh
-cargo build --release
-```
-
-```sh
 cargo run --release
 ```
 
-### Generaging .gba rom
+### Building the .gba rom
+
+#### Native
 
 ```sh
-agb-gbafix target/thumbv4t-none-eabi/release/<binary name> -o <game name>.gba
+cargo install agb-gbafix
+
+cargo build --release
+
+agb-gbafix target/thumbv4t-none-eabi/release/wip-gba-3d -o wip-gba-3d.gba
 ```
+#### In docker
+
+```sh
+docker build -t gameboy-3d .
+
+docker create --name temp-container gameboy-3d
+
+docker cp temp-container:/usr/src/app/wip-gba-3d.gba .
+
+docker rm temp-container
+```
+
 
 ## Features
 
-- [x] A flat shaded software 3d renderer (MODE4)
-- [x] Bundling game levels from json files at build time and loading them with serde
-- [x] Various common platformer game features (moving blocks etc.)
-- [x] Collision detection
+- A flat shaded software 3d renderer (MODE4)
+- Level creation system utilizing json files and bundling them into the rom file at build time.
+- Various common platformer game features (moving blocks etc.)
+- Basic 3d Collision detection
 
+## Creating new levels
 
-## TODO
-
-- [ ] Docs for creating new levels
-- [ ] Menus
+Levels are bundled automatically from the `/levels` folder. See `/docs` folder for details on creating new levels.
