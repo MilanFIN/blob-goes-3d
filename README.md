@@ -33,7 +33,7 @@ docker build -t gameboy-3d .
 
 docker create --name temp-container gameboy-3d
 
-docker cp temp-container:/usr/src/app/wip-gba-3d.gba .
+docker cp temp-container:/app/wip-gba-3d.gba .
 
 docker rm temp-container
 ```
