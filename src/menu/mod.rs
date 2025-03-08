@@ -194,7 +194,6 @@ pub fn pause(
     let color = 48;
 
     let mut choice: u16 = 0;
-    
 
     loop {
         input.update();
@@ -203,6 +202,8 @@ pub fn pause(
             audio::play_sound(6, &vblank, &sound);
             if choice == 0 {
                 return GameState::Playing;
+            } else if choice == 1 {
+                return GameState::Failed;
             } else {
                 return GameState::Menu;
             }
@@ -212,23 +213,25 @@ pub fn pause(
             return GameState::Playing;
         }
 
-        if input.is_just_pressed(agb::input::Button::DOWN | agb::input::Button::UP) {
-            choice = 1 - choice;
+        if input.is_just_pressed(agb::input::Button::DOWN) {
+            choice = (choice + 1) % 3;
+            audio::play_sound(0, &vblank, &sound);
+        }
+        if input.is_just_pressed(agb::input::Button::UP) {
+            choice = (choice + 2) % 3;
             audio::play_sound(0, &vblank, &sound);
         }
 
-        renderer::hw::fill_area(*page, 42, 50, 190, 50, 98);
-
+        renderer::hw::fill_area(*page, 42, 50, 190, 50, 118);
 
         textengine::draw::write_line(86, HEADINGHEIGHT, "paused", color - 2, *page);
-    
+
         textengine::draw::write_line(70, 60, "continue", color - 2, *page);
-        textengine::draw::write_line(70, 80, "quit", color - 2, *page);
-    
-        textengine::draw::write_line(60, 60 + 20*choice, "*", color - 2, *page);
-    
-    
+        textengine::draw::write_line(70, 80, "restart", color - 2, *page);
+        textengine::draw::write_line(70, 100, "quit", color - 2, *page);
+
+        textengine::draw::write_line(60, 60 + 20 * choice, "*", color - 2, *page);
+
         renderer::hw::flip(page);
-    
     }
 }

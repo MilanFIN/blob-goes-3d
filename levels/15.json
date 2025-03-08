@@ -1,0 +1,260 @@
+[
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 0.0,
+            "y": 0,
+            "z": 0,
+            "color": 6,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "crumbling",
+        "data": {
+            "xsize": 3,
+            "ysize": 0.5,
+            "zsize": 3,
+            "x": 0,
+            "y": 0,
+            "z": 5,
+            "rotation": 0.0,
+            "lifetime": 3,
+            "color": 7
+        }
+    },
+    {
+        "type": "crumbling",
+        "data": {
+            "xsize": 3,
+            "ysize": 0.5,
+            "zsize": 3,
+            "x": 0,
+            "y": -5,
+            "z": 5,
+            "rotation": 0.0,
+            "lifetime": 3,
+            "color": 7
+        }
+    },
+
+    {
+        "type": "crumbling",
+        "data": {
+            "xsize": 3,
+            "ysize": 0.5,
+            "zsize": 3,
+            "x": 0,
+            "y": -10,
+            "z": 5,
+            "rotation": 0.0,
+            "lifetime": 3,
+            "color": 7
+        }
+    },
+    {
+        "type": "switch",
+        "data": {
+            "size": 2,
+            "x": 0,
+            "y": -15,
+            "z": 7,
+            "color": 3,
+            "rotation": 0.25
+        }
+    },
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 1,
+            "ysize": 0.25,
+            "zsize": 1,
+            "x": 0.0,
+            "y": -15.5,
+            "z": 7,
+            "color": 6,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "crumbling",
+        "data": {
+            "xsize": 3,
+            "ysize": 0.5,
+            "zsize": 3,
+            "x": 0,
+            "y": -15,
+            "z": 5,
+            "rotation": 0.0,
+            "lifetime": 3,
+            "color": 7
+        }
+    },
+    {
+        "type": "crumbling",
+        "data": {
+            "xsize": 3,
+            "ysize": 0.5,
+            "zsize": 3,
+            "x": 0,
+            "y": -20,
+            "z": 5,
+            "rotation": 0.0,
+            "lifetime": 3,
+            "color": 7
+        }
+    },
+    {
+        "type": "wireframe",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 0,
+            "y": -25,
+            "z": 5,
+            "color": 0,
+            "solid": false,
+            "rotation": 0
+        }
+    },
+    {
+        "type": "wireframe",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 5,
+            "y": -25,
+            "z": 10,
+            "color": 0,
+            "solid": false,
+            "rotation": 0.125
+        }
+    },
+    {
+        "type": "wireframe",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 5,
+            "y": -22,
+            "z": 15,
+            "color": 0,
+            "solid": false,
+            "rotation": 0
+        }
+    },
+    {
+        "type": "wireframe",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 5,
+            "y": -19,
+            "z": 20,
+            "solid": false,
+            "color": 0,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "wireframe",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 5,
+            "y": -16,
+            "z": 25,
+            "solid": false,
+            "color": 0,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "ice",
+        "data": {
+            "xsize": 0.2,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 4,
+            "y": -16,
+            "z": 30,
+            "color": 8,
+            "acceleration": 0.004,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "ice",
+        "data": {
+            "xsize": 0.2,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 4,
+            "y": -16,
+            "z": 33,
+            "color": 8,
+            "acceleration": 0.004,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "ice",
+        "data": {
+            "xsize": 0.2,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 4,
+            "y": -16,
+            "z": 36,
+            "color": 8,
+            "acceleration": 0.004,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "ice",
+        "data": {
+            "xsize": 0.2,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 4,
+            "y": -16,
+            "z": 39,
+            "color": 8,
+            "acceleration": 0.004,
+            "rotation": 0.0
+        }
+    },
+	{
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 4,
+            "y": -16,
+            "z": 44,
+            "color": 6,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "finish",
+        "data": {
+            "size": 3,
+            "x": 4,
+            "y": -13,
+            "z": 44,
+            "color": 2,
+            "rotation": 0
+        }
+    }
+]
