@@ -2,12 +2,7 @@
 
 A 3d platformer / engine for the gameboy advance.
 
-## Gameplay Demo
-
-<video width="600" controls>
-	<source src="https://github.com/MilanFIN/unnamed-gba-3d/raw/refs/heads/promo/screenshots/gameplay.mp4" type="video/mp4">
-	A sample gameplay video.
-</video>
+https://github.com/user-attachments/assets/2935237b-2dd0-4888-b973-26551b50bd69
 
 ## Building
 
