@@ -204,7 +204,6 @@ A switch that can be used to toggle the state of wireframe platforms.
 {
     "type": "switch",
     "data": {
-        "size": 2,
         "x": 0,
         "y": 1,
         "z": 25.5,
@@ -218,7 +217,6 @@ A switch that can be used to toggle the state of wireframe platforms.
 
 | Parameter | Type  | Description                                                              |
 | --------- | ----- | ------------------------------------------------------------------------ |
-| size      | float | Size of the switch                                                       |
 | x         | float | Position of the switch along the x-axis                                  |
 | y         | float | Position of the switch along the y-axis                                  |
 | z         | float | Position of the switch along the z-axis                                  |

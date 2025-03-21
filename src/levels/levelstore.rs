@@ -6,44 +6,6 @@
 pub const LEVELSIZE: usize = 19;
 
 const LEVEL1: &str = r#"[
-    { "type": "cube", "data": { "size": 3, "x": 10, "y": 0, "z": 0 } },
-    { "type": "rectangle", "data": { "xsize": 5, "ysize": 1, "zsize": 5, "x": 0.0, "y": 0, "z": 0, "color": 6, "rotation": 0.0 } },
-    { "type": "ice", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 3, "y": 1, "z": 0, "color": 8, "acceleration": 0.004, "rotation": 0.0 } },
-    { "type": "bounce", "data": { "size": 2, "height": 1, "x": 0, "y": 1, "z": 4, "color": 4, "power": 1.5, "rotation": 0.0 } }
-]
-"#;
-
-const LEVEL2: &str = r#"[
-    {
-        "type": "rectangle",
-        "data": {
-            "xsize": 0.2,
-            "ysize": 1,
-            "zsize": 5,
-            "x": 0,
-            "y": -5,
-            "z": 0,
-            "rotation": 0.125,
-            "color": 6
-        }
-    },
-    {
-        "type": "rectangle",
-        "data": {
-            "xsize": 0.2,
-            "ysize": 1,
-            "zsize": 5,
-            "x": 1,
-            "y": -4,
-            "z": 0,
-            "rotation": 0.125,
-            "color": 6
-        }
-    }
-]
-"#;
-
-const LEVEL3: &str = r#"[
     { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0.0, "y": 0, "z": 0, "color": 6, "rotation": 0.0 } },
     { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": -0.65, "y": 0, "z": 5, "color": 6, "rotation": -0.04 } },
     { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": -2.56, "y": 0, "z": 9.5, "color": 6, "rotation": -0.08 } },
@@ -54,28 +16,7 @@ const LEVEL3: &str = r#"[
     { "type": "finish", "data": {"size": 3, "x": -19, "y": 3, "z": 19, "color": 2, "rotation": -0.22 } }
 ]"#;
 
-const LEVEL4: &str = r#"[
-    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0.0, "y": 0, "z": 0, "color": 6, "rotation": 0.0 } },
-    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 4.0, "y": 3.5, "z": 0, "color": 6, "rotation": 0.0 } },
-    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0.0, "y": 7, "z": 0, "color": 6, "rotation": 0.0 } },
-    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 4.0, "y": 10.5, "z": 0, "color": 6, "rotation": 0.0 } },
-    {"type": "mover",
-        "data": { 
-            "xsize": 4, "ysize": 1, "zsize": 4, "x": 8, "y": 10.5, "z": 0,
-            "pos_a_x": 8, "pos_a_y": 10.5, "pos_a_z": 0,
-            "pos_b_x": 28, "pos_b_y": 15, "pos_b_z": 7,
-            "speed": 2, "wait": 20, "color": 9
-        }
-    },
-    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 32, "y": 15, "z": 7, "color": 6, "rotation": 0.0 } },
-    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 28, "y": 18.5, "z": 7, "color": 6, "rotation": 0.0 } },
-    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 32, "y": 22, "z": 7, "color": 6, "rotation": 0.0 } },
-    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 28, "y": 25.5, "z": 7, "color": 6, "rotation": 0.0 } },
-    { "type": "finish", "data": {"size": 3, "x": 28, "y": 28.5, "z": 7, "color": 2, "rotation": -0.22 } }
-
-]"#;
-
-const LEVEL5: &str = r#"[
+const LEVEL2: &str = r#"[
     {
         "type": "rectangle",
         "data": {
@@ -254,7 +195,28 @@ const LEVEL5: &str = r#"[
 ]
 "#;
 
-const LEVEL6: &str = r#"[
+const LEVEL3: &str = r#"[
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0.0, "y": 0, "z": 0, "color": 6, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 4.0, "y": 3.5, "z": 0, "color": 6, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0.0, "y": 7, "z": 0, "color": 6, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 4.0, "y": 10.5, "z": 0, "color": 6, "rotation": 0.0 } },
+    {"type": "mover",
+        "data": { 
+            "xsize": 4, "ysize": 1, "zsize": 4, "x": 8, "y": 10.5, "z": 0,
+            "pos_a_x": 8, "pos_a_y": 10.5, "pos_a_z": 0,
+            "pos_b_x": 28, "pos_b_y": 15, "pos_b_z": 7,
+            "speed": 2, "wait": 20, "color": 9
+        }
+    },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 32, "y": 15, "z": 7, "color": 6, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 28, "y": 18.5, "z": 7, "color": 6, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 32, "y": 22, "z": 7, "color": 6, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 28, "y": 25.5, "z": 7, "color": 6, "rotation": 0.0 } },
+    { "type": "finish", "data": {"size": 3, "x": 28, "y": 28.5, "z": 7, "color": 2, "rotation": -0.22 } }
+
+]"#;
+
+const LEVEL4: &str = r#"[
     {
         "type": "rectangle",
         "data": {
@@ -336,7 +298,6 @@ const LEVEL6: &str = r#"[
     {
         "type": "switch",
         "data": {
-            "size": 2,
             "x": 0,
             "y": 1,
             "z": 25.5,
@@ -378,6 +339,329 @@ const LEVEL6: &str = r#"[
             "z": 0,
             "color": 2,
             "rotation": 0.25
+        }
+    }
+]
+"#;
+
+const LEVEL5: &str = r#"[
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "color": 6,
+            "rotation": 0.0
+        }
+    },
+
+    {
+        "type": "wireframe",
+        "data": {
+            "xsize": 2,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 0,
+            "y": 0,
+            "z": 6,
+            "color": 0,
+            "solid": true,
+            "rotation": 0.125
+        }
+    },
+
+    {
+        "type": "bounce",
+        "data": {
+            "size": 2,
+            "height": 1,
+            "x": 4.75,
+            "y": 0,
+            "z": 9.5,
+            "color": 4,
+            "power": 1.5,
+            "rotation": 0.0
+        }
+    },
+
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 3,
+            "y": 4,
+            "z": 14,
+            "color": 6,
+            "rotation": 0.0
+        }
+    },
+
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 0,
+            "y": 5,
+            "z": 18,
+            "color": 6,
+            "rotation": 0.125
+        }
+    },
+
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 6,
+            "y": 6,
+            "z": 22,
+            "color": 6,
+            "rotation": 0.125
+        }
+    },
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 0,
+            "y": 7,
+            "z": 25,
+            "color": 6,
+            "rotation": 0.125
+        }
+    },
+    {
+        "type": "switch",
+        "data": {
+            "x": 0,
+            "y": 8,
+            "z": 25,
+            "color": 3,
+            "rotation": 0.25
+        }
+    },
+
+    {
+        "type": "wireframe",
+        "data": {
+            "xsize": 2,
+            "ysize": 1,
+            "zsize": 2,
+            "x": 10,
+            "y": 0,
+            "z": 9.5,
+            "color": 0,
+            "solid": false,
+            "rotation": 0.0
+        }
+    },
+
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 15,
+            "y": 0,
+            "z": 9.5,
+            "color": 6,
+            "rotation": 0.0
+        }
+    },
+
+    {
+        "type": "mover",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 20,
+            "y": 0,
+            "z": 9.5,
+            "pos_a_x": 20,
+            "pos_a_y": 0,
+            "pos_a_z": 9.5,
+            "pos_b_x": 20,
+            "pos_b_y": 10,
+            "pos_b_z": 9.5,
+            "speed": 0.7,
+            "wait": 15,
+            "color": 9
+        }
+    },
+
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 25,
+            "y": 10,
+            "z": 9.5,
+            "color": 6,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "finish",
+        "data": {
+            "size": 3,
+            "x": 25,
+            "y": 13,
+            "z": 9.5,
+            "color": 2,
+            "rotation": 0.25
+        }
+    }
+]
+"#;
+
+const LEVEL6: &str = r#"[
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "color": 6,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "bounce",
+        "data": {
+            "size": 2,
+            "height": 1,
+            "x": 0,
+            "y": 2,
+            "z": 5,
+            "color": 4,
+            "power": 1.5,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 0,
+            "y": 4,
+            "z": 10,
+            "color": 6,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "bounce",
+        "data": {
+            "size": 2,
+            "height": 1,
+            "x": 5,
+            "y": 6,
+            "z": 10,
+            "color": 4,
+            "power": 1.5,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "bounce",
+        "data": {
+            "size": 2,
+            "height": 1,
+            "x": 9,
+            "y": 10,
+            "z": 14,
+            "color": 4,
+            "power": 1.5,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "bounce",
+        "data": {
+            "size": 2,
+            "height": 1,
+            "x": 13,
+            "y": 14,
+            "z": 10,
+            "color": 4,
+            "power": 1.5,
+            "rotation": 0.0
+        }
+    },
+
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 2,
+            "ysize": 1,
+            "zsize": 2,
+            "x": 19,
+            "y": 18,
+            "z": 9,
+            "rotation": 0.125,
+            "lifetime": 10,
+            "color": 6
+
+        }
+    },
+    {
+        "type": "crumbling",
+        "data": {
+            "xsize": 2,
+            "ysize": 1,
+            "zsize": 2,
+            "x": 23,
+            "y": 18,
+            "z": 13,
+            "rotation": 0.125,
+            "lifetime": 10,
+            "color": 7
+        }
+    },
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 2,
+            "ysize": 1,
+            "zsize": 2,
+            "x": 27,
+            "y": 18,
+            "z": 17,
+            "rotation": 0.125,
+            "lifetime": 10,
+            "color": 6
+        }
+    },
+    {
+        "type": "finish",
+        "data": {
+            "size": 3,
+            "x": 27,
+            "y": 21,
+            "z": 17,
+            "color": 2,
+            "rotation": 0.125
         }
     }
 ]
@@ -900,143 +1184,6 @@ const LEVEL11: &str = r#"[
         }
     },
     {
-        "type": "bounce",
-        "data": {
-            "size": 2,
-            "height": 1,
-            "x": 0,
-            "y": 2,
-            "z": 5,
-            "color": 4,
-            "power": 1.5,
-            "rotation": 0.0
-        }
-    },
-    {
-        "type": "rectangle",
-        "data": {
-            "xsize": 3,
-            "ysize": 1,
-            "zsize": 3,
-            "x": 0,
-            "y": 4,
-            "z": 10,
-            "color": 6,
-            "rotation": 0.0
-        }
-    },
-    {
-        "type": "bounce",
-        "data": {
-            "size": 2,
-            "height": 1,
-            "x": 5,
-            "y": 6,
-            "z": 10,
-            "color": 4,
-            "power": 1.5,
-            "rotation": 0.0
-        }
-    },
-    {
-        "type": "bounce",
-        "data": {
-            "size": 2,
-            "height": 1,
-            "x": 9,
-            "y": 10,
-            "z": 14,
-            "color": 4,
-            "power": 1.5,
-            "rotation": 0.0
-        }
-    },
-    {
-        "type": "bounce",
-        "data": {
-            "size": 2,
-            "height": 1,
-            "x": 13,
-            "y": 14,
-            "z": 10,
-            "color": 4,
-            "power": 1.5,
-            "rotation": 0.0
-        }
-    },
-
-    {
-        "type": "rectangle",
-        "data": {
-            "xsize": 2,
-            "ysize": 1,
-            "zsize": 2,
-            "x": 19,
-            "y": 18,
-            "z": 9,
-            "rotation": 0.125,
-            "lifetime": 10,
-            "color": 6
-
-        }
-    },
-    {
-        "type": "crumbling",
-        "data": {
-            "xsize": 2,
-            "ysize": 1,
-            "zsize": 2,
-            "x": 23,
-            "y": 18,
-            "z": 13,
-            "rotation": 0.125,
-            "lifetime": 10,
-            "color": 7
-        }
-    },
-    {
-        "type": "rectangle",
-        "data": {
-            "xsize": 2,
-            "ysize": 1,
-            "zsize": 2,
-            "x": 27,
-            "y": 18,
-            "z": 17,
-            "rotation": 0.125,
-            "lifetime": 10,
-            "color": 6
-        }
-    },
-    {
-        "type": "finish",
-        "data": {
-            "size": 3,
-            "x": 27,
-            "y": 21,
-            "z": 17,
-            "color": 2,
-            "rotation": 0.125
-        }
-    }
-]
-"#;
-
-const LEVEL12: &str = r#"[
-    {
-        "type": "rectangle",
-        "data": {
-            "xsize": 3,
-            "ysize": 1,
-            "zsize": 3,
-            "x": 0,
-            "y": 0,
-            "z": 0,
-            "color": 6,
-            "rotation": 0.0
-        }
-    },
-    {
         "type": "mover",
         "data": {
             "xsize": 4,
@@ -1232,194 +1379,7 @@ const LEVEL12: &str = r#"[
 ]
 "#;
 
-const LEVEL13: &str = r#"[
-    {
-        "type": "rectangle",
-        "data": {
-            "xsize": 3,
-            "ysize": 1,
-            "zsize": 3,
-            "x": 0,
-            "y": 0,
-            "z": 0,
-            "color": 6,
-            "rotation": 0.0
-        }
-    },
-
-    {
-        "type": "wireframe",
-        "data": {
-            "xsize": 2,
-            "ysize": 1,
-            "zsize": 3,
-            "x": 0,
-            "y": 0,
-            "z": 6,
-            "color": 0,
-            "solid": true,
-            "rotation": 0.125
-        }
-    },
-
-    {
-        "type": "bounce",
-        "data": {
-            "size": 2,
-            "height": 1,
-            "x": 4.75,
-            "y": 0,
-            "z": 9.5,
-            "color": 4,
-            "power": 1.5,
-            "rotation": 0.0
-        }
-    },
-
-    {
-        "type": "rectangle",
-        "data": {
-            "xsize": 3,
-            "ysize": 1,
-            "zsize": 3,
-            "x": 3,
-            "y": 4,
-            "z": 14,
-            "color": 6,
-            "rotation": 0.0
-        }
-    },
-
-    {
-        "type": "rectangle",
-        "data": {
-            "xsize": 3,
-            "ysize": 1,
-            "zsize": 3,
-            "x": 0,
-            "y": 5,
-            "z": 18,
-            "color": 6,
-            "rotation": 0.125
-        }
-    },
-
-    {
-        "type": "rectangle",
-        "data": {
-            "xsize": 3,
-            "ysize": 1,
-            "zsize": 3,
-            "x": 6,
-            "y": 6,
-            "z": 22,
-            "color": 6,
-            "rotation": 0.125
-        }
-    },
-    {
-        "type": "rectangle",
-        "data": {
-            "xsize": 3,
-            "ysize": 1,
-            "zsize": 3,
-            "x": 0,
-            "y": 7,
-            "z": 25,
-            "color": 6,
-            "rotation": 0.125
-        }
-    },
-    {
-        "type": "switch",
-        "data": {
-            "size": 2,
-            "x": 0,
-            "y": 8,
-            "z": 25,
-            "color": 3,
-            "rotation": 0.25
-        }
-    },
-
-    {
-        "type": "wireframe",
-        "data": {
-            "xsize": 2,
-            "ysize": 1,
-            "zsize": 2,
-            "x": 10,
-            "y": 0,
-            "z": 9.5,
-            "color": 0,
-            "solid": false,
-            "rotation": 0.0
-        }
-    },
-
-    {
-        "type": "rectangle",
-        "data": {
-            "xsize": 3,
-            "ysize": 1,
-            "zsize": 3,
-            "x": 15,
-            "y": 0,
-            "z": 9.5,
-            "color": 6,
-            "rotation": 0.0
-        }
-    },
-
-    {
-        "type": "mover",
-        "data": {
-            "xsize": 3,
-            "ysize": 1,
-            "zsize": 3,
-            "x": 20,
-            "y": 0,
-            "z": 9.5,
-            "pos_a_x": 20,
-            "pos_a_y": 0,
-            "pos_a_z": 9.5,
-            "pos_b_x": 20,
-            "pos_b_y": 10,
-            "pos_b_z": 9.5,
-            "speed": 0.7,
-            "wait": 15,
-            "color": 9
-        }
-    },
-
-    {
-        "type": "rectangle",
-        "data": {
-            "xsize": 3,
-            "ysize": 1,
-            "zsize": 3,
-            "x": 25,
-            "y": 10,
-            "z": 9.5,
-            "color": 6,
-            "rotation": 0.0
-        }
-    },
-    {
-        "type": "finish",
-        "data": {
-            "size": 3,
-            "x": 25,
-            "y": 13,
-            "z": 9.5,
-            "color": 2,
-            "rotation": 0.25
-        }
-    }
-]
-"#;
-
-const LEVEL14: &str = r#"[
+const LEVEL12: &str = r#"[
     {
         "type": "rectangle",
         "data": {
@@ -1591,7 +1551,7 @@ const LEVEL14: &str = r#"[
 ]
 "#;
 
-const LEVEL15: &str = r#"[
+const LEVEL13: &str = r#"[
     {
         "type": "ice",
         "data": {
@@ -1776,7 +1736,7 @@ const LEVEL15: &str = r#"[
 ]
 "#;
 
-const LEVEL16: &str = r#"[
+const LEVEL14: &str = r#"[
     {
         "type": "rectangle",
         "data": {
@@ -1836,7 +1796,6 @@ const LEVEL16: &str = r#"[
     {
         "type": "switch",
         "data": {
-            "size": 2,
             "x": 0,
             "y": -15,
             "z": 7,
@@ -2038,4 +1997,199 @@ const LEVEL16: &str = r#"[
 ]
 "#;
 
-pub const LEVELS: [&'static str; 16] = [LEVEL1, LEVEL2, LEVEL3, LEVEL4, LEVEL5, LEVEL6, LEVEL7, LEVEL8, LEVEL9, LEVEL10, LEVEL11, LEVEL12, LEVEL13, LEVEL14, LEVEL15, LEVEL16];
+const LEVEL15: &str = r#"[
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "color": 6,
+            "rotation": 0.0
+        }
+    },
+
+    {
+        "type": "crumbling",
+        "data": {
+            "xsize": 3,
+            "ysize": 0.5,
+            "zsize": 3,
+            "x": 2,
+            "y": 2,
+            "z": 5,
+            "rotation": 0.125,
+            "lifetime": 30,
+            "color": 7
+        }
+    },
+    {
+        "type": "crumbling",
+        "data": {
+            "xsize": 3,
+            "ysize": 0.5,
+            "zsize": 3,
+            "x": -2,
+            "y": 4,
+            "z": 10,
+            "rotation": 0.125,
+            "lifetime": 30,
+            "color": 7
+        }
+    },
+    {
+        "type": "crumbling",
+        "data": {
+            "xsize": 3,
+            "ysize": 0.5,
+            "zsize": 3,
+            "x": 2,
+            "y": 6,
+            "z": 15,
+            "rotation": 0.125,
+            "lifetime": 30,
+            "color": 7
+        }
+    },
+    {
+        "type": "crumbling",
+        "data": {
+            "xsize": 3,
+            "ysize": 0.5,
+            "zsize": 3,
+            "x": 7,
+            "y": 8,
+            "z": 16,
+            "rotation": 0,
+            "lifetime": 30,
+            "color": 7
+        }
+    },
+    {
+        "type": "crumbling",
+        "data": {
+            "xsize": 3,
+            "ysize": 0.5,
+            "zsize": 3,
+            "x": 12,
+            "y": 12,
+            "z": 16,
+            "rotation": 0,
+            "lifetime": 30,
+            "color": 7
+        }
+    },
+    {
+        "type": "crumbling",
+        "data": {
+            "xsize": 3,
+            "ysize": 0.5,
+            "zsize": 3,
+            "x": 7,
+            "y": 14,
+            "z": 16,
+            "rotation": 0,
+            "lifetime": 30,
+            "color": 7
+        }
+    },
+    {
+        "type": "crumbling",
+        "data": {
+            "xsize": 3,
+            "ysize": 0.5,
+            "zsize": 3,
+            "x": 7,
+            "y": 16,
+            "z": 21,
+            "rotation": 0,
+            "lifetime": 30,
+            "color": 7
+        }
+    },
+    {
+        "type": "crumbling",
+        "data": {
+            "xsize": 3,
+            "ysize": 0.5,
+            "zsize": 3,
+            "x": 7,
+            "y": 18,
+            "z": 26,
+            "rotation": 0,
+            "lifetime": 30,
+            "color": 7
+        }
+    },
+    {
+        "type": "ice",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 0.2,
+            "x": 7,
+            "y": 18,
+            "z": 31,
+            "color": 8,
+            "acceleration": 0.004,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "ice",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 0.2,
+            "x": 7,
+            "y": 18,
+            "z": 35.5,
+            "color": 8,
+            "acceleration": 0.004,
+            "rotation": 0.0
+        }
+    },    {
+        "type": "ice",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 0.2,
+            "x": 7,
+            "y": 18,
+            "z": 40,
+            "color": 8,
+            "acceleration": 0.004,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 7,
+            "y": 18,
+            "z": 44.5,
+            "color": 6,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "finish",
+        "data": {
+            "size": 3,
+            "x": 7,
+            "y": 21,
+            "z": 44.5,
+            "color": 2,
+            "rotation": 0
+        }
+    }
+]
+"#;
+
+pub const LEVELS: [&'static str; 15] = [LEVEL1, LEVEL2, LEVEL3, LEVEL4, LEVEL5, LEVEL6, LEVEL7, LEVEL8, LEVEL9, LEVEL10, LEVEL11, LEVEL12, LEVEL13, LEVEL14, LEVEL15];

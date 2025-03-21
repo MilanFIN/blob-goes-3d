@@ -1,10 +1,20 @@
 [
     { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0.0, "y": 0, "z": 0, "color": 6, "rotation": 0.0 } },
-    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": -0.65, "y": 0, "z": 5, "color": 6, "rotation": -0.04 } },
-    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": -2.56, "y": 0, "z": 9.5, "color": 6, "rotation": -0.08 } },
-    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": -5.6, "y": 0, "z": 13.5, "color": 6, "rotation": -0.12 } },
-    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": -9.5, "y": 0, "z": 16.5, "color": 6, "rotation": -0.16 } },
-    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": -14.5, "y": 0, "z": 18.5, "color": 6, "rotation": -0.18 } },
-    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": -19, "y": 0, "z": 19, "color": 6, "rotation": -0.22 } },
-    { "type": "finish", "data": {"size": 3, "x": -19, "y": 3, "z": 19, "color": 2, "rotation": -0.22 } }
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 4.0, "y": 3.5, "z": 0, "color": 6, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0.0, "y": 7, "z": 0, "color": 6, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 4.0, "y": 10.5, "z": 0, "color": 6, "rotation": 0.0 } },
+    {"type": "mover",
+        "data": { 
+            "xsize": 4, "ysize": 1, "zsize": 4, "x": 8, "y": 10.5, "z": 0,
+            "pos_a_x": 8, "pos_a_y": 10.5, "pos_a_z": 0,
+            "pos_b_x": 28, "pos_b_y": 15, "pos_b_z": 7,
+            "speed": 2, "wait": 20, "color": 9
+        }
+    },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 32, "y": 15, "z": 7, "color": 6, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 28, "y": 18.5, "z": 7, "color": 6, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 32, "y": 22, "z": 7, "color": 6, "rotation": 0.0 } },
+    { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 28, "y": 25.5, "z": 7, "color": 6, "rotation": 0.0 } },
+    { "type": "finish", "data": {"size": 3, "x": 28, "y": 28.5, "z": 7, "color": 2, "rotation": -0.22 } }
+
 ]

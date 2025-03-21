@@ -138,7 +138,8 @@ fn main(mut gba: agb::Gba) -> ! {
             }
             audio::play_sound(6, &vblank, &gba.sound);
         }
-        //selected_level = 15;
+    //disable this to use the actual level selected in the menu
+        //selected_level = 4;
 
         let levelsize = levels::load_level(selected_level, &mut entity_array);
 

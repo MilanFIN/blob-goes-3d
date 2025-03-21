@@ -1,0 +1,193 @@
+[
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "color": 6,
+            "rotation": 0.0
+        }
+    },
+
+    {
+        "type": "crumbling",
+        "data": {
+            "xsize": 3,
+            "ysize": 0.5,
+            "zsize": 3,
+            "x": 2,
+            "y": 2,
+            "z": 5,
+            "rotation": 0.125,
+            "lifetime": 30,
+            "color": 7
+        }
+    },
+    {
+        "type": "crumbling",
+        "data": {
+            "xsize": 3,
+            "ysize": 0.5,
+            "zsize": 3,
+            "x": -2,
+            "y": 4,
+            "z": 10,
+            "rotation": 0.125,
+            "lifetime": 30,
+            "color": 7
+        }
+    },
+    {
+        "type": "crumbling",
+        "data": {
+            "xsize": 3,
+            "ysize": 0.5,
+            "zsize": 3,
+            "x": 2,
+            "y": 6,
+            "z": 15,
+            "rotation": 0.125,
+            "lifetime": 30,
+            "color": 7
+        }
+    },
+    {
+        "type": "crumbling",
+        "data": {
+            "xsize": 3,
+            "ysize": 0.5,
+            "zsize": 3,
+            "x": 7,
+            "y": 8,
+            "z": 16,
+            "rotation": 0,
+            "lifetime": 30,
+            "color": 7
+        }
+    },
+    {
+        "type": "crumbling",
+        "data": {
+            "xsize": 3,
+            "ysize": 0.5,
+            "zsize": 3,
+            "x": 12,
+            "y": 12,
+            "z": 16,
+            "rotation": 0,
+            "lifetime": 30,
+            "color": 7
+        }
+    },
+    {
+        "type": "crumbling",
+        "data": {
+            "xsize": 3,
+            "ysize": 0.5,
+            "zsize": 3,
+            "x": 7,
+            "y": 14,
+            "z": 16,
+            "rotation": 0,
+            "lifetime": 30,
+            "color": 7
+        }
+    },
+    {
+        "type": "crumbling",
+        "data": {
+            "xsize": 3,
+            "ysize": 0.5,
+            "zsize": 3,
+            "x": 7,
+            "y": 16,
+            "z": 21,
+            "rotation": 0,
+            "lifetime": 30,
+            "color": 7
+        }
+    },
+    {
+        "type": "crumbling",
+        "data": {
+            "xsize": 3,
+            "ysize": 0.5,
+            "zsize": 3,
+            "x": 7,
+            "y": 18,
+            "z": 26,
+            "rotation": 0,
+            "lifetime": 30,
+            "color": 7
+        }
+    },
+    {
+        "type": "ice",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 0.2,
+            "x": 7,
+            "y": 18,
+            "z": 31,
+            "color": 8,
+            "acceleration": 0.004,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "ice",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 0.2,
+            "x": 7,
+            "y": 18,
+            "z": 35.5,
+            "color": 8,
+            "acceleration": 0.004,
+            "rotation": 0.0
+        }
+    },    {
+        "type": "ice",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 0.2,
+            "x": 7,
+            "y": 18,
+            "z": 40,
+            "color": 8,
+            "acceleration": 0.004,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "rectangle",
+        "data": {
+            "xsize": 3,
+            "ysize": 1,
+            "zsize": 3,
+            "x": 7,
+            "y": 18,
+            "z": 44.5,
+            "color": 6,
+            "rotation": 0.0
+        }
+    },
+    {
+        "type": "finish",
+        "data": {
+            "size": 3,
+            "x": 7,
+            "y": 21,
+            "z": 44.5,
+            "color": 2,
+            "rotation": 0
+        }
+    }
+]
