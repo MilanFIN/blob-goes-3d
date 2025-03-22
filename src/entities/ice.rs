@@ -168,6 +168,7 @@ impl Entity for Ice {
             camera,
             self.color,
             polygons,
+            false,
         );
     }
 

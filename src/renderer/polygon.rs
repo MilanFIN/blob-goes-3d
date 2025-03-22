@@ -4,6 +4,7 @@ pub struct Polygon {
 	pub distance_from_camera: Fixed,
 	pub shape: Shape,
 	pub color: u16,
+    pub draw_always: bool,
 }
 
 impl Polygon {

@@ -156,6 +156,7 @@ impl Entity for Rectangle {
             camera,
             self.color,
             polygons,
+            false
         );
     }
 

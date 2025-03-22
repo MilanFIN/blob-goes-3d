@@ -190,6 +190,7 @@ impl Entity for Crumbling {
                 camera,
                 self.color,
                 polygons,
+                false
             );
         }
     }

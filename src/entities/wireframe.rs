@@ -168,6 +168,7 @@ impl Entity for Wireframe {
                 camera,
                 self.color,
                 polygons,
+                false
             );
         } else {
             renderer::render::render_wireframe_rect(

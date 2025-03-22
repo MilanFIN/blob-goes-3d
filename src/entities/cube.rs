@@ -154,6 +154,7 @@ impl Entity for Cube {
             camera,
             self.color,
             polygons,
+            true,
         );
     }
 

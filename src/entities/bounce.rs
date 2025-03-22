@@ -192,7 +192,8 @@ impl Entity for Bounce {
                     screen_points[1],
                     screen_points[2],
                 ]),
-                color,
+                color: color,
+                draw_always: false,
             });
             let distance0 = renderer::utils::polygon_avg_z(&translated_points, 0, 2, 3);
             polygons.push(Polygon {
@@ -202,7 +203,8 @@ impl Entity for Bounce {
                     screen_points[2],
                     screen_points[3],
                 ]),
-                color,
+                color: color,
+                draw_always: false,
             });
             let distance0 = renderer::utils::polygon_avg_z(&translated_points, 0, 3, 4);
             polygons.push(Polygon {
@@ -212,7 +214,8 @@ impl Entity for Bounce {
                     screen_points[3],
                     screen_points[4],
                 ]),
-                color,
+                color: color,
+                draw_always: false,
             });
             let distance0 = renderer::utils::polygon_avg_z(&translated_points, 0, 4, 5);
             polygons.push(Polygon {
@@ -222,7 +225,8 @@ impl Entity for Bounce {
                     screen_points[4],
                     screen_points[5],
                 ]),
-                color,
+                color: color,
+                draw_always: false,
             });
             let distance0 = renderer::utils::polygon_avg_z(&translated_points, 0, 5, 1);
             polygons.push(Polygon {
@@ -232,7 +236,8 @@ impl Entity for Bounce {
                     screen_points[5],
                     screen_points[1],
                 ]),
-                color,
+                color: color,
+                draw_always: false,
             });
         
         }
@@ -249,8 +254,9 @@ impl Entity for Bounce {
                         screen_points[i + 5],
                         screen_points[i + 1],
                     ]),
-                    color,
-                });
+                    color: color,
+                    draw_always: false,
+                    });
                 let distance0 = renderer::utils::polygon_avg_z(&translated_points, i+1, i + 5, i + 6);
                 polygons.push(Polygon {
                     distance_from_camera: distance0,
@@ -259,8 +265,9 @@ impl Entity for Bounce {
                         screen_points[i + 5],
                         screen_points[i + 6],
                     ]),
-                    color,
-                });
+                    color: color,
+                    draw_always: false,
+                    });
             }
         }
         
@@ -276,7 +283,8 @@ impl Entity for Bounce {
                     screen_points[10],
                     screen_points[6],
                 ]),
-                color,
+                color: color,
+                draw_always: false,
             });
             
             let distance0 = renderer::utils::polygon_avg_z(&translated_points, 5,6,1);
@@ -287,7 +295,8 @@ impl Entity for Bounce {
                     screen_points[6],
                     screen_points[1],
                 ]),
-                color,
+                color: color,
+                draw_always: false,
             });
         }
 

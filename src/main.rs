@@ -56,7 +56,7 @@ use renderer::polygon::Polygon;
 const DRAWDISTANCE: Fixed = Fixed::const_new(35);
 const POLYGON_LIMIT: i16 = 60;
 //IMPORTANT: if flashing to real hardware, set save type to match the memory type of the cartridge
-const SAVE_TYPE: save::SaveType = save::SaveType::Sram32K;
+const SAVE_TYPE: save::SaveType = save::SaveType::Flash64K;
 const FLOOR_LEVEL: Fixed = Fixed::const_new(-500);
 
 /*

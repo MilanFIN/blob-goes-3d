@@ -193,6 +193,7 @@ impl Entity for Mover {
             camera,
             self.color,
             polygons,
+            false
         );
     }
 

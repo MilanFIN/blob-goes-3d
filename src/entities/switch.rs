@@ -165,6 +165,7 @@ impl Entity for Switch {
             camera,
             self.color,
             polygons,
+            false
         );
     }
 

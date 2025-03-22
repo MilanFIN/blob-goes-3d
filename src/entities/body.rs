@@ -179,6 +179,7 @@ impl Entity for Body {
             camera,
             self.color,
             polygons,
+            true
         );
     }
 
