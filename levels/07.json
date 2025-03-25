@@ -69,5 +69,5 @@
         }
     },
     { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 75, "color": 6, "rotation": 0.0 } },
-    { "type": "finish", "data": {"size": 3, "x": 0, "y": 3, "z": 75, "color": 2, "rotation": 0 } }
+    { "type": "finish", "data": {"size": 3, "x": 0, "y": 3, "z": 76.5, "color": 2, "rotation": 0 } }
 ]

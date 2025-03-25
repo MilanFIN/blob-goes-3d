@@ -125,9 +125,9 @@
         "type": "finish",
         "data": {
             "size": 3,
-            "x": 27,
+            "x": 28,
             "y": 21,
-            "z": 17,
+            "z": 18,
             "color": 2,
             "rotation": 0.125
         }

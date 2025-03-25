@@ -13,7 +13,7 @@ const LEVEL1: &str = r#"[
     { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": -9.5, "y": 0, "z": 16.5, "color": 6, "rotation": -0.16 } },
     { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": -14.5, "y": 0, "z": 18.5, "color": 6, "rotation": -0.18 } },
     { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": -19, "y": 0, "z": 19, "color": 6, "rotation": -0.22 } },
-    { "type": "finish", "data": {"size": 3, "x": -19, "y": 3, "z": 19, "color": 2, "rotation": -0.22 } }
+    { "type": "finish", "data": {"size": 3, "x": -21, "y": 3, "z": 20, "color": 2, "rotation": -0.22 } }
 ]"#;
 
 const LEVEL2: &str = r#"[
@@ -187,7 +187,7 @@ const LEVEL2: &str = r#"[
             "size": 3,
             "x": 21,
             "y": 7,
-            "z": 45,
+            "z": 46.5,
             "color": 2,
             "rotation": 0
         }
@@ -212,7 +212,7 @@ const LEVEL3: &str = r#"[
     { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 28, "y": 18.5, "z": 7, "color": 6, "rotation": 0.0 } },
     { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 32, "y": 22, "z": 7, "color": 6, "rotation": 0.0 } },
     { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 28, "y": 25.5, "z": 7, "color": 6, "rotation": 0.0 } },
-    { "type": "finish", "data": {"size": 3, "x": 28, "y": 28.5, "z": 7, "color": 2, "rotation": -0.22 } }
+    { "type": "finish", "data": {"size": 3, "x": 26.5, "y": 28.5, "z": 7, "color": 2, "rotation": -0.22 } }
 
 ]"#;
 
@@ -334,7 +334,7 @@ const LEVEL4: &str = r#"[
         "type": "finish",
         "data": {
             "size": 3,
-            "x": -10,
+            "x": -11.5,
             "y": 3,
             "z": 0,
             "color": 2,
@@ -520,7 +520,7 @@ const LEVEL5: &str = r#"[
         "type": "finish",
         "data": {
             "size": 3,
-            "x": 25,
+            "x": 26.5,
             "y": 13,
             "z": 9.5,
             "color": 2,
@@ -657,9 +657,9 @@ const LEVEL6: &str = r#"[
         "type": "finish",
         "data": {
             "size": 3,
-            "x": 27,
+            "x": 28,
             "y": 21,
-            "z": 17,
+            "z": 18,
             "color": 2,
             "rotation": 0.125
         }
@@ -833,7 +833,7 @@ const LEVEL7: &str = r#"[
             "x": 2,
             "y": 0,
             "z": 38,
-            "color": 2,
+            "color": 6,
             "rotation": 0.0
         }
     },
@@ -843,7 +843,7 @@ const LEVEL7: &str = r#"[
             "size": 3,
             "x": 2,
             "y": 3,
-            "z": 38,
+            "z": 39.5,
             "color": 2,
             "rotation": 0
         }
@@ -922,7 +922,7 @@ const LEVEL8: &str = r#"[
         }
     },
     { "type": "rectangle", "data": { "xsize": 3, "ysize": 1, "zsize": 3, "x": 0, "y": 0, "z": 75, "color": 6, "rotation": 0.0 } },
-    { "type": "finish", "data": {"size": 3, "x": 0, "y": 3, "z": 75, "color": 2, "rotation": 0 } }
+    { "type": "finish", "data": {"size": 3, "x": 0, "y": 3, "z": 76.5, "color": 2, "rotation": 0 } }
 ]"#;
 
 const LEVEL9: &str = r#"[
@@ -947,7 +947,7 @@ const LEVEL9: &str = r#"[
             "zsize": 3,
             "x": 0,
             "y": 0,
-            "z": 8,
+            "z": 6,
             "color": 5
         }
     },
@@ -969,7 +969,7 @@ const LEVEL9: &str = r#"[
             "xsize": 3,
             "ysize": 1,
             "zsize": 3,
-            "x": 3,
+            "x": 2.5,
             "y": 0,
             "z": 17,
             "color": 8
@@ -981,7 +981,7 @@ const LEVEL9: &str = r#"[
             "xsize": 3,
             "ysize": 1,
             "zsize": 3,
-            "x": -3,
+            "x": -2.5,
             "y": 0,
             "z": 22,
             "color": 8
@@ -993,7 +993,7 @@ const LEVEL9: &str = r#"[
             "xsize": 3,
             "ysize": 1,
             "zsize": 3,
-            "x": 3,
+            "x": 2.5,
             "y": 0,
             "z": 27,
             "color": 8
@@ -1054,7 +1054,7 @@ const LEVEL9: &str = r#"[
         "type": "finish",
         "data": {
             "size": 3,
-            "x": 15.5,
+            "x": 16.5,
             "y": 12,
             "z": 32,
             "color": 2,
@@ -1159,7 +1159,7 @@ const LEVEL10: &str = r#"[
         "type": "finish",
         "data": {
             "size": 3,
-            "x": 19,
+            "x": 20,
             "y": 21,
             "z": 22,
             "color": 2,
@@ -1369,7 +1369,7 @@ const LEVEL11: &str = r#"[
         "type": "finish",
         "data": {
             "size": 3,
-            "x": 46,
+            "x": 47,
             "y": 23,
             "z": 30,
             "color": 2,
@@ -1541,7 +1541,7 @@ const LEVEL12: &str = r#"[
         "type": "finish",
         "data": {
             "size": 3,
-            "x": 29,
+            "x": 30,
             "y": 9,
             "z": 16,
             "color": 2,

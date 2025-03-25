@@ -35,25 +35,26 @@ pub fn default_fixed() -> Fixed {
     Fixed::new(0)
 }
 
-fn default_fixed_generic<const N: usize>() -> [[Fixed; 3]; N] {
-    [[Fixed::const_new(0); 3]; N]
+fn default_fixed_generic<const N: usize, const M: usize>() -> [[Fixed; M]; N] {
+    [[Fixed::const_new(0); M]; N]
 }
 
+
 pub fn default_fixed_3_3() -> [[Fixed; 3]; 3] {
-    default_fixed_generic::<3>()
+    default_fixed_generic::<3, 3>()
 }
 
 pub fn default_fixed_3_11() -> [[Fixed; 3]; 11] {
-    default_fixed_generic::<11>()
+    default_fixed_generic::<11, 3>()
 }
 
 
 pub fn default_fixed_3_8() -> [[Fixed; 3]; 8] {
-    default_fixed_generic::<8>()
+    default_fixed_generic::<8, 3>()
 }
 
 pub fn default_fixed_3_14() -> [[Fixed; 3]; 14] {
-    default_fixed_generic::<14>()
+    default_fixed_generic::<14, 3>()
 }
 
 pub const fn i32_to_fixed(m: i32) -> Fixed {

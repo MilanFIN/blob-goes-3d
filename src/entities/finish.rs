@@ -13,8 +13,8 @@ use super::Camera;
 use super::Entity;
 use crate::effects;
 use crate::renderer;
-use crate::renderer::render::back_face_culling;
 use crate::renderer::polygon::Polygon;
+use crate::renderer::render::back_face_culling;
 use math::*;
 
 use crate::fixed;
@@ -89,10 +89,22 @@ impl Finish {
 
     fn finish_bounding_box(&self) -> BoundingBox {
         let points: [[Fixed; 2]; 4] = [
-            [self.radius + self.x, self.depth / 2 + self.z],
-            [self.radius + self.x, -self.depth / 2 + self.z],
-            [-self.radius + self.x, -self.depth / 2 + self.z],
-            [-self.radius + self.x, self.depth / 2 + self.z],
+            [
+                self.model_rotated_points[1][0] + self.x,
+                self.model_rotated_points[1][2] + self.z,
+            ],
+            [
+                self.model_rotated_points[4][0] + self.x,
+                self.model_rotated_points[4][2] + self.z,
+            ],
+            [
+                self.model_rotated_points[11][0] + self.x,
+                self.model_rotated_points[11][2] + self.z,
+            ],
+            [
+                self.model_rotated_points[8][0] + self.x,
+                self.model_rotated_points[8][2] + self.z,
+            ],
         ];
         BoundingBox {
             data: points,
@@ -134,7 +146,7 @@ impl Entity for Finish {
 
         self.radius = Fixed::const_new(2);
 
-        for i in 1..8 {
+        for i in 1..7 {
             let angle = Fixed::from_raw(43) * i; // Angle in radians (i * 60 degrees)
             self.points[i] = [
                 self.radius * angle.cos(),
@@ -192,8 +204,12 @@ impl Entity for Finish {
         //not implemented
     }
 
-    fn render(&mut self, camera: &Camera, polygons: &mut Vec<Polygon, InternalAllocator>, render_distance: Fixed) {
-
+    fn render(
+        &mut self,
+        camera: &Camera,
+        polygons: &mut Vec<Polygon, InternalAllocator>,
+        render_distance: Fixed,
+    ) {
         if self.distance_from_camera(camera) > render_distance {
             return;
         }
@@ -371,7 +387,7 @@ impl Entity for Finish {
                     ]),
                     color: color,
                     draw_always: false,
-                    });
+                });
                 let distance0 = renderer::utils::polygon_avg_z(&translated_points, i, i + 7, i + 8);
                 polygons.push(Polygon {
                     distance_from_camera: distance0,
@@ -382,13 +398,13 @@ impl Entity for Finish {
                     ]),
                     color: color,
                     draw_always: false,
-                    });
+                });
             }
         }
         let visible: bool = back_face_culling(&translated_points, 6, 13, 8);
         if visible {
             let color: u16 = renderer::utils::get_color(self.color, 1);
-            let distance0 = renderer::utils::polygon_avg_z(&translated_points, 6,13,8);
+            let distance0 = renderer::utils::polygon_avg_z(&translated_points, 6, 13, 8);
             polygons.push(Polygon {
                 distance_from_camera: distance0,
                 shape: renderer::polygon::Shape::Triangle([
@@ -410,7 +426,6 @@ impl Entity for Finish {
                 color: color,
                 draw_always: false,
             });
-
         }
     }
 
@@ -420,7 +435,7 @@ impl Entity for Finish {
 
     fn bounding_shape(&self) -> Option<BoundingShape> {
         //the finish has no collision with the player
-       None
+        None
     }
 
     fn bounding_cylinder(&self) -> BoundingCylinder {
