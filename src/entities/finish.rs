@@ -109,10 +109,10 @@ impl Finish {
         BoundingBox {
             data: points,
             center: utils::calculate_center(&points),
-            width: (self.model_rotated_points[0][0] + self.x
-                - (self.model_rotated_points[1][0] + self.x))
+            width: (self.model_rotated_points[1][0] + self.x
+                - (self.model_rotated_points[4][0] + self.x))
                 .abs(),
-            height: (self.model_rotated_points[1][2] + self.z
+            height: (self.model_rotated_points[2][2] + self.z
                 - (self.model_rotated_points[5][2] + self.z))
                 .abs(),
             y_top: self.radius + self.y,
