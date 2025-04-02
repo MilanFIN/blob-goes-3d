@@ -24,7 +24,7 @@ cargo install agb-gbafix
 
 cargo build --release
 
-agb-gbafix target/thumbv4t-none-eabi/release/wip-gba-3d -o wip-gba-3d.gba
+agb-gbafix target/thumbv4t-none-eabi/release/blobgoes3d -o blobgoes3d.gba
 ```
 #### In docker
 
@@ -33,7 +33,7 @@ docker build -t gameboy-3d .
 
 docker create --name temp-container gameboy-3d
 
-docker cp temp-container:/app/wip-gba-3d.gba .
+docker cp temp-container:/app/blobgoes3d .
 
 docker rm temp-container
 ```

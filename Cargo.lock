@@ -164,6 +164,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b048fb63fd8b5923fc5aa7b340d8e156aec7ec02f0c78fa8a6ddc2613f6f71de"
 
 [[package]]
+name = "blobgoes3d"
+version = "1.0.0"
+dependencies = [
+ "agb",
+ "serde",
+ "serde-json-core",
+ "serde_json",
+]
+
+[[package]]
 name = "bytemuck"
 version = "1.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -515,16 +525,6 @@ name = "version_check"
 version = "0.9.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
-
-[[package]]
-name = "wip-gba-3d"
-version = "0.1.0"
-dependencies = [
- "agb",
- "serde",
- "serde-json-core",
- "serde_json",
-]
 
 [[package]]
 name = "zerocopy"
