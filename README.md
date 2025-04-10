@@ -2,6 +2,8 @@
 
 A 3d platformer / engine for the gameboy advance.
 
+https://github.com/user-attachments/assets/2935237b-2dd0-4888-b973-26551b50bd69
+
 ## Building
 
 ### Prerequisites
