@@ -56,7 +56,7 @@ use renderer::polygon::Polygon;
 const DRAWDISTANCE: Fixed = Fixed::const_new(35);
 const POLYGON_LIMIT: i16 = 60;
 //IMPORTANT: if flashing to real hardware, set save type to match the memory type of the cartridge
-const SAVE_TYPE: save::SaveType = save::SaveType::Flash64K;
+const SAVE_TYPE: save::SaveType = save::SaveType::Flash64K;//None;
 const FLOOR_LEVEL: Fixed = Fixed::const_new(-500);
 
 /*
@@ -75,7 +75,7 @@ fn main(mut gba: agb::Gba) -> ! {
     completed_levels.resize(LEVEL_COUNT, true);
     //save::store_save(&mut gba, &mut completed_levels);
 
-    match save::read_save(&mut gba, levels::levelstore::LEVELS.len()) {
+    match save::read_save(&mut gba, levels::levelstore::LEVELS.len(), SAVE_TYPE) {
         Ok(saved_data) => {
             completed_levels = saved_data;
         }
@@ -337,6 +337,6 @@ fn main(mut gba: agb::Gba) -> ! {
 
             renderer::hw::flip(&mut page);
         }
-        let _ = save::store_save(&mut gba, &mut completed_levels);
+        let _ = save::store_save(&mut gba, &mut completed_levels, SAVE_TYPE);
     }
 }
