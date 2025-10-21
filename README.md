@@ -1,4 +1,4 @@
-# WIP GBA 3d platformer
+# Blob Goes 3D
 
 A 3d platformer / engine for the gameboy advance.
 
